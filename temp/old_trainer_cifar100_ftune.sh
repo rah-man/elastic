@@ -1,0 +1,15 @@
+python ftune.py -t 5 -f "cifar100/ftune/pkl/cifar_100_5_1.pkl" > cifar100/ftune/cifar_100_5_1.txt
+python ftune.py -t 5 -f "cifar100/ftune/pkl/cifar_100_5_2.pkl" > cifar100/ftune/cifar_100_5_2.txt
+python ftune.py -t 5 -f "cifar100/ftune/pkl/cifar_100_5_3.pkl" > cifar100/ftune/cifar_100_5_3.txt
+python ftune.py -t 5 -f "cifar100/ftune/pkl/cifar_100_5_4.pkl" > cifar100/ftune/cifar_100_5_4.txt
+python ftune.py -t 5 -f "cifar100/ftune/pkl/cifar_100_5_5.pkl" > cifar100/ftune/cifar_100_5_5.txt
+python ftune.py -t 10 -f "cifar100/ftune/pkl/cifar_100_10_1.pkl" > cifar100/ftune/cifar_100_10_1.txt
+python ftune.py -t 10 -f "cifar100/ftune/pkl/cifar_100_10_2.pkl" > cifar100/ftune/cifar_100_10_2.txt
+python ftune.py -t 10 -f "cifar100/ftune/pkl/cifar_100_10_3.pkl" > cifar100/ftune/cifar_100_10_3.txt
+python ftune.py -t 10 -f "cifar100/ftune/pkl/cifar_100_10_4.pkl" > cifar100/ftune/cifar_100_10_4.txt
+python ftune.py -t 10 -f "cifar100/ftune/pkl/cifar_100_10_5.pkl" > cifar100/ftune/cifar_100_10_5.txt
+python ftune.py -t 20 -f "cifar100/ftune/pkl/cifar_100_20_1.pkl" > cifar100/ftune/cifar_100_20_1.txt
+python ftune.py -t 20 -f "cifar100/ftune/pkl/cifar_100_20_2.pkl" > cifar100/ftune/cifar_100_20_2.txt
+python ftune.py -t 20 -f "cifar100/ftune/pkl/cifar_100_20_3.pkl" > cifar100/ftune/cifar_100_20_3.txt
+python ftune.py -t 20 -f "cifar100/ftune/pkl/cifar_100_20_4.pkl" > cifar100/ftune/cifar_100_20_4.txt
+python ftune.py -t 20 -f "cifar100/ftune/pkl/cifar_100_20_5.pkl" > cifar100/ftune/cifar_100_20_5.txt

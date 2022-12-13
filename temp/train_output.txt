@@ -1,0 +1,356 @@
+TRAINING TASK-0	CLASSES: [18 37 40 54 58 60 66 74 83 96]
+CLASS_COUNTER: Counter({66: 415, 74: 406, 54: 404, 58: 401, 40: 400, 60: 399, 96: 397, 18: 397, 37: 391, 83: 390})
+Epoch: 1/10	loss: 2.2189	train_accuracy: 29.6000
+Epoch: 2/10	loss: 2.0657	train_accuracy: 56.9000
+Epoch: 3/10	loss: 1.8927	train_accuracy: 64.9250
+Epoch: 4/10	loss: 1.7020	train_accuracy: 69.8000
+Epoch: 5/10	loss: 1.5099	train_accuracy: 73.5750
+Epoch: 6/10	loss: 1.3304	train_accuracy: 76.5250
+Epoch: 7/10	loss: 1.1665	train_accuracy: 79.4000
+Epoch: 8/10	loss: 1.0188	train_accuracy: 82.6250
+Epoch: 9/10	loss: 0.8898	train_accuracy: 84.9750
+Epoch: 10/10	loss: 0.7807	train_accuracy: 86.1750
+FINISH STEP 1
+CLASS_COUNTER: Counter({66: 415, 74: 406, 54: 404, 58: 401, 40: 400, 60: 399, 96: 397, 18: 397, 37: 391, 83: 390})
+Epoch: 1/10	loss: 0.7308	train_accuracy: 86.9500
+Epoch: 2/10	loss: 0.7309	train_accuracy: 86.9500
+Epoch: 3/10	loss: 0.7310	train_accuracy: 86.9500
+Epoch: 4/10	loss: 0.7311	train_accuracy: 86.9500
+Epoch: 5/10	loss: 0.7312	train_accuracy: 86.9500
+Epoch: 6/10	loss: 0.7313	train_accuracy: 86.9500
+Epoch: 7/10	loss: 0.7314	train_accuracy: 86.9500
+Epoch: 8/10	loss: 0.7315	train_accuracy: 86.9500
+Epoch: 9/10	loss: 0.7316	train_accuracy: 86.9500
+Epoch: 10/10	loss: 0.7317	train_accuracy: 86.9500
+FINISH STEP 2
+	Task-0 val_accuracy: 86.4000
+
+TRAINING TASK-1	CLASSES: [17 19 30 35 41 44 49 63 86 88]
+CLASS_COUNTER: Counter({30: 423, 19: 405, 63: 401, 44: 401, 35: 399, 86: 398, 41: 396, 17: 395, 88: 392, 49: 390})
+Epoch: 1/10	loss: 2.9839	train_accuracy: 9.5500
+Epoch: 2/10	loss: 2.6474	train_accuracy: 43.2750
+Epoch: 3/10	loss: 2.2419	train_accuracy: 53.6500
+Epoch: 4/10	loss: 1.8409	train_accuracy: 59.1750
+Epoch: 5/10	loss: 1.4991	train_accuracy: 70.5000
+Epoch: 6/10	loss: 1.1974	train_accuracy: 82.3500
+Epoch: 7/10	loss: 0.9491	train_accuracy: 88.1250
+Epoch: 8/10	loss: 0.7667	train_accuracy: 90.5500
+Epoch: 9/10	loss: 0.6389	train_accuracy: 91.7000
+Epoch: 10/10	loss: 0.5458	train_accuracy: 92.0000
+FINISH STEP 1
+CLASS_COUNTER: Counter({40: 250, 88: 250, 83: 250, 17: 250, 30: 250, 44: 250, 86: 250, 96: 250, 74: 250, 58: 250, 49: 250, 66: 250, 41: 250, 35: 250, 60: 250, 18: 250, 37: 250, 19: 250, 63: 250, 54: 250})
+Epoch: 1/10	loss: 2.5045	train_accuracy: 49.9000
+Epoch: 2/10	loss: 1.3698	train_accuracy: 74.3000
+Epoch: 3/10	loss: 1.2114	train_accuracy: 80.7800
+Epoch: 4/10	loss: 1.1530	train_accuracy: 82.0600
+Epoch: 5/10	loss: 1.1168	train_accuracy: 82.8000
+Epoch: 6/10	loss: 1.0945	train_accuracy: 83.3200
+Epoch: 7/10	loss: 1.0767	train_accuracy: 83.4000
+Epoch: 8/10	loss: 1.0579	train_accuracy: 83.7800
+Epoch: 9/10	loss: 1.0490	train_accuracy: 84.1400
+Epoch: 10/10	loss: 1.0376	train_accuracy: 84.0600
+FINISH STEP 2
+	Task-0 val_accuracy: 78.5000
+	Task-1 val_accuracy: 87.8000
+
+TRAINING TASK-2	CLASSES: [ 2  3 27 28 38 61 78 84 90 98]
+CLASS_COUNTER: Counter({98: 412, 2: 409, 61: 408, 90: 403, 38: 403, 28: 403, 27: 398, 3: 398, 78: 390, 84: 376})
+Epoch: 1/10	loss: 3.4665	train_accuracy: 2.9500
+Epoch: 2/10	loss: 3.0731	train_accuracy: 23.8250
+Epoch: 3/10	loss: 2.5724	train_accuracy: 43.2250
+Epoch: 4/10	loss: 1.9638	train_accuracy: 65.8500
+Epoch: 5/10	loss: 1.4657	train_accuracy: 78.8750
+Epoch: 6/10	loss: 1.1549	train_accuracy: 83.4750
+Epoch: 7/10	loss: 0.9545	train_accuracy: 85.3750
+Epoch: 8/10	loss: 0.8119	train_accuracy: 87.3500
+Epoch: 9/10	loss: 0.7050	train_accuracy: 88.3750
+Epoch: 10/10	loss: 0.6208	train_accuracy: 89.2000
+FINISH STEP 1
+CLASS_COUNTER: Counter({30: 167, 19: 167, 49: 167, 58: 167, 60: 167, 63: 167, 88: 167, 41: 167, 17: 167, 66: 167, 37: 167, 74: 167, 54: 167, 86: 167, 35: 167, 40: 167, 18: 167, 96: 167, 44: 167, 83: 167, 98: 166, 90: 166, 28: 166, 78: 166, 61: 166, 3: 166, 38: 166, 2: 166, 84: 166, 27: 166})
+Epoch: 1/10	loss: 2.8345	train_accuracy: 53.9000
+Epoch: 2/10	loss: 1.5103	train_accuracy: 75.5800
+Epoch: 3/10	loss: 1.4399	train_accuracy: 77.1200
+Epoch: 4/10	loss: 1.4053	train_accuracy: 78.1200
+Epoch: 5/10	loss: 1.3846	train_accuracy: 78.5200
+Epoch: 6/10	loss: 1.3560	train_accuracy: 79.0000
+Epoch: 7/10	loss: 1.3400	train_accuracy: 79.3600
+Epoch: 8/10	loss: 1.3211	train_accuracy: 79.6400
+Epoch: 9/10	loss: 1.3107	train_accuracy: 79.9000
+Epoch: 10/10	loss: 1.2974	train_accuracy: 80.1600
+FINISH STEP 2
+	Task-0 val_accuracy: 73.5000
+	Task-1 val_accuracy: 80.8000
+	Task-2 val_accuracy: 80.2000
+
+TRAINING TASK-3	CLASSES: [ 4 14 22 25 31 36 51 62 69 87]
+CLASS_COUNTER: Counter({14: 413, 22: 409, 87: 407, 51: 405, 69: 401, 31: 401, 36: 393, 62: 393, 4: 391, 25: 387})
+Epoch: 1/10	loss: 3.8543	train_accuracy: 1.9000
+Epoch: 2/10	loss: 3.4190	train_accuracy: 29.2000
+Epoch: 3/10	loss: 2.8490	train_accuracy: 44.9250
+Epoch: 4/10	loss: 2.1495	train_accuracy: 48.0500
+Epoch: 5/10	loss: 1.4945	train_accuracy: 65.6500
+Epoch: 6/10	loss: 1.0154	train_accuracy: 82.5000
+Epoch: 7/10	loss: 0.7618	train_accuracy: 88.2000
+Epoch: 8/10	loss: 0.6287	train_accuracy: 89.3750
+Epoch: 9/10	loss: 0.5460	train_accuracy: 90.2500
+Epoch: 10/10	loss: 0.4874	train_accuracy: 90.5500
+FINISH STEP 1
+CLASS_COUNTER: Counter({14: 125, 36: 125, 69: 125, 83: 125, 74: 125, 25: 125, 44: 125, 22: 125, 86: 125, 30: 125, 2: 125, 60: 125, 40: 125, 61: 125, 27: 125, 28: 125, 78: 125, 31: 125, 66: 125, 19: 125, 63: 125, 37: 125, 98: 125, 18: 125, 51: 125, 4: 125, 88: 125, 54: 125, 96: 125, 41: 125, 87: 125, 62: 125, 17: 125, 35: 125, 49: 125, 90: 125, 84: 125, 38: 125, 3: 125, 58: 125})
+Epoch: 1/10	loss: 2.8208	train_accuracy: 51.0400
+Epoch: 2/10	loss: 1.5590	train_accuracy: 75.6600
+Epoch: 3/10	loss: 1.5141	train_accuracy: 76.3000
+Epoch: 4/10	loss: 1.4807	train_accuracy: 76.8800
+Epoch: 5/10	loss: 1.4543	train_accuracy: 77.5200
+Epoch: 6/10	loss: 1.4481	train_accuracy: 77.5400
+Epoch: 7/10	loss: 1.4234	train_accuracy: 77.8200
+Epoch: 8/10	loss: 1.4087	train_accuracy: 78.3400
+Epoch: 9/10	loss: 1.3969	train_accuracy: 78.4000
+Epoch: 10/10	loss: 1.3842	train_accuracy: 78.7600
+FINISH STEP 2
+	Task-0 val_accuracy: 66.4000
+	Task-1 val_accuracy: 80.0000
+	Task-2 val_accuracy: 79.4000
+	Task-3 val_accuracy: 83.1000
+
+TRAINING TASK-4	CLASSES: [ 0 16 42 59 67 68 79 81 82 91]
+CLASS_COUNTER: Counter({79: 424, 81: 408, 68: 405, 42: 404, 67: 401, 16: 401, 91: 399, 0: 394, 59: 383, 82: 381})
+Epoch: 1/10	loss: 4.1819	train_accuracy: 1.5000
+Epoch: 2/10	loss: 3.6554	train_accuracy: 20.9750
+Epoch: 3/10	loss: 2.9767	train_accuracy: 37.4500
+Epoch: 4/10	loss: 2.2011	train_accuracy: 51.2000
+Epoch: 5/10	loss: 1.6016	train_accuracy: 66.7250
+Epoch: 6/10	loss: 1.2046	train_accuracy: 84.9000
+Epoch: 7/10	loss: 0.9454	train_accuracy: 91.7250
+Epoch: 8/10	loss: 0.7653	train_accuracy: 92.3750
+Epoch: 9/10	loss: 0.6363	train_accuracy: 92.8250
+Epoch: 10/10	loss: 0.5434	train_accuracy: 93.0000
+FINISH STEP 1
+CLASS_COUNTER: Counter({37: 100, 88: 100, 68: 100, 61: 100, 17: 100, 59: 100, 67: 100, 35: 100, 41: 100, 96: 100, 38: 100, 0: 100, 90: 100, 49: 100, 42: 100, 81: 100, 36: 100, 31: 100, 44: 100, 83: 100, 54: 100, 91: 100, 58: 100, 30: 100, 16: 100, 14: 100, 79: 100, 19: 100, 63: 100, 66: 100, 4: 100, 22: 100, 86: 100, 82: 100, 27: 100, 87: 100, 28: 100, 25: 100, 18: 100, 2: 100, 78: 100, 3: 100, 74: 100, 98: 100, 84: 100, 69: 100, 51: 100, 62: 100, 60: 100, 40: 100})
+Epoch: 1/10	loss: 3.3174	train_accuracy: 52.5200
+Epoch: 2/10	loss: 1.6995	train_accuracy: 73.7600
+Epoch: 3/10	loss: 1.6543	train_accuracy: 74.7600
+Epoch: 4/10	loss: 1.6235	train_accuracy: 75.4200
+Epoch: 5/10	loss: 1.5969	train_accuracy: 76.0400
+Epoch: 6/10	loss: 1.5691	train_accuracy: 76.4200
+Epoch: 7/10	loss: 1.5536	train_accuracy: 76.6600
+Epoch: 8/10	loss: 1.5391	train_accuracy: 77.2400
+Epoch: 9/10	loss: 1.5219	train_accuracy: 77.3600
+Epoch: 10/10	loss: 1.5133	train_accuracy: 77.4000
+FINISH STEP 2
+	Task-0 val_accuracy: 59.3000
+	Task-1 val_accuracy: 78.6000
+	Task-2 val_accuracy: 76.9000
+	Task-3 val_accuracy: 82.4000
+	Task-4 val_accuracy: 76.1000
+
+TRAINING TASK-5	CLASSES: [ 1  7 11 20 24 50 53 56 57 72]
+CLASS_COUNTER: Counter({56: 410, 72: 409, 50: 405, 7: 404, 1: 399, 11: 398, 57: 398, 24: 395, 53: 393, 20: 389})
+Epoch: 1/10	loss: 4.3898	train_accuracy: 2.7750
+Epoch: 2/10	loss: 3.7839	train_accuracy: 20.7000
+Epoch: 3/10	loss: 2.9768	train_accuracy: 34.9750
+Epoch: 4/10	loss: 2.1381	train_accuracy: 43.9500
+Epoch: 5/10	loss: 1.4921	train_accuracy: 62.1500
+Epoch: 6/10	loss: 1.0983	train_accuracy: 83.7000
+Epoch: 7/10	loss: 0.8728	train_accuracy: 87.3750
+Epoch: 8/10	loss: 0.7224	train_accuracy: 88.7750
+Epoch: 9/10	loss: 0.6140	train_accuracy: 89.6000
+Epoch: 10/10	loss: 0.5353	train_accuracy: 90.2500
+FINISH STEP 1
+CLASS_COUNTER: Counter({63: 84, 44: 84, 60: 84, 35: 84, 74: 84, 41: 84, 88: 84, 37: 84, 86: 84, 18: 84, 83: 84, 54: 84, 19: 84, 58: 84, 96: 84, 17: 84, 40: 84, 49: 84, 66: 84, 30: 84, 24: 83, 68: 83, 7: 83, 25: 83, 87: 83, 56: 83, 0: 83, 27: 83, 72: 83, 82: 83, 57: 83, 36: 83, 90: 83, 67: 83, 20: 83, 11: 83, 53: 83, 50: 83, 69: 83, 84: 83, 38: 83, 51: 83, 79: 83, 62: 83, 61: 83, 3: 83, 91: 83, 31: 83, 1: 83, 81: 83, 22: 83, 28: 83, 16: 83, 98: 83, 14: 83, 78: 83, 4: 83, 59: 83, 2: 83, 42: 83})
+Epoch: 1/10	loss: 3.1759	train_accuracy: 52.9400
+Epoch: 2/10	loss: 1.7391	train_accuracy: 73.3800
+Epoch: 3/10	loss: 1.7067	train_accuracy: 74.3600
+Epoch: 4/10	loss: 1.6724	train_accuracy: 75.0800
+Epoch: 5/10	loss: 1.6590	train_accuracy: 75.5400
+Epoch: 6/10	loss: 1.6458	train_accuracy: 75.2600
+Epoch: 7/10	loss: 1.6279	train_accuracy: 75.7600
+Epoch: 8/10	loss: 1.6114	train_accuracy: 75.8400
+Epoch: 9/10	loss: 1.5989	train_accuracy: 76.2600
+Epoch: 10/10	loss: 1.5822	train_accuracy: 76.6200
+FINISH STEP 2
+	Task-0 val_accuracy: 55.7000
+	Task-1 val_accuracy: 75.6000
+	Task-2 val_accuracy: 75.4000
+	Task-3 val_accuracy: 81.0000
+	Task-4 val_accuracy: 78.0000
+	Task-5 val_accuracy: 71.5000
+
+TRAINING TASK-6	CLASSES: [ 9 23 29 33 45 64 75 77 89 97]
+CLASS_COUNTER: Counter({29: 413, 9: 406, 23: 405, 77: 405, 89: 401, 75: 401, 64: 397, 45: 394, 97: 390, 33: 388})
+Epoch: 1/10	loss: 4.5120	train_accuracy: 2.4000
+Epoch: 2/10	loss: 3.5728	train_accuracy: 26.7250
+Epoch: 3/10	loss: 2.4460	train_accuracy: 43.0500
+Epoch: 4/10	loss: 1.7792	train_accuracy: 58.5500
+Epoch: 5/10	loss: 1.4400	train_accuracy: 66.0750
+Epoch: 6/10	loss: 1.2124	train_accuracy: 74.2500
+Epoch: 7/10	loss: 1.0445	train_accuracy: 80.3500
+Epoch: 8/10	loss: 0.9138	train_accuracy: 83.9750
+Epoch: 9/10	loss: 0.8113	train_accuracy: 85.4500
+Epoch: 10/10	loss: 0.7271	train_accuracy: 86.2750
+FINISH STEP 1
+CLASS_COUNTER: Counter({66: 72, 54: 72, 96: 72, 3: 72, 17: 72, 60: 72, 44: 72, 35: 72, 98: 72, 18: 72, 37: 72, 90: 72, 2: 72, 86: 72, 78: 72, 74: 72, 19: 72, 61: 72, 49: 72, 88: 72, 84: 72, 63: 72, 30: 72, 83: 72, 58: 72, 40: 72, 28: 72, 27: 72, 41: 72, 38: 72, 29: 71, 45: 71, 31: 71, 75: 71, 9: 71, 36: 71, 23: 71, 97: 71, 64: 71, 89: 71, 42: 71, 33: 71, 22: 71, 51: 71, 25: 71, 82: 71, 77: 71, 16: 71, 56: 71, 53: 71, 72: 71, 50: 71, 59: 71, 67: 71, 87: 71, 4: 71, 57: 71, 62: 71, 1: 71, 91: 71, 7: 71, 68: 71, 81: 71, 69: 71, 0: 71, 11: 71, 24: 71, 14: 71, 79: 71, 20: 71})
+Epoch: 1/10	loss: 3.2365	train_accuracy: 56.1800
+Epoch: 2/10	loss: 1.8019	train_accuracy: 73.2000
+Epoch: 3/10	loss: 1.7650	train_accuracy: 74.5200
+Epoch: 4/10	loss: 1.7420	train_accuracy: 74.9000
+Epoch: 5/10	loss: 1.7198	train_accuracy: 75.3400
+Epoch: 6/10	loss: 1.7100	train_accuracy: 75.3600
+Epoch: 7/10	loss: 1.6903	train_accuracy: 75.8600
+Epoch: 8/10	loss: 1.6817	train_accuracy: 75.8600
+Epoch: 9/10	loss: 1.6682	train_accuracy: 76.3000
+Epoch: 10/10	loss: 1.6523	train_accuracy: 76.2000
+FINISH STEP 2
+	Task-0 val_accuracy: 52.3000
+	Task-1 val_accuracy: 72.6000
+	Task-2 val_accuracy: 73.0000
+	Task-3 val_accuracy: 81.0000
+	Task-4 val_accuracy: 75.8000
+	Task-5 val_accuracy: 75.0000
+	Task-6 val_accuracy: 71.3000
+
+TRAINING TASK-7	CLASSES: [ 5 32 39 43 52 55 65 73 92 93]
+CLASS_COUNTER: Counter({65: 413, 73: 406, 32: 405, 55: 400, 93: 399, 43: 399, 92: 397, 52: 397, 5: 395, 39: 389})
+Epoch: 1/10	loss: 4.9053	train_accuracy: 0.2750
+Epoch: 2/10	loss: 3.9782	train_accuracy: 16.7500
+Epoch: 3/10	loss: 2.9059	train_accuracy: 33.1500
+Epoch: 4/10	loss: 2.0375	train_accuracy: 58.3000
+Epoch: 5/10	loss: 1.4661	train_accuracy: 76.2750
+Epoch: 6/10	loss: 1.1303	train_accuracy: 84.5750
+Epoch: 7/10	loss: 0.9137	train_accuracy: 85.9500
+Epoch: 8/10	loss: 0.7625	train_accuracy: 87.3750
+Epoch: 9/10	loss: 0.6548	train_accuracy: 87.9250
+Epoch: 10/10	loss: 0.5780	train_accuracy: 88.2250
+FINISH STEP 1
+CLASS_COUNTER: Counter({17: 63, 51: 63, 78: 63, 58: 63, 98: 63, 88: 63, 28: 63, 69: 63, 90: 63, 54: 63, 37: 63, 4: 63, 74: 63, 35: 63, 49: 63, 96: 63, 36: 63, 18: 63, 83: 63, 44: 63, 2: 63, 19: 63, 25: 63, 31: 63, 66: 63, 63: 63, 60: 63, 22: 63, 87: 63, 61: 63, 62: 63, 86: 63, 40: 63, 38: 63, 84: 63, 41: 63, 30: 63, 3: 63, 27: 63, 14: 63, 93: 62, 81: 62, 53: 62, 39: 62, 43: 62, 7: 62, 11: 62, 24: 62, 55: 62, 9: 62, 52: 62, 73: 62, 32: 62, 59: 62, 92: 62, 33: 62, 5: 62, 29: 62, 23: 62, 45: 62, 75: 62, 65: 62, 91: 62, 89: 62, 64: 62, 57: 62, 1: 62, 72: 62, 68: 62, 56: 62, 79: 62, 82: 62, 0: 62, 20: 62, 97: 62, 42: 62, 50: 62, 77: 62, 16: 62, 67: 62})
+Epoch: 1/10	loss: 3.4381	train_accuracy: 53.7200
+Epoch: 2/10	loss: 1.9102	train_accuracy: 71.7200
+Epoch: 3/10	loss: 1.8753	train_accuracy: 72.8800
+Epoch: 4/10	loss: 1.8474	train_accuracy: 73.6200
+Epoch: 5/10	loss: 1.8277	train_accuracy: 73.8400
+Epoch: 6/10	loss: 1.8084	train_accuracy: 73.9200
+Epoch: 7/10	loss: 1.7960	train_accuracy: 74.4800
+Epoch: 8/10	loss: 1.7817	train_accuracy: 74.6200
+Epoch: 9/10	loss: 1.7632	train_accuracy: 74.6200
+Epoch: 10/10	loss: 1.7466	train_accuracy: 75.0600
+FINISH STEP 2
+	Task-0 val_accuracy: 50.9000
+	Task-1 val_accuracy: 70.4000
+	Task-2 val_accuracy: 73.5000
+	Task-3 val_accuracy: 77.5000
+	Task-4 val_accuracy: 73.1000
+	Task-5 val_accuracy: 74.3000
+	Task-6 val_accuracy: 71.8000
+	Task-7 val_accuracy: 61.0000
+
+TRAINING TASK-8	CLASSES: [ 6  8 12 26 46 47 71 80 94 99]
+CLASS_COUNTER: Counter({46: 412, 94: 407, 99: 405, 71: 403, 8: 403, 80: 400, 6: 397, 26: 392, 12: 391, 47: 390})
+Epoch: 1/10	loss: 4.9179	train_accuracy: 0.2000
+Epoch: 2/10	loss: 4.2187	train_accuracy: 7.2000
+Epoch: 3/10	loss: 3.2026	train_accuracy: 19.0250
+Epoch: 4/10	loss: 2.3747	train_accuracy: 48.7500
+Epoch: 5/10	loss: 1.8642	train_accuracy: 61.2500
+Epoch: 6/10	loss: 1.5091	train_accuracy: 80.1250
+Epoch: 7/10	loss: 1.2592	train_accuracy: 82.3750
+Epoch: 8/10	loss: 1.0604	train_accuracy: 84.5000
+Epoch: 9/10	loss: 0.9016	train_accuracy: 85.9500
+Epoch: 10/10	loss: 0.7752	train_accuracy: 87.3500
+FINISH STEP 1
+CLASS_COUNTER: Counter({91: 56, 68: 56, 38: 56, 69: 56, 63: 56, 96: 56, 0: 56, 83: 56, 62: 56, 82: 56, 59: 56, 36: 56, 86: 56, 35: 56, 88: 56, 54: 56, 40: 56, 79: 56, 74: 56, 60: 56, 90: 56, 18: 56, 58: 56, 2: 56, 31: 56, 17: 56, 4: 56, 16: 56, 27: 56, 42: 56, 3: 56, 87: 56, 98: 56, 37: 56, 81: 56, 28: 56, 14: 56, 84: 56, 44: 56, 49: 56, 78: 56, 22: 56, 19: 56, 51: 56, 30: 56, 25: 56, 61: 56, 41: 56, 67: 56, 66: 56, 6: 55, 26: 55, 20: 55, 47: 55, 52: 55, 8: 55, 94: 55, 46: 55, 45: 55, 64: 55, 12: 55, 99: 55, 71: 55, 80: 55, 55: 55, 43: 55, 93: 55, 29: 55, 57: 55, 97: 55, 92: 55, 73: 55, 24: 55, 1: 55, 5: 55, 56: 55, 23: 55, 39: 55, 89: 55, 9: 55, 65: 55, 50: 55, 33: 55, 72: 55, 53: 55, 32: 55, 75: 55, 77: 55, 7: 55, 11: 55})
+Epoch: 1/10	loss: 3.5671	train_accuracy: 53.1800
+Epoch: 2/10	loss: 1.9944	train_accuracy: 71.0800
+Epoch: 3/10	loss: 1.9617	train_accuracy: 72.0400
+Epoch: 4/10	loss: 1.9441	train_accuracy: 72.1000
+Epoch: 5/10	loss: 1.9270	train_accuracy: 72.1800
+Epoch: 6/10	loss: 1.9022	train_accuracy: 73.1400
+Epoch: 7/10	loss: 1.8962	train_accuracy: 73.1600
+Epoch: 8/10	loss: 1.8739	train_accuracy: 73.5200
+Epoch: 9/10	loss: 1.8669	train_accuracy: 73.4000
+Epoch: 10/10	loss: 1.8551	train_accuracy: 73.5000
+FINISH STEP 2
+	Task-0 val_accuracy: 48.1000
+	Task-1 val_accuracy: 68.8000
+	Task-2 val_accuracy: 71.3000
+	Task-3 val_accuracy: 75.9000
+	Task-4 val_accuracy: 71.7000
+	Task-5 val_accuracy: 73.4000
+	Task-6 val_accuracy: 70.5000
+	Task-7 val_accuracy: 60.7000
+	Task-8 val_accuracy: 61.8000
+
+TRAINING TASK-9	CLASSES: [10 13 15 21 34 48 70 76 85 95]
+CLASS_COUNTER: Counter({85: 424, 15: 406, 21: 406, 10: 400, 34: 399, 95: 395, 76: 393, 70: 393, 48: 392, 13: 392})
+Epoch: 1/10	loss: 5.1992	train_accuracy: 0.3250
+Epoch: 2/10	loss: 4.4161	train_accuracy: 14.5250
+Epoch: 3/10	loss: 3.5679	train_accuracy: 25.3500
+Epoch: 4/10	loss: 2.5812	train_accuracy: 41.9500
+Epoch: 5/10	loss: 1.7857	train_accuracy: 68.2750
+Epoch: 6/10	loss: 1.2780	train_accuracy: 81.4000
+Epoch: 7/10	loss: 0.9440	train_accuracy: 88.4500
+Epoch: 8/10	loss: 0.7455	train_accuracy: 92.3250
+Epoch: 9/10	loss: 0.6139	train_accuracy: 92.9000
+Epoch: 10/10	loss: 0.5209	train_accuracy: 93.3750
+FINISH STEP 1
+CLASS_COUNTER: Counter({76: 50, 13: 50, 34: 50, 10: 50, 55: 50, 18: 50, 72: 50, 21: 50, 85: 50, 70: 50, 94: 50, 95: 50, 6: 50, 22: 50, 5: 50, 89: 50, 29: 50, 57: 50, 19: 50, 48: 50, 8: 50, 2: 50, 15: 50, 73: 50, 30: 50, 39: 50, 96: 50, 12: 50, 32: 50, 91: 50, 88: 50, 69: 50, 20: 50, 49: 50, 28: 50, 25: 50, 50: 50, 47: 50, 46: 50, 16: 50, 92: 50, 24: 50, 59: 50, 63: 50, 27: 50, 74: 50, 3: 50, 99: 50, 75: 50, 77: 50, 9: 50, 79: 50, 67: 50, 78: 50, 31: 50, 98: 50, 26: 50, 4: 50, 41: 50, 86: 50, 33: 50, 82: 50, 81: 50, 61: 50, 45: 50, 38: 50, 62: 50, 87: 50, 90: 50, 80: 50, 66: 50, 56: 50, 11: 50, 60: 50, 51: 50, 84: 50, 58: 50, 54: 50, 35: 50, 1: 50, 64: 50, 68: 50, 36: 50, 83: 50, 44: 50, 93: 50, 71: 50, 37: 50, 7: 50, 42: 50, 0: 50, 23: 50, 14: 50, 53: 50, 97: 50, 40: 50, 17: 50, 43: 50, 52: 50, 65: 50})
+Epoch: 1/10	loss: 3.5837	train_accuracy: 51.8400
+Epoch: 2/10	loss: 2.0439	train_accuracy: 70.7200
+Epoch: 3/10	loss: 1.9961	train_accuracy: 71.9200
+Epoch: 4/10	loss: 1.9674	train_accuracy: 72.1600
+Epoch: 5/10	loss: 1.9443	train_accuracy: 72.9600
+Epoch: 6/10	loss: 1.9318	train_accuracy: 72.9200
+Epoch: 7/10	loss: 1.9199	train_accuracy: 72.9000
+Epoch: 8/10	loss: 1.9052	train_accuracy: 73.1800
+Epoch: 9/10	loss: 1.8937	train_accuracy: 73.3200
+Epoch: 10/10	loss: 1.8866	train_accuracy: 73.6000
+FINISH STEP 2
+	Task-0 val_accuracy: 47.6000
+	Task-1 val_accuracy: 66.0000
+	Task-2 val_accuracy: 68.1000
+	Task-3 val_accuracy: 73.7000
+	Task-4 val_accuracy: 70.2000
+	Task-5 val_accuracy: 73.9000
+	Task-6 val_accuracy: 70.8000
+	Task-7 val_accuracy: 61.9000
+	Task-8 val_accuracy: 64.0000
+	Task-9 val_accuracy: 65.3000
+
+Execution time:
+CPU time: 00:01:41	Wall time: 00:01:43
+FAA: 66.14999999999999
+FF: 9.877777777777776
+
+TRAINER.METRIC.ACCURACY
+0: [86.4]
+1: [78.5, 87.8]
+2: [73.5, 80.80000000000001, 80.2]
+3: [66.4, 80.0, 79.4, 83.1]
+4: [59.3, 78.60000000000001, 76.9, 82.39999999999999, 76.1]
+5: [55.7, 75.6, 75.4, 81.0, 78.0, 71.5]
+6: [52.300000000000004, 72.6, 73.0, 81.0, 75.8, 75.0, 71.3]
+7: [50.9, 70.39999999999999, 73.5, 77.5, 73.1, 74.3, 71.8, 61.0]
+8: [48.1, 68.8, 71.3, 75.9, 71.7, 73.4, 70.5, 60.699999999999996, 61.8]
+9: [47.599999999999994, 66.0, 68.10000000000001, 73.7, 70.19999999999999, 73.9, 70.8, 61.9, 64.0, 65.3]
+
+TRAINER.METRIC.FORGET
+0: {}
+1: {0: 7.900000000000006}
+2: {0: 12.900000000000006, 1: 6.999999999999986}
+3: {0: 20.0, 1: 7.799999999999997, 2: 0.7999999999999972}
+4: {0: 27.10000000000001, 1: 9.199999999999989, 2: 3.299999999999997, 3: 0.7000000000000028}
+5: {0: 30.700000000000003, 1: 12.200000000000003, 2: 4.799999999999997, 3: 2.0999999999999943, 4: -1.9000000000000057}
+6: {0: 34.1, 1: 15.200000000000003, 2: 7.200000000000003, 3: 2.0999999999999943, 4: 2.200000000000003, 5: -3.5}
+7: {0: 35.50000000000001, 1: 17.400000000000006, 2: 6.700000000000003, 3: 5.599999999999994, 4: 4.900000000000006, 5: 0.7000000000000028, 6: -0.5}
+8: {0: 38.300000000000004, 1: 19.0, 2: 8.900000000000006, 3: 7.199999999999989, 4: 6.299999999999997, 5: 1.5999999999999943, 6: 1.2999999999999972, 7: 0.30000000000000426}
+9: {0: 38.80000000000001, 1: 21.799999999999997, 2: 12.099999999999994, 3: 9.399999999999991, 4: 7.800000000000011, 5: 1.0999999999999943, 6: 1.0, 7: -0.8999999999999986, 8: -2.200000000000003}
+
+CALCULATING TEST LOSS PER TASK
+	TASK-0	CLASSES: [18 37 40 54 58 60 66 74 83 96]	test_accuracy: 47.7000
+	TASK-1	CLASSES: [17 19 30 35 41 44 49 63 86 88]	test_accuracy: 62.6000
+	TASK-2	CLASSES: [ 2  3 27 28 38 61 78 84 90 98]	test_accuracy: 70.0000
+	TASK-3	CLASSES: [ 4 14 22 25 31 36 51 62 69 87]	test_accuracy: 71.0000
+	TASK-4	CLASSES: [ 0 16 42 59 67 68 79 81 82 91]	test_accuracy: 70.9000
+	TASK-5	CLASSES: [ 1  7 11 20 24 50 53 56 57 72]	test_accuracy: 72.8000
+	TASK-6	CLASSES: [ 9 23 29 33 45 64 75 77 89 97]	test_accuracy: 65.6000
+	TASK-7	CLASSES: [ 5 32 39 43 52 55 65 73 92 93]	test_accuracy: 64.6000
+	TASK-8	CLASSES: [ 6  8 12 26 46 47 71 80 94 99]	test_accuracy: 61.0000
+	TASK-9	CLASSES: [10 13 15 21 34 48 70 76 85 95]	test_accuracy: 66.6000
+All accuracy: 65.2800

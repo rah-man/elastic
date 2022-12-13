@@ -1,0 +1,581 @@
+CLASS_COUNTER: Counter({0: 500, 90: 500, 31: 500, 39: 500, 80: 500, 70: 500, 22: 500, 45: 500, 76: 500, 73: 500, 83: 500, 33: 500, 53: 500, 18: 500, 77: 500, 4: 500, 30: 500, 44: 500, 12: 500, 10: 500})
+STEP-1	Epoch: 1/100	loss: 2.6009	train_accuracy: 36.0200
+STEP-1	Epoch: 2/100	loss: 1.9142	train_accuracy: 66.9200
+STEP-1	Epoch: 3/100	loss: 1.4921	train_accuracy: 75.3900
+STEP-1	Epoch: 4/100	loss: 1.2163	train_accuracy: 80.0700
+STEP-1	Epoch: 5/100	loss: 1.0252	train_accuracy: 82.8100
+STEP-1	Epoch: 6/100	loss: 0.8879	train_accuracy: 84.5900
+STEP-1	Epoch: 7/100	loss: 0.7861	train_accuracy: 85.8000
+STEP-1	Epoch: 8/100	loss: 0.7078	train_accuracy: 86.6100
+STEP-1	Epoch: 9/100	loss: 0.6471	train_accuracy: 87.3600
+STEP-1	Epoch: 10/100	loss: 0.5981	train_accuracy: 87.9300
+STEP-1	Epoch: 11/100	loss: 0.5580	train_accuracy: 88.3000
+STEP-1	Epoch: 12/100	loss: 0.5243	train_accuracy: 88.5500
+STEP-1	Epoch: 13/100	loss: 0.4956	train_accuracy: 89.0700
+STEP-1	Epoch: 14/100	loss: 0.4705	train_accuracy: 89.5400
+STEP-1	Epoch: 15/100	loss: 0.4488	train_accuracy: 89.8000
+STEP-1	Epoch: 16/100	loss: 0.4295	train_accuracy: 90.2700
+STEP-1	Epoch: 17/100	loss: 0.4120	train_accuracy: 90.6000
+STEP-1	Epoch: 18/100	loss: 0.3964	train_accuracy: 90.8200
+STEP-1	Epoch: 19/100	loss: 0.3819	train_accuracy: 91.1700
+STEP-1	Epoch: 20/100	loss: 0.3692	train_accuracy: 91.3200
+STEP-1	Epoch: 21/100	loss: 0.3567	train_accuracy: 91.4700
+STEP-1	Epoch: 22/100	loss: 0.3454	train_accuracy: 91.7800
+STEP-1	Epoch: 23/100	loss: 0.3349	train_accuracy: 92.0100
+STEP-1	Epoch: 24/100	loss: 0.3250	train_accuracy: 92.1500
+STEP-1	Epoch: 25/100	loss: 0.3158	train_accuracy: 92.2200
+STEP-1	Epoch: 26/100	loss: 0.3073	train_accuracy: 92.3800
+STEP-1	Epoch: 27/100	loss: 0.2988	train_accuracy: 92.5400
+STEP-1	Epoch: 28/100	loss: 0.2909	train_accuracy: 92.8100
+STEP-1	Epoch: 29/100	loss: 0.2835	train_accuracy: 92.9000
+STEP-1	Epoch: 30/100	loss: 0.2762	train_accuracy: 93.0400
+STEP-1	Epoch: 31/100	loss: 0.2695	train_accuracy: 93.2700
+STEP-1	Epoch: 32/100	loss: 0.2627	train_accuracy: 93.4700
+STEP-1	Epoch: 33/100	loss: 0.2564	train_accuracy: 93.7000
+STEP-1	Epoch: 34/100	loss: 0.2504	train_accuracy: 93.8000
+STEP-1	Epoch: 35/100	loss: 0.2442	train_accuracy: 94.0400
+STEP-1	Epoch: 36/100	loss: 0.2387	train_accuracy: 94.2300
+STEP-1	Epoch: 37/100	loss: 0.2331	train_accuracy: 94.3900
+STEP-1	Epoch: 38/100	loss: 0.2275	train_accuracy: 94.5300
+STEP-1	Epoch: 39/100	loss: 0.2224	train_accuracy: 94.6800
+STEP-1	Epoch: 40/100	loss: 0.2173	train_accuracy: 94.8100
+STEP-1	Epoch: 41/100	loss: 0.2125	train_accuracy: 94.9800
+STEP-1	Epoch: 42/100	loss: 0.2077	train_accuracy: 95.0400
+STEP-1	Epoch: 43/100	loss: 0.2030	train_accuracy: 95.2600
+STEP-1	Epoch: 44/100	loss: 0.1985	train_accuracy: 95.3800
+STEP-1	Epoch: 45/100	loss: 0.1941	train_accuracy: 95.3900
+STEP-1	Epoch: 46/100	loss: 0.1899	train_accuracy: 95.4600
+STEP-1	Epoch: 47/100	loss: 0.1858	train_accuracy: 95.7300
+STEP-1	Epoch: 48/100	loss: 0.1817	train_accuracy: 95.7700
+STEP-1	Epoch: 49/100	loss: 0.1778	train_accuracy: 95.8300
+STEP-1	Epoch: 50/100	loss: 0.1740	train_accuracy: 96.0200
+STEP-1	Epoch: 51/100	loss: 0.1703	train_accuracy: 96.1400
+STEP-1	Epoch: 52/100	loss: 0.1666	train_accuracy: 96.1900
+STEP-1	Epoch: 53/100	loss: 0.1632	train_accuracy: 96.4000
+STEP-1	Epoch: 54/100	loss: 0.1596	train_accuracy: 96.4200
+STEP-1	Epoch: 55/100	loss: 0.1562	train_accuracy: 96.5500
+STEP-1	Epoch: 56/100	loss: 0.1536	train_accuracy: 96.5900
+STEP-1	Epoch: 57/100	loss: 0.1496	train_accuracy: 96.8400
+STEP-1	Epoch: 58/100	loss: 0.1464	train_accuracy: 96.8000
+STEP-1	Epoch: 59/100	loss: 0.1433	train_accuracy: 96.9300
+STEP-1	Epoch: 60/100	loss: 0.1402	train_accuracy: 96.9900
+STEP-1	Epoch: 61/100	loss: 0.1372	train_accuracy: 97.0600
+STEP-1	Epoch: 62/100	loss: 0.1345	train_accuracy: 97.1200
+STEP-1	Epoch: 63/100	loss: 0.1318	train_accuracy: 97.2400
+STEP-1	Epoch: 64/100	loss: 0.1287	train_accuracy: 97.2700
+STEP-1	Epoch: 65/100	loss: 0.1264	train_accuracy: 97.2600
+STEP-1	Epoch: 66/100	loss: 0.1234	train_accuracy: 97.4700
+STEP-1	Epoch: 67/100	loss: 0.1208	train_accuracy: 97.5700
+STEP-1	Epoch: 68/100	loss: 0.1184	train_accuracy: 97.6100
+STEP-1	Epoch: 69/100	loss: 0.1159	train_accuracy: 97.6800
+STEP-1	Epoch: 70/100	loss: 0.1134	train_accuracy: 97.7700
+STEP-1	Epoch: 71/100	loss: 0.1110	train_accuracy: 97.8400
+STEP-1	Epoch: 72/100	loss: 0.1088	train_accuracy: 97.9000
+STEP-1	Epoch: 73/100	loss: 0.1066	train_accuracy: 97.9900
+STEP-1	Epoch: 74/100	loss: 0.1044	train_accuracy: 98.0500
+STEP-1	Epoch: 75/100	loss: 0.1023	train_accuracy: 98.1600
+STEP-1	Epoch: 76/100	loss: 0.1003	train_accuracy: 98.2300
+STEP-1	Epoch: 77/100	loss: 0.0983	train_accuracy: 98.3200
+STEP-1	Epoch: 78/100	loss: 0.0962	train_accuracy: 98.3900
+STEP-1	Epoch: 79/100	loss: 0.0942	train_accuracy: 98.4900
+STEP-1	Epoch: 80/100	loss: 0.0924	train_accuracy: 98.5100
+STEP-1	Epoch: 81/100	loss: 0.0905	train_accuracy: 98.6100
+STEP-1	Epoch: 82/100	loss: 0.0888	train_accuracy: 98.6600
+STEP-1	Epoch: 83/100	loss: 0.0870	train_accuracy: 98.6400
+STEP-1	Epoch: 84/100	loss: 0.0853	train_accuracy: 98.7500
+STEP-1	Epoch: 85/100	loss: 0.0836	train_accuracy: 98.6900
+STEP-1	Epoch: 86/100	loss: 0.0819	train_accuracy: 98.8300
+STEP-1	Epoch: 87/100	loss: 0.0805	train_accuracy: 98.8100
+STEP-1	Epoch: 88/100	loss: 0.0788	train_accuracy: 98.8700
+STEP-1	Epoch: 89/100	loss: 0.0772	train_accuracy: 98.8800
+STEP-1	Epoch: 90/100	loss: 0.0762	train_accuracy: 98.9300
+STEP-1	Epoch: 91/100	loss: 0.0742	train_accuracy: 98.9400
+STEP-1	Epoch: 92/100	loss: 0.0729	train_accuracy: 98.9400
+STEP-1	Epoch: 93/100	loss: 0.0716	train_accuracy: 98.9900
+STEP-1	Epoch: 94/100	loss: 0.0701	train_accuracy: 98.9900
+STEP-1	Epoch: 95/100	loss: 0.0687	train_accuracy: 99.0200
+STEP-1	Epoch: 96/100	loss: 0.0674	train_accuracy: 99.0400
+STEP-1	Epoch: 97/100	loss: 0.0663	train_accuracy: 99.1200
+STEP-1	Epoch: 98/100	loss: 0.0649	train_accuracy: 99.1600
+STEP-1	Epoch: 99/100	loss: 0.0637	train_accuracy: 99.1800
+STEP-1	Epoch: 100/100	loss: 0.0627	train_accuracy: 99.1900
+FINISH STEP 1
+CLASS_COUNTER: Counter({0: 500, 90: 500, 31: 500, 39: 500, 80: 500, 70: 500, 22: 500, 45: 500, 76: 500, 73: 500, 83: 500, 33: 500, 53: 500, 18: 500, 77: 500, 4: 500, 30: 500, 44: 500, 12: 500, 10: 500})
+STEP-2	Epoch: 1/100	loss: 0.0612	train_accuracy: 99.2600
+STEP-2	Epoch: 2/100	loss: 0.0612	train_accuracy: 99.2600
+STEP-2	Epoch: 3/100	loss: 0.0612	train_accuracy: 99.2600
+STEP-2	Epoch: 4/100	loss: 0.0612	train_accuracy: 99.2600
+STEP-2	Epoch: 5/100	loss: 0.0612	train_accuracy: 99.2600
+STEP-2	Epoch: 6/100	loss: 0.0612	train_accuracy: 99.2600
+STEP-2	Epoch: 7/100	loss: 0.0612	train_accuracy: 99.2600
+STEP-2	Epoch: 8/100	loss: 0.0612	train_accuracy: 99.2600
+STEP-2	Epoch: 9/100	loss: 0.0612	train_accuracy: 99.2600
+STEP-2	Epoch: 10/100	loss: 0.0612	train_accuracy: 99.2600
+STEP-2	Epoch: 11/100	loss: 0.0612	train_accuracy: 99.2600
+STEP-2	Epoch: 12/100	loss: 0.0612	train_accuracy: 99.2600
+STEP-2	Epoch: 13/100	loss: 0.0612	train_accuracy: 99.2600
+STEP-2	Epoch: 14/100	loss: 0.0612	train_accuracy: 99.2600
+STEP-2	Epoch: 15/100	loss: 0.0612	train_accuracy: 99.2600
+STEP-2	Epoch: 16/100	loss: 0.0612	train_accuracy: 99.2600
+STEP-2	Epoch: 17/100	loss: 0.0612	train_accuracy: 99.2600
+STEP-2	Epoch: 18/100	loss: 0.0612	train_accuracy: 99.2600
+STEP-2	Epoch: 19/100	loss: 0.0612	train_accuracy: 99.2600
+STEP-2	Epoch: 20/100	loss: 0.0613	train_accuracy: 99.2600
+STEP-2	Epoch: 21/100	loss: 0.0613	train_accuracy: 99.2600
+STEP-2	Epoch: 22/100	loss: 0.0613	train_accuracy: 99.2600
+STEP-2	Epoch: 23/100	loss: 0.0613	train_accuracy: 99.2600
+STEP-2	Epoch: 24/100	loss: 0.0613	train_accuracy: 99.2600
+STEP-2	Epoch: 25/100	loss: 0.0613	train_accuracy: 99.2600
+STEP-2	Epoch: 26/100	loss: 0.0613	train_accuracy: 99.2600
+STEP-2	Epoch: 27/100	loss: 0.0613	train_accuracy: 99.2600
+STEP-2	Epoch: 28/100	loss: 0.0613	train_accuracy: 99.2600
+STEP-2	Epoch: 29/100	loss: 0.0613	train_accuracy: 99.2600
+STEP-2	Epoch: 30/100	loss: 0.0613	train_accuracy: 99.2600
+STEP-2	Epoch: 31/100	loss: 0.0613	train_accuracy: 99.2600
+STEP-2	Epoch: 32/100	loss: 0.0613	train_accuracy: 99.2600
+STEP-2	Epoch: 33/100	loss: 0.0613	train_accuracy: 99.2600
+STEP-2	Epoch: 34/100	loss: 0.0613	train_accuracy: 99.2600
+STEP-2	Epoch: 35/100	loss: 0.0613	train_accuracy: 99.2600
+STEP-2	Epoch: 36/100	loss: 0.0613	train_accuracy: 99.2600
+STEP-2	Epoch: 37/100	loss: 0.0613	train_accuracy: 99.2600
+STEP-2	Epoch: 38/100	loss: 0.0613	train_accuracy: 99.2600
+STEP-2	Epoch: 39/100	loss: 0.0613	train_accuracy: 99.2600
+STEP-2	Epoch: 40/100	loss: 0.0614	train_accuracy: 99.2600
+STEP-2	Epoch: 41/100	loss: 0.0614	train_accuracy: 99.2600
+STEP-2	Epoch: 42/100	loss: 0.0614	train_accuracy: 99.2600
+STEP-2	Epoch: 43/100	loss: 0.0614	train_accuracy: 99.2600
+STEP-2	Epoch: 44/100	loss: 0.0614	train_accuracy: 99.2600
+STEP-2	Epoch: 45/100	loss: 0.0614	train_accuracy: 99.2600
+STEP-2	Epoch: 46/100	loss: 0.0614	train_accuracy: 99.2600
+STEP-2	Epoch: 47/100	loss: 0.0614	train_accuracy: 99.2600
+STEP-2	Epoch: 48/100	loss: 0.0614	train_accuracy: 99.2600
+STEP-2	Epoch: 49/100	loss: 0.0614	train_accuracy: 99.2600
+STEP-2	Epoch: 50/100	loss: 0.0614	train_accuracy: 99.2600
+STEP-2	Epoch: 51/100	loss: 0.0614	train_accuracy: 99.2600
+STEP-2	Epoch: 52/100	loss: 0.0614	train_accuracy: 99.2600
+STEP-2	Epoch: 53/100	loss: 0.0614	train_accuracy: 99.2600
+STEP-2	Epoch: 54/100	loss: 0.0614	train_accuracy: 99.2600
+STEP-2	Epoch: 55/100	loss: 0.0614	train_accuracy: 99.2600
+STEP-2	Epoch: 56/100	loss: 0.0614	train_accuracy: 99.2600
+STEP-2	Epoch: 57/100	loss: 0.0614	train_accuracy: 99.2600
+STEP-2	Epoch: 58/100	loss: 0.0614	train_accuracy: 99.2600
+STEP-2	Epoch: 59/100	loss: 0.0615	train_accuracy: 99.2600
+STEP-2	Epoch: 60/100	loss: 0.0615	train_accuracy: 99.2600
+STEP-2	Epoch: 61/100	loss: 0.0615	train_accuracy: 99.2600
+STEP-2	Epoch: 62/100	loss: 0.0615	train_accuracy: 99.2600
+STEP-2	Epoch: 63/100	loss: 0.0615	train_accuracy: 99.2600
+STEP-2	Epoch: 64/100	loss: 0.0615	train_accuracy: 99.2600
+STEP-2	Epoch: 65/100	loss: 0.0615	train_accuracy: 99.2600
+STEP-2	Epoch: 66/100	loss: 0.0615	train_accuracy: 99.2600
+STEP-2	Epoch: 67/100	loss: 0.0615	train_accuracy: 99.2600
+STEP-2	Epoch: 68/100	loss: 0.0615	train_accuracy: 99.2600
+STEP-2	Epoch: 69/100	loss: 0.0615	train_accuracy: 99.2600
+STEP-2	Epoch: 70/100	loss: 0.0615	train_accuracy: 99.2600
+STEP-2	Epoch: 71/100	loss: 0.0615	train_accuracy: 99.2600
+STEP-2	Epoch: 72/100	loss: 0.0615	train_accuracy: 99.2600
+STEP-2	Epoch: 73/100	loss: 0.0615	train_accuracy: 99.2600
+STEP-2	Epoch: 74/100	loss: 0.0615	train_accuracy: 99.2600
+STEP-2	Epoch: 75/100	loss: 0.0615	train_accuracy: 99.2600
+STEP-2	Epoch: 76/100	loss: 0.0615	train_accuracy: 99.2600
+STEP-2	Epoch: 77/100	loss: 0.0615	train_accuracy: 99.2600
+STEP-2	Epoch: 78/100	loss: 0.0615	train_accuracy: 99.2600
+STEP-2	Epoch: 79/100	loss: 0.0616	train_accuracy: 99.2600
+STEP-2	Epoch: 80/100	loss: 0.0616	train_accuracy: 99.2600
+STEP-2	Epoch: 81/100	loss: 0.0616	train_accuracy: 99.2600
+STEP-2	Epoch: 82/100	loss: 0.0616	train_accuracy: 99.2600
+STEP-2	Epoch: 83/100	loss: 0.0616	train_accuracy: 99.2600
+STEP-2	Epoch: 84/100	loss: 0.0616	train_accuracy: 99.2600
+STEP-2	Epoch: 85/100	loss: 0.0616	train_accuracy: 99.2600
+STEP-2	Epoch: 86/100	loss: 0.0616	train_accuracy: 99.2600
+STEP-2	Epoch: 87/100	loss: 0.0616	train_accuracy: 99.2600
+STEP-2	Epoch: 88/100	loss: 0.0616	train_accuracy: 99.2600
+STEP-2	Epoch: 89/100	loss: 0.0616	train_accuracy: 99.2600
+STEP-2	Epoch: 90/100	loss: 0.0616	train_accuracy: 99.2600
+STEP-2	Epoch: 91/100	loss: 0.0616	train_accuracy: 99.2600
+STEP-2	Epoch: 92/100	loss: 0.0616	train_accuracy: 99.2600
+STEP-2	Epoch: 93/100	loss: 0.0616	train_accuracy: 99.2600
+STEP-2	Epoch: 94/100	loss: 0.0616	train_accuracy: 99.2600
+STEP-2	Epoch: 95/100	loss: 0.0616	train_accuracy: 99.2600
+STEP-2	Epoch: 96/100	loss: 0.0616	train_accuracy: 99.2600
+STEP-2	Epoch: 97/100	loss: 0.0616	train_accuracy: 99.2600
+STEP-2	Epoch: 98/100	loss: 0.0617	train_accuracy: 99.2600
+STEP-2	Epoch: 99/100	loss: 0.0617	train_accuracy: 99.2600
+STEP-2	Epoch: 100/100	loss: 0.0617	train_accuracy: 99.2600
+FINISH STEP 2
+	Task-0 val_loss: 0.3165	val_accuracy: 90.0500
+
+CLASS_COUNTER: Counter({11: 500, 28: 500, 96: 500, 42: 500, 47: 500, 65: 500, 9: 500, 55: 500, 72: 500, 35: 500, 15: 500, 66: 500, 69: 500, 93: 500, 88: 500, 40: 500, 26: 500, 85: 500, 5: 500, 16: 500})
+STEP-1	Epoch: 1/100	loss: 3.5996	train_accuracy: 11.5300
+STEP-1	Epoch: 2/100	loss: 2.7503	train_accuracy: 45.2100
+STEP-1	Epoch: 3/100	loss: 2.1561	train_accuracy: 60.0200
+STEP-1	Epoch: 4/100	loss: 1.7314	train_accuracy: 67.0800
+STEP-1	Epoch: 5/100	loss: 1.4351	train_accuracy: 71.4600
+STEP-1	Epoch: 6/100	loss: 1.2290	train_accuracy: 74.1700
+STEP-1	Epoch: 7/100	loss: 1.0813	train_accuracy: 76.2600
+STEP-1	Epoch: 8/100	loss: 0.9731	train_accuracy: 77.3800
+STEP-1	Epoch: 9/100	loss: 0.8905	train_accuracy: 78.7400
+STEP-1	Epoch: 10/100	loss: 0.8246	train_accuracy: 79.6600
+STEP-1	Epoch: 11/100	loss: 0.7719	train_accuracy: 80.5200
+STEP-1	Epoch: 12/100	loss: 0.7274	train_accuracy: 81.0800
+STEP-1	Epoch: 13/100	loss: 0.6890	train_accuracy: 81.7400
+STEP-1	Epoch: 14/100	loss: 0.6566	train_accuracy: 82.6100
+STEP-1	Epoch: 15/100	loss: 0.6277	train_accuracy: 82.9600
+STEP-1	Epoch: 16/100	loss: 0.6023	train_accuracy: 83.5300
+STEP-1	Epoch: 17/100	loss: 0.5793	train_accuracy: 84.0000
+STEP-1	Epoch: 18/100	loss: 0.5583	train_accuracy: 84.4100
+STEP-1	Epoch: 19/100	loss: 0.5390	train_accuracy: 84.9000
+STEP-1	Epoch: 20/100	loss: 0.5216	train_accuracy: 85.3900
+STEP-1	Epoch: 21/100	loss: 0.5048	train_accuracy: 85.7700
+STEP-1	Epoch: 22/100	loss: 0.4900	train_accuracy: 86.2600
+STEP-1	Epoch: 23/100	loss: 0.4751	train_accuracy: 86.7200
+STEP-1	Epoch: 24/100	loss: 0.4619	train_accuracy: 87.0000
+STEP-1	Epoch: 25/100	loss: 0.4502	train_accuracy: 87.3800
+STEP-1	Epoch: 26/100	loss: 0.4367	train_accuracy: 87.6600
+STEP-1	Epoch: 27/100	loss: 0.4252	train_accuracy: 88.0200
+STEP-1	Epoch: 28/100	loss: 0.4142	train_accuracy: 88.5000
+STEP-1	Epoch: 29/100	loss: 0.4033	train_accuracy: 88.6700
+STEP-1	Epoch: 30/100	loss: 0.3934	train_accuracy: 88.9700
+STEP-1	Epoch: 31/100	loss: 0.3836	train_accuracy: 89.2900
+STEP-1	Epoch: 32/100	loss: 0.3742	train_accuracy: 89.5400
+STEP-1	Epoch: 33/100	loss: 0.3652	train_accuracy: 89.7900
+STEP-1	Epoch: 34/100	loss: 0.3565	train_accuracy: 90.0200
+STEP-1	Epoch: 35/100	loss: 0.3488	train_accuracy: 90.2800
+STEP-1	Epoch: 36/100	loss: 0.3402	train_accuracy: 90.5400
+STEP-1	Epoch: 37/100	loss: 0.3325	train_accuracy: 90.8700
+STEP-1	Epoch: 38/100	loss: 0.3251	train_accuracy: 91.1700
+STEP-1	Epoch: 39/100	loss: 0.3176	train_accuracy: 91.3300
+STEP-1	Epoch: 40/100	loss: 0.3106	train_accuracy: 91.4800
+STEP-1	Epoch: 41/100	loss: 0.3034	train_accuracy: 91.7400
+STEP-1	Epoch: 42/100	loss: 0.2970	train_accuracy: 91.9000
+STEP-1	Epoch: 43/100	loss: 0.2901	train_accuracy: 92.2300
+STEP-1	Epoch: 44/100	loss: 0.2839	train_accuracy: 92.3800
+STEP-1	Epoch: 45/100	loss: 0.2776	train_accuracy: 92.6100
+STEP-1	Epoch: 46/100	loss: 0.2715	train_accuracy: 92.8600
+STEP-1	Epoch: 47/100	loss: 0.2658	train_accuracy: 92.9900
+STEP-1	Epoch: 48/100	loss: 0.2601	train_accuracy: 93.2500
+STEP-1	Epoch: 49/100	loss: 0.2544	train_accuracy: 93.4900
+STEP-1	Epoch: 50/100	loss: 0.2499	train_accuracy: 93.4700
+STEP-1	Epoch: 51/100	loss: 0.2435	train_accuracy: 93.8100
+STEP-1	Epoch: 52/100	loss: 0.2384	train_accuracy: 93.9200
+STEP-1	Epoch: 53/100	loss: 0.2333	train_accuracy: 94.2200
+STEP-1	Epoch: 54/100	loss: 0.2284	train_accuracy: 94.2700
+STEP-1	Epoch: 55/100	loss: 0.2232	train_accuracy: 94.5800
+STEP-1	Epoch: 56/100	loss: 0.2187	train_accuracy: 94.6700
+STEP-1	Epoch: 57/100	loss: 0.2142	train_accuracy: 94.8100
+STEP-1	Epoch: 58/100	loss: 0.2101	train_accuracy: 94.9500
+STEP-1	Epoch: 59/100	loss: 0.2048	train_accuracy: 95.1300
+STEP-1	Epoch: 60/100	loss: 0.2005	train_accuracy: 95.3400
+STEP-1	Epoch: 61/100	loss: 0.1959	train_accuracy: 95.4800
+STEP-1	Epoch: 62/100	loss: 0.1916	train_accuracy: 95.5200
+STEP-1	Epoch: 63/100	loss: 0.1882	train_accuracy: 95.6800
+STEP-1	Epoch: 64/100	loss: 0.1837	train_accuracy: 95.8600
+STEP-1	Epoch: 65/100	loss: 0.1795	train_accuracy: 96.0400
+STEP-1	Epoch: 66/100	loss: 0.1758	train_accuracy: 96.1200
+STEP-1	Epoch: 67/100	loss: 0.1719	train_accuracy: 96.2100
+STEP-1	Epoch: 68/100	loss: 0.1683	train_accuracy: 96.3600
+STEP-1	Epoch: 69/100	loss: 0.1647	train_accuracy: 96.4900
+STEP-1	Epoch: 70/100	loss: 0.1612	train_accuracy: 96.5900
+STEP-1	Epoch: 71/100	loss: 0.1581	train_accuracy: 96.7500
+STEP-1	Epoch: 72/100	loss: 0.1545	train_accuracy: 96.9200
+STEP-1	Epoch: 73/100	loss: 0.1511	train_accuracy: 96.9500
+STEP-1	Epoch: 74/100	loss: 0.1477	train_accuracy: 97.1000
+STEP-1	Epoch: 75/100	loss: 0.1450	train_accuracy: 97.2100
+STEP-1	Epoch: 76/100	loss: 0.1419	train_accuracy: 97.2600
+STEP-1	Epoch: 77/100	loss: 0.1388	train_accuracy: 97.3300
+STEP-1	Epoch: 78/100	loss: 0.1358	train_accuracy: 97.4500
+STEP-1	Epoch: 79/100	loss: 0.1329	train_accuracy: 97.5200
+STEP-1	Epoch: 80/100	loss: 0.1300	train_accuracy: 97.6300
+STEP-1	Epoch: 81/100	loss: 0.1272	train_accuracy: 97.7600
+STEP-1	Epoch: 82/100	loss: 0.1243	train_accuracy: 97.8200
+STEP-1	Epoch: 83/100	loss: 0.1220	train_accuracy: 97.8500
+STEP-1	Epoch: 84/100	loss: 0.1190	train_accuracy: 97.9100
+STEP-1	Epoch: 85/100	loss: 0.1172	train_accuracy: 97.9800
+STEP-1	Epoch: 86/100	loss: 0.1142	train_accuracy: 98.0400
+STEP-1	Epoch: 87/100	loss: 0.1118	train_accuracy: 98.1500
+STEP-1	Epoch: 88/100	loss: 0.1092	train_accuracy: 98.1400
+STEP-1	Epoch: 89/100	loss: 0.1068	train_accuracy: 98.3000
+STEP-1	Epoch: 90/100	loss: 0.1046	train_accuracy: 98.3400
+STEP-1	Epoch: 91/100	loss: 0.1024	train_accuracy: 98.4500
+STEP-1	Epoch: 92/100	loss: 0.1003	train_accuracy: 98.4300
+STEP-1	Epoch: 93/100	loss: 0.0983	train_accuracy: 98.4800
+STEP-1	Epoch: 94/100	loss: 0.0963	train_accuracy: 98.5500
+STEP-1	Epoch: 95/100	loss: 0.0942	train_accuracy: 98.6300
+STEP-1	Epoch: 96/100	loss: 0.0921	train_accuracy: 98.6200
+STEP-1	Epoch: 97/100	loss: 0.0902	train_accuracy: 98.7500
+STEP-1	Epoch: 98/100	loss: 0.0886	train_accuracy: 98.7500
+STEP-1	Epoch: 99/100	loss: 0.0868	train_accuracy: 98.8700
+STEP-1	Epoch: 100/100	loss: 0.0848	train_accuracy: 98.9700
+FINISH STEP 1
+CLASS_COUNTER: Counter({90: 13, 73: 13, 30: 13, 83: 13, 77: 13, 80: 13, 12: 13, 10: 13, 0: 13, 44: 13, 22: 13, 31: 13, 4: 13, 33: 13, 70: 13, 45: 13, 76: 13, 53: 13, 39: 13, 18: 13, 66: 12, 96: 12, 69: 12, 9: 12, 5: 12, 16: 12, 28: 12, 42: 12, 35: 12, 55: 12, 26: 12, 85: 12, 88: 12, 93: 12, 65: 12, 11: 12, 15: 12, 72: 12, 47: 12, 40: 12})
+tensor([[-0.2925, -0.3015, -0.3038,  ...,  0.0130,  0.4231,  9.3726],
+        [-0.2507, -0.2597, -0.2643,  ...,  4.2321,  0.6949,  1.5796],
+        [-0.0970, -0.0866, -0.1023,  ...,  1.2807,  2.4226,  2.8134],
+        ...,
+        [-0.0120,  0.0346,  0.0610,  ...,  0.4372, -0.1570,  0.9693],
+        [-0.0440, -0.0401, -0.0468,  ...,  1.0916, -5.1927, -3.8749],
+        [-0.2355, -0.2358, -0.2436,  ..., -0.5823,  6.5137,  0.3980]],
+       device='cuda:0', grad_fn=<IndexPutBackward0>)
+
+(tensor([[-0.0650, -0.1552, -0.1563,  ..., -0.6793,  0.4193,  0.0240],
+        [ 1.3469,  0.9952, -0.6487,  ...,  0.1230, -0.1724,  0.0986],
+        [-0.8943,  0.4324, -2.0680,  ..., -0.2252,  0.4458,  0.0121],
+        ...,
+        [-0.5667, -0.1725, -0.0065,  ..., -0.2299,  0.1046, -0.0187],
+        [-0.5277, -0.6032,  1.1796,  ...,  0.1308, -0.0861, -0.1412],
+        [-0.8791,  1.3550, -0.9166,  ..., -0.0891,  0.0321, -0.1226]],
+       device='cuda:0'), tensor(9.3642e-07, device='cuda:0'), [tensor(2.9699, device='cuda:0'), tensor(3.7156, device='cuda:0')], tensor([[0.1420, 0.8580],
+        [0.5853, 0.4147],
+        [0.5587, 0.4413],
+        [0.1061, 0.8939],
+        [0.6999, 0.3001],
+        [0.4873, 0.5127],
+        [0.5792, 0.4208],
+        [0.3664, 0.6336],
+        [0.2472, 0.7528],
+        [0.1440, 0.8560],
+        [0.4783, 0.5217],
+        [0.1952, 0.8048],
+        [0.3102, 0.6898],
+        [0.6661, 0.3339],
+        [0.4770, 0.5230],
+        [0.7615, 0.2385],
+        [0.4735, 0.5265],
+        [0.8243, 0.1757],
+        [0.3051, 0.6949],
+        [0.9628, 0.0372],
+        [0.4630, 0.5370],
+        [0.3589, 0.6411],
+        [0.5741, 0.4259],
+        [0.4818, 0.5182],
+        [0.6265, 0.3735],
+        [0.4793, 0.5207],
+        [0.4054, 0.5946],
+        [0.5898, 0.4102],
+        [0.9072, 0.0928],
+        [0.4167, 0.5833],
+        [0.7485, 0.2515],
+        [0.4131, 0.5869],
+        [0.1183, 0.8817],
+        [0.2223, 0.7777],
+        [0.2483, 0.7517],
+        [0.2906, 0.7094],
+        [0.4346, 0.5654],
+        [0.6466, 0.3534],
+        [0.1737, 0.8263],
+        [0.6602, 0.3398],
+        [0.4963, 0.5037],
+        [0.4938, 0.5062],
+        [0.6348, 0.3652],
+        [0.7761, 0.2239],
+        [0.2067, 0.7933],
+        [0.4698, 0.5302],
+        [0.4943, 0.5057],
+        [0.7907, 0.2093],
+        [0.5017, 0.4983],
+        [0.7110, 0.2890],
+        [0.2671, 0.7329],
+        [0.7942, 0.2058],
+        [0.3144, 0.6856],
+        [0.8561, 0.1439],
+        [0.2584, 0.7416],
+        [0.6277, 0.3723],
+        [0.2395, 0.7605],
+        [0.7157, 0.2843],
+        [0.5943, 0.4057],
+        [0.2840, 0.7160],
+        [0.7969, 0.2031],
+        [0.4522, 0.5478],
+        [0.7259, 0.2741],
+        [0.7865, 0.2135],
+        [0.7475, 0.2525],
+        [0.3887, 0.6113],
+        [0.6993, 0.3007],
+        [0.5787, 0.4213],
+        [0.0501, 0.9499],
+        [0.0742, 0.9258],
+        [0.5571, 0.4429],
+        [0.2324, 0.7676],
+        [0.8713, 0.1287],
+        [0.5258, 0.4742],
+        [0.2403, 0.7597],
+        [0.6017, 0.3983],
+        [0.3403, 0.6597],
+        [0.3058, 0.6942],
+        [0.6009, 0.3991],
+        [0.7985, 0.2015],
+        [0.6401, 0.3599],
+        [0.4388, 0.5612],
+        [0.4494, 0.5506],
+        [0.1450, 0.8550],
+        [0.2416, 0.7584],
+        [0.6180, 0.3820],
+        [0.4503, 0.5497],
+        [0.9418, 0.0582],
+        [0.6308, 0.3692],
+        [0.6573, 0.3427],
+        [0.9138, 0.0862],
+        [0.3514, 0.6486],
+        [0.6436, 0.3564],
+        [0.7543, 0.2457],
+        [0.1396, 0.8604],
+        [0.3428, 0.6572],
+        [0.8438, 0.1562],
+        [0.8491, 0.1509],
+        [0.4217, 0.5783],
+        [0.3026, 0.6974],
+        [0.3598, 0.6402],
+        [0.3471, 0.6529],
+        [0.3829, 0.6171],
+        [0.6004, 0.3996],
+        [0.9181, 0.0819],
+        [0.3024, 0.6976],
+        [0.2929, 0.7071],
+        [0.3147, 0.6853],
+        [0.7678, 0.2322],
+        [0.4556, 0.5444],
+        [0.5233, 0.4767],
+        [0.3364, 0.6636],
+        [0.8512, 0.1488],
+        [0.1911, 0.8089],
+        [0.7277, 0.2723],
+        [0.4058, 0.5942],
+        [0.7657, 0.2343],
+        [0.2728, 0.7272],
+        [0.7372, 0.2628],
+        [0.5707, 0.4293],
+        [0.4961, 0.5039],
+        [0.1227, 0.8773],
+        [0.6270, 0.3730],
+        [0.7268, 0.2732],
+        [0.8616, 0.1384],
+        [0.1084, 0.8916],
+        [0.6998, 0.3002],
+        [0.6224, 0.3776],
+        [0.8647, 0.1353],
+        [0.6825, 0.3175],
+        [0.3618, 0.6382],
+        [0.4828, 0.5172],
+        [0.6200, 0.3800],
+        [0.3697, 0.6303],
+        [0.4407, 0.5593],
+        [0.4821, 0.5179],
+        [0.1725, 0.8275],
+        [0.4907, 0.5093],
+        [0.1576, 0.8424],
+        [0.3068, 0.6932],
+        [0.1685, 0.8315],
+        [0.4962, 0.5038],
+        [0.5773, 0.4227],
+        [0.3397, 0.6603],
+        [0.2886, 0.7114],
+        [0.5448, 0.4552],
+        [0.3796, 0.6204],
+        [0.6755, 0.3245],
+        [0.5586, 0.4414],
+        [0.2334, 0.7666],
+        [0.1074, 0.8926],
+        [0.8233, 0.1767],
+        [0.8549, 0.1451],
+        [0.4843, 0.5157],
+        [0.4862, 0.5138],
+        [0.6067, 0.3933],
+        [0.2960, 0.7040],
+        [0.6222, 0.3778],
+        [0.3820, 0.6180],
+        [0.8351, 0.1649],
+        [0.4228, 0.5772],
+        [0.5200, 0.4800],
+        [0.6022, 0.3978],
+        [0.0454, 0.9546],
+        [0.5625, 0.4375],
+        [0.2835, 0.7165],
+        [0.6978, 0.3022],
+        [0.4243, 0.5757],
+        [0.6976, 0.3024],
+        [0.3208, 0.6792],
+        [0.3767, 0.6233],
+        [0.7997, 0.2003],
+        [0.5927, 0.4073],
+        [0.4050, 0.5950],
+        [0.5842, 0.4158],
+        [0.3801, 0.6199],
+        [0.2594, 0.7406],
+        [0.3064, 0.6936],
+        [0.1514, 0.8486],
+        [0.8385, 0.1615],
+        [0.2872, 0.7128],
+        [0.3913, 0.6087],
+        [0.3191, 0.6809],
+        [0.4826, 0.5174],
+        [0.5203, 0.4797],
+        [0.6491, 0.3509],
+        [0.2801, 0.7199],
+        [0.5122, 0.4878],
+        [0.3963, 0.6037],
+        [0.5129, 0.4871],
+        [0.7003, 0.2997],
+        [0.6250, 0.3750],
+        [0.6839, 0.3161],
+        [0.2961, 0.7039],
+        [0.5469, 0.4531],
+        [0.6248, 0.3752],
+        [0.3129, 0.6871],
+        [0.2805, 0.7195],
+        [0.6718, 0.3282],
+        [0.6540, 0.3460],
+        [0.4715, 0.5285],
+        [0.5263, 0.4737],
+        [0.7884, 0.2116],
+        [0.7172, 0.2828],
+        [0.2349, 0.7651],
+        [0.5307, 0.4693],
+        [0.4089, 0.5911],
+        [0.5290, 0.4710],
+        [0.3953, 0.6047],
+        [0.4984, 0.5016],
+        [0.5089, 0.4911],
+        [0.5733, 0.4267],
+        [0.7927, 0.2073],
+        [0.5716, 0.4284],
+        [0.3078, 0.6922],
+        [0.2613, 0.7387],
+        [0.3661, 0.6339],
+        [0.5474, 0.4526],
+        [0.1963, 0.8037],
+        [0.5728, 0.4272],
+        [0.5052, 0.4948],
+        [0.3958, 0.6042],
+        [0.6701, 0.3299],
+        [0.5246, 0.4754],
+        [0.5383, 0.4617],
+        [0.3657, 0.6343],
+        [0.6167, 0.3833],
+        [0.8279, 0.1721],
+        [0.5052, 0.4948],
+        [0.6959, 0.3041],
+        [0.2461, 0.7539],
+        [0.8568, 0.1432],
+        [0.1112, 0.8888],
+        [0.6939, 0.3061],
+        [0.4988, 0.5012],
+        [0.8318, 0.1682],
+        [0.7605, 0.2395],
+        [0.5801, 0.4199],
+        [0.3723, 0.6277],
+        [0.4608, 0.5392],
+        [0.5369, 0.4631],
+        [0.7037, 0.2963],
+        [0.5419, 0.4581],
+        [0.6570, 0.3430],
+        [0.8110, 0.1890],
+        [0.6022, 0.3978],
+        [0.5214, 0.4786],
+        [0.6817, 0.3183],
+        [0.4237, 0.5763],
+        [0.3497, 0.6503],
+        [0.5217, 0.4783],
+        [0.5113, 0.4887],
+        [0.9053, 0.0947],
+        [0.2653, 0.7347],
+        [0.6491, 0.3509],
+        [0.4336, 0.5664]], device='cuda:0'))

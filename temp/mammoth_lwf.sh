@@ -1,0 +1,15 @@
+python main.py --model lwf_mod --dataset mod-cifar100 --lr 0.03 --optim_wd 0 --optim_mom 0 --n_epochs 100 --batch_size 256 --ntask 5 --wandb_project lwf_5
+python main.py --model lwf_mod --dataset mod-cifar100 --lr 0.03 --optim_wd 0 --optim_mom 0 --n_epochs 100 --batch_size 256 --ntask 5 --wandb_project lwf_5
+python main.py --model lwf_mod --dataset mod-cifar100 --lr 0.03 --optim_wd 0 --optim_mom 0 --n_epochs 100 --batch_size 256 --ntask 5 --wandb_project lwf_5
+python main.py --model lwf_mod --dataset mod-cifar100 --lr 0.03 --optim_wd 0 --optim_mom 0 --n_epochs 100 --batch_size 256 --ntask 5 --wandb_project lwf_5
+python main.py --model lwf_mod --dataset mod-cifar100 --lr 0.03 --optim_wd 0 --optim_mom 0 --n_epochs 100 --batch_size 256 --ntask 5 --wandb_project lwf_5
+python main.py --model lwf_mod --dataset mod-cifar100 --lr 0.03 --optim_wd 0 --optim_mom 0 --n_epochs 100 --batch_size 256 --ntask 10 --wandb_project lwf_10
+python main.py --model lwf_mod --dataset mod-cifar100 --lr 0.03 --optim_wd 0 --optim_mom 0 --n_epochs 100 --batch_size 256 --ntask 10 --wandb_project lwf_10
+python main.py --model lwf_mod --dataset mod-cifar100 --lr 0.03 --optim_wd 0 --optim_mom 0 --n_epochs 100 --batch_size 256 --ntask 10 --wandb_project lwf_10
+python main.py --model lwf_mod --dataset mod-cifar100 --lr 0.03 --optim_wd 0 --optim_mom 0 --n_epochs 100 --batch_size 256 --ntask 10 --wandb_project lwf_10
+python main.py --model lwf_mod --dataset mod-cifar100 --lr 0.03 --optim_wd 0 --optim_mom 0 --n_epochs 100 --batch_size 256 --ntask 10 --wandb_project lwf_10
+python main.py --model lwf_mod --dataset mod-cifar100 --lr 0.03 --optim_wd 0 --optim_mom 0 --n_epochs 100 --batch_size 256 --ntask 20 --wandb_project lwf_20
+python main.py --model lwf_mod --dataset mod-cifar100 --lr 0.03 --optim_wd 0 --optim_mom 0 --n_epochs 100 --batch_size 256 --ntask 20 --wandb_project lwf_20
+python main.py --model lwf_mod --dataset mod-cifar100 --lr 0.03 --optim_wd 0 --optim_mom 0 --n_epochs 100 --batch_size 256 --ntask 20 --wandb_project lwf_20
+python main.py --model lwf_mod --dataset mod-cifar100 --lr 0.03 --optim_wd 0 --optim_mom 0 --n_epochs 100 --batch_size 256 --ntask 20 --wandb_project lwf_20
+python main.py --model lwf_mod --dataset mod-cifar100 --lr 0.03 --optim_wd 0 --optim_mom 0 --n_epochs 100 --batch_size 256 --ntask 20 --wandb_project lwf_20

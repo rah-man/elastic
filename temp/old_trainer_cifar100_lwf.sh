@@ -1,0 +1,15 @@
+python lwf.py -t 5 -f "cifar100/lwf/pkl/cifar_5_1.pkl" > cifar100/lwf/cifar_5_1.txt
+python lwf.py -t 5 -f "cifar100/lwf/pkl/cifar_5_2.pkl" > cifar100/lwf/cifar_5_2.txt
+python lwf.py -t 5 -f "cifar100/lwf/pkl/cifar_5_3.pkl" > cifar100/lwf/cifar_5_3.txt
+python lwf.py -t 5 -f "cifar100/lwf/pkl/cifar_5_4.pkl" > cifar100/lwf/cifar_5_4.txt
+python lwf.py -t 5 -f "cifar100/lwf/pkl/cifar_5_5.pkl" > cifar100/lwf/cifar_5_5.txt
+python lwf.py -t 10 -f "cifar100/lwf/pkl/cifar_10_1.pkl" > cifar100/lwf/cifar_10_1.txt
+python lwf.py -t 10 -f "cifar100/lwf/pkl/cifar_10_2.pkl" > cifar100/lwf/cifar_10_2.txt
+python lwf.py -t 10 -f "cifar100/lwf/pkl/cifar_10_3.pkl" > cifar100/lwf/cifar_10_3.txt
+python lwf.py -t 10 -f "cifar100/lwf/pkl/cifar_10_4.pkl" > cifar100/lwf/cifar_10_4.txt
+python lwf.py -t 10 -f "cifar100/lwf/pkl/cifar_10_5.pkl" > cifar100/lwf/cifar_10_5.txt
+python lwf.py -t 20 -f "cifar100/lwf/pkl/cifar_20_1.pkl" > cifar100/lwf/cifar_20_1.txt
+python lwf.py -t 20 -f "cifar100/lwf/pkl/cifar_20_2.pkl" > cifar100/lwf/cifar_20_2.txt
+python lwf.py -t 20 -f "cifar100/lwf/pkl/cifar_20_3.pkl" > cifar100/lwf/cifar_20_3.txt
+python lwf.py -t 20 -f "cifar100/lwf/pkl/cifar_20_4.pkl" > cifar100/lwf/cifar_20_4.txt
+python lwf.py -t 20 -f "cifar100/lwf/pkl/cifar_20_5.pkl" > cifar100/lwf/cifar_20_5.txt

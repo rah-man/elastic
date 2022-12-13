@@ -1,0 +1,888 @@
+SGD (
+Parameter Group 0
+    dampening: 0
+    foreach: None
+    initial_lr: 0.3
+    lr: 0.3
+    maximize: False
+    momentum: 0.0
+    nesterov: False
+    weight_decay: 1e-05
+)
+
+Herding 50 exemplars for each [ 4  5 11 18 26 37 53 67 90 92]
+Training task-0
+Classes: [ 4  5 11 18 26 37 53 67 90 92]
+Class map: {4: 0, 5: 1, 11: 2, 18: 3, 26: 4, 37: 5, 53: 6, 67: 7, 90: 8, 92: 9}
+Epoch: 1/100	train_loss: 0.4972	train_accuracy: 84.8222
+Epoch: 2/100	train_loss: 0.1730	train_accuracy: 95.4000
+Epoch: 3/100	train_loss: 0.1476	train_accuracy: 96.4889
+Epoch: 4/100	train_loss: 0.1436	train_accuracy: 96.5333
+Epoch: 5/100	train_loss: 0.1424	train_accuracy: 96.5556
+Epoch: 6/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 7/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 8/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 9/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 10/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 11/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 12/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 13/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 14/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 15/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 16/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 17/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 18/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 19/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 20/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 21/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 22/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 23/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 24/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 25/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 26/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 27/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 28/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 29/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 30/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 31/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 32/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 33/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 34/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 35/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 36/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 37/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 38/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 39/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 40/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 41/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 42/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 43/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 44/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 45/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 46/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 47/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 48/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 49/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 50/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 51/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 52/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 53/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 54/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 55/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 56/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 57/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 58/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 59/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 60/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 61/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 62/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 63/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 64/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 65/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 66/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 67/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 68/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 69/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 70/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 71/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 72/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 73/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 74/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 75/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 76/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 77/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 78/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 79/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 80/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 81/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 82/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 83/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 84/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 85/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 86/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 87/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 88/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 89/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 90/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 91/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 92/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 93/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 94/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 95/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 96/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 97/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 98/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 99/100	train_loss: 0.1420	train_accuracy: 96.5556
+Epoch: 100/100	train_loss: 0.1420	train_accuracy: 96.5556
+FINISH TRAINING TASK- 0
+	Task-0 val_loss: 0.1841	val_accuracy: 95.4000
+Herding 25 exemplars for each [ 4  5 11 18 26 37 53 67 90 92]
+Herding 25 exemplars for each [ 4  5 11 18 26 37 53 67 90 92]
+SGD (
+Parameter Group 0
+    dampening: 0
+    foreach: None
+    initial_lr: 0.3
+    lr: 0.3
+    maximize: False
+    momentum: 0.0
+    nesterov: False
+    weight_decay: 1e-05
+)
+
+Herding 16 exemplars for each [ 4  5 11 18 26 37 53 67 90 92]
+Herding 16 exemplars for each [21 38 42 43 47 48 60 64 82 94]
+Training task-1
+Classes: [ 4  5 11 18 21 26 37 38 42 43 47 48 53 60 64 67 82 90 92 94]
+Class map: {4: 0, 5: 1, 11: 2, 18: 3, 26: 4, 37: 5, 53: 6, 67: 7, 90: 8, 92: 9, 21: 10, 38: 11, 42: 12, 43: 13, 47: 14, 48: 15, 60: 16, 64: 17, 82: 18, 94: 19}
+Epoch: 1/100	train_loss: 0.8350	train_accuracy: 82.2470
+Epoch: 2/100	train_loss: 0.2224	train_accuracy: 93.7247
+Epoch: 3/100	train_loss: 0.1894	train_accuracy: 94.8785
+Epoch: 4/100	train_loss: 0.1848	train_accuracy: 95.0607
+Epoch: 5/100	train_loss: 0.1842	train_accuracy: 95.0810
+Epoch: 6/100	train_loss: 0.1839	train_accuracy: 95.0810
+Epoch: 7/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 8/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 9/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 10/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 11/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 12/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 13/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 14/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 15/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 16/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 17/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 18/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 19/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 20/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 21/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 22/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 23/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 24/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 25/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 26/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 27/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 28/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 29/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 30/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 31/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 32/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 33/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 34/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 35/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 36/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 37/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 38/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 39/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 40/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 41/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 42/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 43/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 44/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 45/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 46/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 47/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 48/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 49/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 50/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 51/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 52/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 53/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 54/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 55/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 56/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 57/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 58/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 59/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 60/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 61/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 62/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 63/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 64/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 65/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 66/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 67/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 68/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 69/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 70/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 71/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 72/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 73/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 74/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 75/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 76/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 77/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 78/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 79/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 80/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 81/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 82/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 83/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 84/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 85/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 86/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 87/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 88/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 89/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 90/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 91/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 92/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 93/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 94/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 95/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 96/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 97/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 98/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 99/100	train_loss: 0.1838	train_accuracy: 95.0607
+Epoch: 100/100	train_loss: 0.1838	train_accuracy: 95.0607
+FINISH TRAINING TASK- 1
+	Task-0 val_loss: 0.7023	val_accuracy: 81.0000
+	Task-1 val_loss: 0.3144	val_accuracy: 92.5000
+Herding 12 exemplars for each [ 4  5 11 18 21 26 37 38 42 43 47 48 53 60 64 67 82 90 92 94]
+Herding 12 exemplars for each [21 38 42 43 47 48 60 64 82 94]
+SGD (
+Parameter Group 0
+    dampening: 0
+    foreach: None
+    initial_lr: 0.3
+    lr: 0.3
+    maximize: False
+    momentum: 0.0
+    nesterov: False
+    weight_decay: 1e-05
+)
+
+Herding 10 exemplars for each [ 4  5 11 18 21 26 37 38 42 43 47 48 53 60 64 67 82 90 92 94]
+Herding 10 exemplars for each [10 16 19 29 30 40 41 54 63 98]
+Training task-2
+Classes: [ 4  5 10 11 16 18 19 21 26 29 30 37 38 40 41 42 43 47 48 53 54 60 63 64
+ 67 82 90 92 94 98]
+Class map: {4: 0, 5: 1, 11: 2, 18: 3, 26: 4, 37: 5, 53: 6, 67: 7, 90: 8, 92: 9, 21: 10, 38: 11, 42: 12, 43: 13, 47: 14, 48: 15, 60: 16, 64: 17, 82: 18, 94: 19, 10: 20, 16: 21, 19: 22, 29: 23, 30: 24, 40: 25, 41: 26, 54: 27, 63: 28, 98: 29}
+Epoch: 1/100	train_loss: 0.6599	train_accuracy: 84.7931
+Epoch: 2/100	train_loss: 0.2192	train_accuracy: 94.1399
+Epoch: 3/100	train_loss: 0.1855	train_accuracy: 95.3581
+Epoch: 4/100	train_loss: 0.1805	train_accuracy: 95.4631
+Epoch: 5/100	train_loss: 0.1793	train_accuracy: 95.5051
+Epoch: 6/100	train_loss: 0.1790	train_accuracy: 95.5261
+Epoch: 7/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 8/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 9/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 10/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 11/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 12/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 13/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 14/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 15/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 16/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 17/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 18/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 19/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 20/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 21/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 22/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 23/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 24/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 25/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 26/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 27/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 28/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 29/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 30/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 31/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 32/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 33/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 34/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 35/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 36/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 37/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 38/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 39/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 40/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 41/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 42/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 43/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 44/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 45/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 46/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 47/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 48/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 49/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 50/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 51/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 52/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 53/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 54/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 55/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 56/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 57/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 58/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 59/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 60/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 61/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 62/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 63/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 64/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 65/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 66/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 67/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 68/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 69/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 70/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 71/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 72/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 73/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 74/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 75/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 76/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 77/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 78/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 79/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 80/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 81/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 82/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 83/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 84/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 85/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 86/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 87/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 88/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 89/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 90/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 91/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 92/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 93/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 94/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 95/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 96/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 97/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 98/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 99/100	train_loss: 0.1789	train_accuracy: 95.5261
+Epoch: 100/100	train_loss: 0.1789	train_accuracy: 95.5261
+FINISH TRAINING TASK- 2
+	Task-0 val_loss: 1.4629	val_accuracy: 56.6000
+	Task-1 val_loss: 1.0759	val_accuracy: 75.0000
+	Task-2 val_loss: 0.6075	val_accuracy: 85.0000
+Herding 8 exemplars for each [ 4  5 10 11 16 18 19 21 26 29 30 37 38 40 41 42 43 47 48 53 54 60 63 64
+ 67 82 90 92 94 98]
+Herding 8 exemplars for each [10 16 19 29 30 40 41 54 63 98]
+SGD (
+Parameter Group 0
+    dampening: 0
+    foreach: None
+    initial_lr: 0.3
+    lr: 0.3
+    maximize: False
+    momentum: 0.0
+    nesterov: False
+    weight_decay: 1e-05
+)
+
+Herding 7 exemplars for each [ 4  5 10 11 16 18 19 21 26 29 30 37 38 40 41 42 43 47 48 53 54 60 63 64
+ 67 82 90 92 94 98]
+Herding 7 exemplars for each [ 0  7 23 33 39 70 74 77 91 95]
+Training task-3
+Classes: [ 0  4  5  7 10 11 16 18 19 21 23 26 29 30 33 37 38 39 40 41 42 43 47 48
+ 53 54 60 63 64 67 70 74 77 82 90 91 92 94 95 98]
+Class map: {4: 0, 5: 1, 11: 2, 18: 3, 26: 4, 37: 5, 53: 6, 67: 7, 90: 8, 92: 9, 21: 10, 38: 11, 42: 12, 43: 13, 47: 14, 48: 15, 60: 16, 64: 17, 82: 18, 94: 19, 10: 20, 16: 21, 19: 22, 29: 23, 30: 24, 40: 25, 41: 26, 54: 27, 63: 28, 98: 29, 0: 30, 7: 31, 23: 32, 33: 33, 39: 34, 70: 35, 74: 36, 77: 37, 91: 38, 95: 39}
+Epoch: 1/100	train_loss: 0.8155	train_accuracy: 83.5663
+Epoch: 2/100	train_loss: 0.2560	train_accuracy: 93.6256
+Epoch: 3/100	train_loss: 0.2166	train_accuracy: 94.6633
+Epoch: 4/100	train_loss: 0.2109	train_accuracy: 94.7056
+Epoch: 5/100	train_loss: 0.2094	train_accuracy: 94.7692
+Epoch: 6/100	train_loss: 0.2089	train_accuracy: 94.7903
+Epoch: 7/100	train_loss: 0.2089	train_accuracy: 94.7903
+Epoch: 8/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 9/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 10/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 11/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 12/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 13/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 14/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 15/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 16/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 17/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 18/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 19/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 20/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 21/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 22/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 23/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 24/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 25/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 26/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 27/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 28/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 29/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 30/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 31/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 32/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 33/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 34/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 35/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 36/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 37/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 38/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 39/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 40/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 41/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 42/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 43/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 44/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 45/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 46/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 47/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 48/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 49/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 50/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 51/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 52/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 53/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 54/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 55/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 56/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 57/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 58/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 59/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 60/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 61/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 62/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 63/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 64/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 65/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 66/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 67/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 68/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 69/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 70/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 71/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 72/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 73/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 74/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 75/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 76/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 77/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 78/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 79/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 80/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 81/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 82/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 83/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 84/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 85/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 86/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 87/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 88/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 89/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 90/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 91/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 92/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 93/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 94/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 95/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 96/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 97/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 98/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 99/100	train_loss: 0.2088	train_accuracy: 94.7903
+Epoch: 100/100	train_loss: 0.2088	train_accuracy: 94.7903
+FINISH TRAINING TASK- 3
+	Task-0 val_loss: 1.8677	val_accuracy: 51.6000
+	Task-1 val_loss: 1.3718	val_accuracy: 66.2500
+	Task-2 val_loss: 1.2465	val_accuracy: 70.0000
+	Task-3 val_loss: 0.2118	val_accuracy: 94.4000
+Herding 6 exemplars for each [ 0  4  5  7 10 11 16 18 19 21 23 26 29 30 33 37 38 39 40 41 42 43 47 48
+ 53 54 60 63 64 67 70 74 77 82 90 91 92 94 95 98]
+Herding 6 exemplars for each [ 0  7 23 33 39 70 74 77 91 95]
+SGD (
+Parameter Group 0
+    dampening: 0
+    foreach: None
+    initial_lr: 0.3
+    lr: 0.3
+    maximize: False
+    momentum: 0.0
+    nesterov: False
+    weight_decay: 1e-05
+)
+
+Herding 5 exemplars for each [ 0  4  5  7 10 11 16 18 19 21 23 26 29 30 33 37 38 39 40 41 42 43 47 48
+ 53 54 60 63 64 67 70 74 77 82 90 91 92 94 95 98]
+Herding 5 exemplars for each [ 9 15 20 44 46 56 73 83 88 93]
+Training task-4
+Classes: [ 0  4  5  7  9 10 11 15 16 18 19 20 21 23 26 29 30 33 37 38 39 40 41 42
+ 43 44 46 47 48 53 54 56 60 63 64 67 70 73 74 77 82 83 88 90 91 92 93 94
+ 95 98]
+Class map: {4: 0, 5: 1, 11: 2, 18: 3, 26: 4, 37: 5, 53: 6, 67: 7, 90: 8, 92: 9, 21: 10, 38: 11, 42: 12, 43: 13, 47: 14, 48: 15, 60: 16, 64: 17, 82: 18, 94: 19, 10: 20, 16: 21, 19: 22, 29: 23, 30: 24, 40: 25, 41: 26, 54: 27, 63: 28, 98: 29, 0: 30, 7: 31, 23: 32, 33: 33, 39: 34, 70: 35, 74: 36, 77: 37, 91: 38, 95: 39, 9: 40, 15: 41, 20: 42, 44: 43, 46: 44, 56: 45, 73: 46, 83: 47, 88: 48, 93: 49}
+Epoch: 1/100	train_loss: 0.7660	train_accuracy: 84.1064
+Epoch: 2/100	train_loss: 0.2338	train_accuracy: 93.7234
+Epoch: 3/100	train_loss: 0.1989	train_accuracy: 94.8511
+Epoch: 4/100	train_loss: 0.1936	train_accuracy: 95.0851
+Epoch: 5/100	train_loss: 0.1925	train_accuracy: 95.0851
+Epoch: 6/100	train_loss: 0.1922	train_accuracy: 95.0851
+Epoch: 7/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 8/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 9/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 10/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 11/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 12/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 13/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 14/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 15/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 16/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 17/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 18/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 19/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 20/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 21/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 22/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 23/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 24/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 25/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 26/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 27/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 28/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 29/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 30/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 31/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 32/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 33/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 34/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 35/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 36/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 37/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 38/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 39/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 40/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 41/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 42/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 43/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 44/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 45/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 46/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 47/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 48/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 49/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 50/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 51/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 52/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 53/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 54/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 55/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 56/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 57/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 58/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 59/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 60/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 61/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 62/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 63/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 64/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 65/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 66/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 67/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 68/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 69/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 70/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 71/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 72/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 73/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 74/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 75/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 76/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 77/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 78/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 79/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 80/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 81/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 82/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 83/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 84/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 85/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 86/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 87/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 88/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 89/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 90/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 91/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 92/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 93/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 94/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 95/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 96/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 97/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 98/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 99/100	train_loss: 0.1921	train_accuracy: 95.0851
+Epoch: 100/100	train_loss: 0.1921	train_accuracy: 95.0851
+FINISH TRAINING TASK- 4
+	Task-0 val_loss: 2.3020	val_accuracy: 40.4000
+	Task-1 val_loss: 1.7824	val_accuracy: 52.5000
+	Task-2 val_loss: 1.6795	val_accuracy: 60.0000
+	Task-3 val_loss: 1.5989	val_accuracy: 60.8000
+	Task-4 val_loss: 0.2180	val_accuracy: 94.0000
+Herding 5 exemplars for each [ 0  4  5  7  9 10 11 15 16 18 19 20 21 23 26 29 30 33 37 38 39 40 41 42
+ 43 44 46 47 48 53 54 56 60 63 64 67 70 73 74 77 82 83 88 90 91 92 93 94
+ 95 98]
+Herding 5 exemplars for each [ 9 15 20 44 46 56 73 83 88 93]
+SGD (
+Parameter Group 0
+    dampening: 0
+    foreach: None
+    initial_lr: 0.3
+    lr: 0.3
+    maximize: False
+    momentum: 0.0
+    nesterov: False
+    weight_decay: 1e-05
+)
+
+Herding 4 exemplars for each [ 0  4  5  7  9 10 11 15 16 18 19 20 21 23 26 29 30 33 37 38 39 40 41 42
+ 43 44 46 47 48 53 54 56 60 63 64 67 70 73 74 77 82 83 88 90 91 92 93 94
+ 95 98]
+Herding 4 exemplars for each [ 1  3  6  8 34 36 49 78 85 89]
+Training task-5
+Classes: [ 0  1  3  4  5  6  7  8  9 10 11 15 16 18 19 20 21 23 26 29 30 33 34 36
+ 37 38 39 40 41 42 43 44 46 47 48 49 53 54 56 60 63 64 67 70 73 74 77 78
+ 82 83 85 88 89 90 91 92 93 94 95 98]
+Class map: {4: 0, 5: 1, 11: 2, 18: 3, 26: 4, 37: 5, 53: 6, 67: 7, 90: 8, 92: 9, 21: 10, 38: 11, 42: 12, 43: 13, 47: 14, 48: 15, 60: 16, 64: 17, 82: 18, 94: 19, 10: 20, 16: 21, 19: 22, 29: 23, 30: 24, 40: 25, 41: 26, 54: 27, 63: 28, 98: 29, 0: 30, 7: 31, 23: 32, 33: 33, 39: 34, 70: 35, 74: 36, 77: 37, 91: 38, 95: 39, 9: 40, 15: 41, 20: 42, 44: 43, 46: 44, 56: 45, 73: 46, 83: 47, 88: 48, 93: 49, 1: 50, 3: 51, 6: 52, 8: 53, 34: 54, 36: 55, 49: 56, 78: 57, 85: 58, 89: 59}
+Epoch: 1/100	train_loss: 0.6753	train_accuracy: 87.5699
+Epoch: 2/100	train_loss: 0.1776	train_accuracy: 95.1398
+Epoch: 3/100	train_loss: 0.1475	train_accuracy: 96.1720
+Epoch: 4/100	train_loss: 0.1440	train_accuracy: 96.3226
+Epoch: 5/100	train_loss: 0.1431	train_accuracy: 96.4086
+Epoch: 6/100	train_loss: 0.1428	train_accuracy: 96.4086
+Epoch: 7/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 8/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 9/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 10/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 11/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 12/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 13/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 14/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 15/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 16/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 17/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 18/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 19/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 20/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 21/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 22/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 23/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 24/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 25/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 26/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 27/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 28/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 29/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 30/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 31/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 32/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 33/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 34/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 35/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 36/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 37/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 38/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 39/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 40/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 41/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 42/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 43/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 44/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 45/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 46/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 47/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 48/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 49/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 50/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 51/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 52/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 53/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 54/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 55/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 56/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 57/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 58/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 59/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 60/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 61/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 62/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 63/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 64/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 65/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 66/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 67/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 68/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 69/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 70/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 71/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 72/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 73/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 74/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 75/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 76/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 77/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 78/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 79/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 80/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 81/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 82/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 83/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 84/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 85/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 86/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 87/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 88/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 89/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 90/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 91/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 92/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 93/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 94/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 95/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 96/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 97/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 98/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 99/100	train_loss: 0.1427	train_accuracy: 96.4086
+Epoch: 100/100	train_loss: 0.1427	train_accuracy: 96.4086
+FINISH TRAINING TASK- 5
+	Task-0 val_loss: 2.3307	val_accuracy: 43.4000
+	Task-1 val_loss: 1.9970	val_accuracy: 52.5000
+	Task-2 val_loss: 1.4929	val_accuracy: 65.0000
+	Task-3 val_loss: 2.0268	val_accuracy: 47.2000
+	Task-4 val_loss: 1.9704	val_accuracy: 60.8000
+	Task-5 val_loss: 0.1785	val_accuracy: 95.2000
+Herding 4 exemplars for each [ 0  1  3  4  5  6  7  8  9 10 11 15 16 18 19 20 21 23 26 29 30 33 34 36
+ 37 38 39 40 41 42 43 44 46 47 48 49 53 54 56 60 63 64 67 70 73 74 77 78
+ 82 83 85 88 89 90 91 92 93 94 95 98]
+Herding 4 exemplars for each [ 1  3  6  8 34 36 49 78 85 89]
+SGD (
+Parameter Group 0
+    dampening: 0
+    foreach: None
+    initial_lr: 0.3
+    lr: 0.3
+    maximize: False
+    momentum: 0.0
+    nesterov: False
+    weight_decay: 1e-05
+)
+
+Herding 3 exemplars for each [ 0  1  3  4  5  6  7  8  9 10 11 15 16 18 19 20 21 23 26 29 30 33 34 36
+ 37 38 39 40 41 42 43 44 46 47 48 49 53 54 56 60 63 64 67 70 73 74 77 78
+ 82 83 85 88 89 90 91 92 93 94 95 98]
+Herding 3 exemplars for each [17 24 32 45 52 61 65 80 81 84]
+Training task-6
+Classes: [ 0  1  3  4  5  6  7  8  9 10 11 15 16 17 18 19 20 21 23 24 26 29 30 32
+ 33 34 36 37 38 39 40 41 42 43 44 45 46 47 48 49 52 53 54 56 60 61 63 64
+ 65 67 70 73 74 77 78 80 81 82 83 84 85 88 89 90 91 92 93 94 95 98]
+Class map: {4: 0, 5: 1, 11: 2, 18: 3, 26: 4, 37: 5, 53: 6, 67: 7, 90: 8, 92: 9, 21: 10, 38: 11, 42: 12, 43: 13, 47: 14, 48: 15, 60: 16, 64: 17, 82: 18, 94: 19, 10: 20, 16: 21, 19: 22, 29: 23, 30: 24, 40: 25, 41: 26, 54: 27, 63: 28, 98: 29, 0: 30, 7: 31, 23: 32, 33: 33, 39: 34, 70: 35, 74: 36, 77: 37, 91: 38, 95: 39, 9: 40, 15: 41, 20: 42, 44: 43, 46: 44, 56: 45, 73: 46, 83: 47, 88: 48, 93: 49, 1: 50, 3: 51, 6: 52, 8: 53, 34: 54, 36: 55, 49: 56, 78: 57, 85: 58, 89: 59, 17: 60, 24: 61, 32: 62, 45: 63, 52: 64, 61: 65, 65: 66, 80: 67, 81: 68, 84: 69}
+Epoch: 1/100	train_loss: 0.9004	train_accuracy: 81.4474
+Epoch: 2/100	train_loss: 0.2658	train_accuracy: 92.5658
+Epoch: 3/100	train_loss: 0.2295	train_accuracy: 93.6842
+Epoch: 4/100	train_loss: 0.2247	train_accuracy: 93.8816
+Epoch: 5/100	train_loss: 0.2229	train_accuracy: 93.8816
+Epoch: 6/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 7/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 8/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 9/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 10/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 11/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 12/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 13/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 14/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 15/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 16/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 17/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 18/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 19/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 20/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 21/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 22/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 23/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 24/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 25/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 26/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 27/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 28/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 29/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 30/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 31/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 32/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 33/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 34/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 35/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 36/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 37/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 38/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 39/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 40/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 41/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 42/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 43/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 44/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 45/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 46/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 47/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 48/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 49/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 50/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 51/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 52/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 53/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 54/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 55/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 56/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 57/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 58/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 59/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 60/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 61/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 62/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 63/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 64/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 65/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 66/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 67/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 68/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 69/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 70/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 71/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 72/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 73/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 74/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 75/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 76/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 77/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 78/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 79/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 80/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 81/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 82/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 83/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 84/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 85/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 86/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 87/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 88/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 89/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 90/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 91/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 92/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 93/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 94/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 95/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 96/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 97/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 98/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 99/100	train_loss: 0.2224	train_accuracy: 93.9035
+Epoch: 100/100	train_loss: 0.2224	train_accuracy: 93.9035
+FINISH TRAINING TASK- 6
+	Task-0 val_loss: 4.0748	val_accuracy: 23.2000
+	Task-1 val_loss: 3.4053	val_accuracy: 36.2500
+	Task-2 val_loss: 2.4360	val_accuracy: 45.0000
+	Task-3 val_loss: 3.1454	val_accuracy: 38.0000
+	Task-4 val_loss: 3.4254	val_accuracy: 35.0000
+	Task-5 val_loss: 1.9016	val_accuracy: 57.0000
+	Task-6 val_loss: 0.2112	val_accuracy: 93.8000
+Herding 3 exemplars for each [ 0  1  3  4  5  6  7  8  9 10 11 15 16 17 18 19 20 21 23 24 26 29 30 32
+ 33 34 36 37 38 39 40 41 42 43 44 45 46 47 48 49 52 53 54 56 60 61 63 64
+ 65 67 70 73 74 77 78 80 81 82 83 84 85 88 89 90 91 92 93 94 95 98]

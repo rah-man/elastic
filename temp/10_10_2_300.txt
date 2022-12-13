@@ -1,0 +1,13 @@
+TRAINING TASK-0	CLASSES: [ 7 14 17 18 25 34 37 66 85 91]
+CLASS_COUNTER: Counter({37: 413, 34: 407, 25: 406, 14: 401, 91: 401, 66: 397, 85: 397, 17: 395, 18: 394, 7: 389})
+Epoch: 1/10	loss: 2.24	train_accuracy: 18.25
+Epoch: 2/10	loss: 2.12	train_accuracy: 40.42
+Epoch: 3/10	loss: 2.01	train_accuracy: 56.53
+Epoch: 4/10	loss: 1.89	train_accuracy: 67.10
+Epoch: 5/10	loss: 1.76	train_accuracy: 73.12
+Epoch: 6/10	loss: 1.64	train_accuracy: 76.48
+Epoch: 7/10	loss: 1.51	train_accuracy: 77.88
+Epoch: 8/10	loss: 1.39	train_accuracy: 78.55
+Epoch: 9/10	loss: 1.28	train_accuracy: 78.67
+Epoch: 10/10	loss: 1.18	train_accuracy: 78.88
+FINISH STEP 1

@@ -1,0 +1,5 @@
+python trainer_moe.py -b 256 -c 20 -s 2 -m 2000 -e 100 -n 20 -k 2 -f "cifar100/expert_coarse/cifar_a_2_2000_20_20_2_1.pkl" > cifar100/expert_coarse/cifar_a_2_2000_20_20_2_1.txt
+python trainer_moe.py -b 256 -c 20 -s 2 -m 2000 -e 100 -n 20 -k 2 -f "cifar100/expert_coarse/cifar_a_2_2000_20_20_2_2.pkl" > cifar100/expert_coarse/cifar_a_2_2000_20_20_2_2.txt
+python trainer_moe.py -b 256 -c 20 -s 2 -m 2000 -e 100 -n 20 -k 2 -f "cifar100/expert_coarse/cifar_a_2_2000_20_20_2_3.pkl" > cifar100/expert_coarse/cifar_a_2_2000_20_20_2_3.txt
+python trainer_moe.py -b 256 -c 20 -s 2 -m 2000 -e 100 -n 20 -k 2 -f "cifar100/expert_coarse/cifar_a_2_2000_20_20_2_4.pkl" > cifar100/expert_coarse/cifar_a_2_2000_20_20_2_4.txt
+python trainer_moe.py -b 256 -c 20 -s 2 -m 2000 -e 100 -n 20 -k 2 -f "cifar100/expert_coarse/cifar_a_2_2000_20_20_2_5.pkl" > cifar100/expert_coarse/cifar_a_2_2000_20_20_2_5.txt
