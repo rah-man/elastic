@@ -1,14 +1,18 @@
 import copy
 import numpy as np
+import os
+import pickle
+import random
+import scipy
+import time
 import torch
 import torchvision.models as models
-import random
 
 from collections import Counter
+from PIL import Image
 from torch.utils.data import Dataset, ConcatDataset, DataLoader
 from torchvision import datasets, transforms
 from torchvision.models.feature_extraction import create_feature_extractor
-
 
 class BaseDataset(Dataset):
     def __init__(self, x, y, transform=None, cls2idx=None):
@@ -43,7 +47,8 @@ def get_data(
     k=2, 
     transform=None, 
     dummy=False,
-    seed=42):
+    seed=42,
+    expert=False):
     """
     # torch_dataset: one instance of torchvision datasets --> removed as using embedding input
     # data_path: path to store the dataset --> removed as now it needs two specific embedding input paths
@@ -154,15 +159,18 @@ def get_data(
         data[tt]['tst'] = {'x': [], 'y': []}
         # data[tt]['nclass'] = cpertask[tt]
 
+
     # Populate the train set
     # for i, (this_image, this_label) in enumerate(trainset):
     for i, (this_image, this_label) in enumerate(trainset["data"]):
-        this_label = int(this_label)
-        this_label = class_order.index(this_label)
+        original_label = int(this_label)
+        this_label = class_order.index(original_label)
         this_task = (this_label >= cpertask_cumsum).sum()
-
         data[this_task]['trn']['x'].append(this_image)
-        data[this_task]['trn']['y'].append(this_label - init_class[this_task])
+        if not expert:
+            data[this_task]['trn']['y'].append(this_label - init_class[this_task])
+        else:
+            data[this_task]['trn']['y'].append(original_label)
 
         if dummy and i >= 500:
             break
@@ -171,12 +179,15 @@ def get_data(
     # for i, (this_image, this_label) in enumerate(testset):
     if test_embedding_path:
         for i, (this_image, this_label) in enumerate(testset["data"]):
-            this_label = int(this_label)
-            this_label = class_order.index(this_label)
+            original_label = int(this_label)
+            this_label = class_order.index(original_label)
             this_task = (this_label >= cpertask_cumsum).sum()
 
             data[this_task]['tst']['x'].append(this_image)
-            data[this_task]['tst']['y'].append(this_label - init_class[this_task])
+            if not expert:
+                data[this_task]['tst']['y'].append(this_label - init_class[this_task])
+            else:
+                data[this_task]['tst']['y'].append(original_label)
 
             if dummy and i >= 100:
                 break
@@ -185,12 +196,15 @@ def get_data(
     if val_embedding_path:
         # if there's a special validation set, i.e. ImageNet
         for i, (this_image, this_label) in enumerate(valset["data"]):
-            this_label = int(this_label)
-            this_label = class_order.index(this_label)
+            original_label = int(this_label)
+            this_label = class_order.index(original_label)
             this_task = (this_label >= cpertask_cumsum).sum()
 
             data[this_task]['val']['x'].append(this_image)
-            data[this_task]['val']['y'].append(this_label - init_class[this_task])       
+            if not expert:
+                data[this_task]['val']['y'].append(this_label - init_class[this_task])       
+            else:
+                data[this_task]['val']['y'].append(original_label)       
     elif validation > 0.0:
         for tt in data.keys():
             pop_idx = [i for i in range(len(data[tt]["trn"]["x"]))]
@@ -212,6 +226,11 @@ def get_data(
         taskcla.append((t, data[t]['ncla']))
         n += data[t]['ncla']
     data['ncla'] = n    
+
+    # for i in range(num_tasks):
+    #     cur = data[i]
+    #     print(f"classes: {cur['classes']}")
+    # exit()
 
     return data, taskcla, class_order
 
@@ -288,12 +307,9 @@ def extract_imagenet(path, vit_transform, extractor, device, batch_size=256, out
     dataset = datasets.ImageFolder(path, transform=vit_transform)
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False)
 
-    
-
     embeddings, targets = [], []
 
     for i, (images, labels_) in enumerate(dataloader):
-        images = images.to(device)
         extracted = extractor(images.to(device))
         e = extracted.detach().cpu()
         l = labels_.detach().cpu().numpy().tolist()
@@ -309,8 +325,417 @@ def extract_imagenet(path, vit_transform, extractor, device, batch_size=256, out
     extraction = {"data": embeddings, "targets": targets}
     torch.save(extraction, outfile)
 
+def get_params():
+    model_ = models.vit_b_16
+    weights = models.ViT_B_16_Weights.IMAGENET1K_SWAG_LINEAR_V1
+    vit_transform = weights.transforms()
+    return_nodes = ["getitem_5"]
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    extractor = Extractor(model_, weights=weights, return_nodes=return_nodes, device=device)
+    return vit_transform, device, extractor
 
-if __name__ == "__main__":
+def extract_core50():    
+    vit_transform, device, extractor = get_params()
+
+    path = "core50/core50_128x128/"    
+    outfile = "ds_core50_embedding.pt"
+
+    # make static so they're in order
+    # dirs = sorted(os.listdir(path))
+    dirs = [f"s{i}" for i in range(1, 12)]
+    embs = {}
+    for dir in dirs:
+        imagefolder_path = os.path.join(os.getcwd(), path, dir)
+        print(imagefolder_path)
+    
+        dataset = datasets.ImageFolder(imagefolder_path, transform=vit_transform)
+        dataloader = DataLoader(dataset, batch_size=256, shuffle=False)
+        embeddings, targets = [], []
+        for images, labels_ in dataloader:
+            extracted = extractor(images.to(device))
+            e = extracted.detach().cpu()
+            l = labels_.detach().cpu().numpy().tolist()
+            embeddings.extend(zip(e, l))
+            targets.extend(l)
+            print(np.unique(labels_))
+            torch.cuda.empty_cache()
+        embs[dir] = {"data": embeddings, "targets": targets}
+    
+    torch.save(embs, outfile)
+
+def extract_inaturalist():
+    vit_transform, device, extractor = get_params()
+
+    path = "dataset/inaturalist/train_val2018"
+    outfile = "ds_inaturalist_embedding.pt"    
+    dirs = ["Actinopterygii", "Amphibia", "Animalia",
+            "Arachnida", "Aves", "Bacteria", "Chromista",
+            "Fungi", "Insecta", "Mammalia", "Mollusca",
+            "Plantae", "Protozoa", "Reptilia"]
+    embs = {}
+    for dir in dirs:
+        imagefolder_path = os.path.join(os.getcwd(), path, dir)
+        print(imagefolder_path)
+
+        dataset = datasets.ImageFolder(imagefolder_path, transform=vit_transform)
+        dataloader = DataLoader(dataset, batch_size=1024, shuffle=False)
+        embeddings, targets = [], []
+        for images, labels_ in dataloader:
+            extracted = extractor(images.to(device))
+            e = extracted.detach().cpu()
+            l = labels_.detach().cpu().numpy().tolist()
+            embeddings.extend(zip(e, l))
+            targets.extend(l)
+            print(np.unique(labels_))
+            torch.cuda.empty_cache()
+        embs[dir] = {"data": embeddings, "targets": targets, "classes": dataset.classes, "class_to_idx": dataset.class_to_idx}       
+    torch.save(embs, outfile) 
+
+def extract_oxflowers():
+    vit_transform, device, extractor = get_params()
+    path = "dataset/oxford_flowers/"
+    outfile = "ds_oxford_flowers.pt"
+    embs = {}
+    imagefolder_path = os.path.join(os.getcwd(), path, "jpg")
+    print(imagefolder_path)
+    dataset = datasets.ImageFolder(imagefolder_path, transform=vit_transform)
+    dataloader = DataLoader(dataset, batch_size=1024, shuffle=False)
+    embeddings = []
+    for images, _ in dataloader:
+        extracted = extractor(images.to(device))
+        e = extracted.detach().cpu()
+        embeddings.extend(e)
+        torch.cuda.empty_cache()
+        print(images.size())
+
+    # attach labels
+    labels = scipy.io.loadmat(os.path.join(os.getcwd(), path, "imagelabels.mat"))
+    labels = labels["labels"].tolist()[0]
+    embeddings = [(feat, lab) for feat, lab in zip(embeddings, labels)]
+
+    # attach setid
+    setid = scipy.io.loadmat(os.path.join(os.getcwd(), path, "setid.mat"))
+    trnid = setid["trnid"].tolist()[0]
+    valid = setid["valid"].tolist()[0]
+    tstid = setid["tstid"].tolist()[0]
+    embs = {"data": embeddings, "targets": labels, "trnid": trnid, "valid": valid, "tstid": tstid}
+    torch.save(embs, outfile)
+
+def extract_mitscenes():
+    vit_transform, device, extractor = get_params()
+    path = "dataset/mit_scenes/"
+    outfile = "mit_scenes.pt"
+
+    imagefolder_path = os.path.join(os.getcwd(), path, "Images")
+    dataset = datasets.ImageFolder(imagefolder_path, transform=vit_transform)
+    dataloader = DataLoader(dataset, batch_size=1024, shuffle=False)
+    embeddings, targets = [], []
+    for images, labels_ in dataloader:
+        extracted = extractor(images.to(device))
+        e = extracted.detach().cpu()
+        l = labels_.detach().cpu().numpy().tolist()
+        print(np.unique(labels_))
+        embeddings.extend(zip(e, l))
+        targets.extend(l)
+        torch.cuda.empty_cache()
+    embs = {"data": embeddings, "targets": targets, "classes": dataset.classes, "class_to_idx": dataset.class_to_idx}
+    torch.save(embs, outfile)
+
+def split_mitscenes():
+    mit = torch.load("mit_scenes.pt")
+    path = "dataset/mit_scenes/"
+    outfile = "mit_scenes.pt"
+    train_all, test_all, train_names, test_names = [], [], {}, {}
+
+    # READ TRAIN/TEST    
+    with open(os.path.join(os.getcwd(), path, "TrainImages.txt")) as f:
+        train_lines = f.readlines()
+
+    with open(os.path.join(os.getcwd(), path, "TestImages.txt")) as f:
+        test_lines = f.readlines()
+
+    for line in train_lines:
+        line = line.strip().split("/")
+        existing_dir = train_names.get(line[0], [])
+        existing_dir.append(line[1])
+        train_names[line[0]] = existing_dir
+
+    for line in test_lines:
+        line = line.strip().split("/")
+        existing_dir = test_names.get(line[0], [])
+        existing_dir.append(line[1])
+        test_names[line[0]] = existing_dir        
+
+    for dir in mit["classes"]:
+        images_path = os.path.join(os.getcwd(), path, "Images", dir)
+        files = os.listdir((images_path))
+        train_idx, test_idx = np.zeros(len(files)), np.zeros(len(files))
+
+        for name in train_names[dir]:
+            train_idx[files.index(name)] = 1
+        for name in test_names[dir]:
+            test_idx[files.index(name)] = 1
+
+        train_all.extend(train_idx.tolist())
+        test_all.extend(test_idx.tolist())
+    
+    train_all = (torch.tensor(train_all).int() == 1).nonzero().squeeze()
+    test_all = (torch.tensor(test_all).int() == 1).nonzero().squeeze()
+
+    print(train_all.size())
+    print(test_all.size())
+
+    features = [feat[0] for feat in mit["data"]]
+    labels = [feat[1] for feat in mit["data"]]
+    features = torch.stack(features)
+    labels = torch.tensor(labels).int()
+    print(features.size(), labels.size())
+
+    train_features = torch.index_select(features, 0, train_all)
+    test_features = torch.index_select(features, 0, test_all)
+    train_labels = torch.index_select(labels, 0, train_all).cpu().tolist()
+    test_labels = torch.index_select(labels, 0, test_all).cpu().tolist()
+
+    train_features = [(f, l) for f, l in zip(train_features, train_labels)]
+    test_features = [(f, l) for f, l in zip(test_features, test_labels)]
+
+    train_ds = {"data": train_features, "targets": train_labels, "classes": mit["classes"], "class_to_idx": mit["class_to_idx"]}
+    test_ds = {"data": test_features, "targets": test_labels, "classes": mit["classes"], "class_to_idx": mit["class_to_idx"]}
+
+    torch.save(train_ds, "ds_mit_scenes_train.pt")
+    torch.save(test_ds, "ds_mit_scenes_test.pt")
+
+def separate_cub():
+    path = os.path.join(os.getcwd(), "dataset/cub/CUB_200_2011")
+    name_split = {}
+    with open(os.path.join(path, "images.txt")) as f1, open(os.path.join(path, "train_test_split.txt")) as f2:
+        images = f1.readlines()
+        datasplit = f2.readlines()
+        for image, split_ in zip(images, datasplit):
+            _, names = image.strip().split(" ")
+            _, name = names.split("/")          
+            tsplit = int(split_.strip().split(" ")[1])
+            name_split[name] = tsplit
+
+    train_path = os.path.join(path, "train")
+    test_path = os.path.join(path, "test")
+    images_path = os.path.join(path, "images")
+    dirs = sorted(os.listdir(images_path))
+    for dir in dirs:        
+        if not os.path.exists(os.path.join(train_path, dir)):
+            os.mkdir(os.path.join(train_path, dir))
+        if not os.path.exists(os.path.join(test_path, dir)):
+            os.mkdir(os.path.join(test_path, dir))            
+        files = os.listdir(os.path.join(images_path, dir))
+        for file in files:
+            split_ = name_split[file]
+            current = os.path.join(images_path, dir, file)
+            destination = os.path.join(train_path, dir, file) if split_ == 1 else os.path.join(test_path, dir, file)
+            os.rename(current, destination)                        
+
+def separate_stanfordcars():
+    path = os.path.join(os.getcwd(), "dataset/stanford_cars")
+    anno = scipy.io.loadmat(os.path.join(path, "cars_annos.mat"))
+
+    name_split = {}
+    for img in anno["annotations"][0]:
+        name = img[0][0].split("/")[1]
+        name_split[name] = (img[5][0][0], img[6][0][0])
+
+    train_path = os.path.join(path, "train")
+    test_path = os.path.join(path, "test")
+    images_path = os.path.join(path, "car_ims")
+    files = os.listdir(images_path)
+    for file in files:
+        cls_, test = name_split[file]
+        if not os.path.exists(os.path.join(train_path, str(cls_))):
+            os.mkdir(os.path.join(train_path, str(cls_)))
+        if not os.path.exists(os.path.join(test_path, str(cls_))):
+            os.mkdir(os.path.join(test_path, str(cls_)))            
+        current = os.path.join(images_path, file)
+        destination = os.path.join(test_path, str(cls_), file) if test == 1 else os.path.join(train_path, str(cls_), file)
+        os.rename(current, destination)        
+
+def separate_fgvcaircraft():
+    path = os.path.join(os.getcwd(), "dataset/fgvc_aircraft/fgvc-aircraft-2013b/data")
+    train_path = os.path.join(path, "images_variant_train.txt")
+    val_path = os.path.join(path, "images_variant_val.txt")
+    test_path = os.path.join(path, "images_variant_test.txt")
+
+    with open(train_path) as tr, open(val_path) as va, open(test_path) as te:
+        train_idx = [name.strip() for name in tr.readlines()]
+        val_idx = [name.strip() for name in va.readlines()]
+        test_idx = [name.strip() for name in te.readlines()]
+
+    # need to replace dash -, space  and forward slash / to underscore _
+    # use stupid/lazy way
+    train_idx = {t.split(" ")[0]: t.split(" ")[1].replace("-", "_").replace(" ", "_").replace("/", "_") for t in train_idx}
+    val_idx = {t.split(" ")[0]: t.split(" ")[1].replace("-", "_").replace(" ", "_").replace("/", "_") for t in val_idx}
+    test_idx = {t.split(" ")[0]: t.split(" ")[1].replace("-", "_").replace(" ", "_").replace("/", "_") for t in test_idx}
+
+    train_path = os.path.join(path, "train")
+    val_path = os.path.join(path, "val")
+    test_path = os.path.join(path, "test")
+    images_path = os.path.join(path, "images")
+    files = os.listdir(images_path)
+    for file in files:
+        name = file[:-4]
+        if name in train_idx:
+            cls_ = train_idx[name]
+            if not os.path.exists(os.path.join(train_path, cls_)):
+                os.mkdir(os.path.join(train_path, cls_))
+            destination = os.path.join(train_path, cls_, file)
+        elif name in val_idx:
+            cls_ = val_idx[name]
+            if not os.path.exists(os.path.join(val_path, cls_)):
+                os.mkdir(os.path.join(val_path, cls_))
+            destination = os.path.join(val_path, cls_, file)                
+        elif name in test_idx:   
+            cls_ = test_idx[name]
+            if not os.path.exists(os.path.join(test_path, cls_)):
+                os.mkdir(os.path.join(test_path, cls_))       
+            destination = os.path.join(test_path, cls_, file)     
+        current = os.path.join(images_path, file)
+        print(current, destination)
+        os.rename(current, destination)     
+
+def separate_letters():
+    path = os.path.join(os.getcwd(), "dataset/letters")
+    train_path = os.path.join(path, "good_train.txt")
+    val_path = os.path.join(path, "good_val.txt")
+    test_path = os.path.join(path, "good_test.txt")
+
+    with open(train_path) as tr, open(val_path) as va, open(test_path) as te:
+        train_idx = [name.strip() for name in tr.readlines()]
+        val_idx = [name.strip() for name in va.readlines()]
+        test_idx = [name.strip() for name in te.readlines()]
+
+    # English/Img/GoodImg/Bmp/Sample050/img050-00009.png
+    # make a dictionary of {class: [images]} for lookup
+    train_idx = letters_helper(train_idx, dict())
+    val_idx = letters_helper(val_idx, dict())
+    test_idx = letters_helper(test_idx, dict())
+
+    train_path = os.path.join(path, "train")
+    val_path = os.path.join(path, "val")
+    test_path = os.path.join(path, "test")
+    images_path = os.path.join(path, "English/Img/GoodImg/Bmp")
+    dirs = os.listdir(images_path)
+
+    for dir in dirs:
+        if not os.path.exists(os.path.join(train_path, dir)):
+            os.mkdir(os.path.join(train_path, dir))
+        if not os.path.exists(os.path.join(val_path, dir)):
+            os.mkdir(os.path.join(val_path, dir))
+        if not os.path.exists(os.path.join(test_path, dir)):
+            os.mkdir(os.path.join(test_path, dir))
+
+        files = os.listdir(os.path.join(images_path, dir))
+        for file in files:
+            if file in train_idx[dir]:
+                destination = os.path.join(train_path, dir, file)
+            elif file in val_idx[dir]:
+                destination = os.path.join(val_path, dir, file)
+            elif file in test_idx[dir]:
+                destination = os.path.join(test_path, dir, file)
+            current = os.path.join(images_path, dir, file)
+            print(current, destination)
+            os.rename(current, destination)
+
+def letters_helper(idx, dict_):
+    for idx_ in idx:
+        idx_ = idx_.split("/")
+        cls_, name = idx_[-2], idx_[-1]
+        temp = dict_.get(cls_, [])
+        temp.append(name)
+        dict_[cls_] = temp
+    return dict_
+            
+def extract_generic(subdir, outfile):
+    vit_transform, device, extractor = get_params()
+    path = os.path.join(os.getcwd(), subdir)
+
+    dataset = datasets.ImageFolder(path, transform=vit_transform)
+    dataloader = DataLoader(dataset, batch_size=1024, shuffle=False)
+    embeddings, targets = [], []
+    for images, labels_ in dataloader:
+        extracted = extractor(images.to(device))
+        e = extracted.detach().cpu()
+        l = labels_.detach().cpu().numpy().tolist()
+        print(np.unique(labels_))
+        embeddings.extend(zip(e, l))
+        targets.extend(l)
+        torch.cuda.empty_cache()
+    embs = {"data": embeddings, "targets": targets, "classes": dataset.classes, "class_to_idx": dataset.class_to_idx}
+    torch.save(embs, outfile)
+
+def conv2image_svhn(path, mat_file, type):
+    path = os.path.join(os.getcwd(), path)
+    dir_path = os.path.join(path, type)
+    
+    mat = scipy.io.loadmat(os.path.join(path, mat_file))
+    X = np.transpose(mat["X"], (3, 0, 1, 2))
+    y = mat["y"].reshape(-1).tolist()
+
+    for i in range(len(y)):
+        if not os.path.exists(os.path.join(dir_path, str(y[i]))):
+            os.mkdir(os.path.join(dir_path, str(y[i])))
+        im = Image.fromarray(X[i])        
+        im.save(os.path.join(dir_path, str(y[i]), f"{str(time.time_ns())}.png"))
+
+if __name__ == "__main__":    
+    ###############################################
+    # EXTRACT SVHN
+    # conv2image_svhn("dataset/svhn", "train_32x32.mat", "train")
+    # conv2image_svhn("dataset/svhn", "test_32x32.mat", "test")
+    # extract_generic("dataset/svhn/train", "ds_svhn_train.pt")
+    # extract_generic("dataset/svhn/test", "ds_svhn_test.pt")
+    exit()            
+    ###############################################
+    # EXTRACT LETTERS
+    # separate_letters()    
+    # extract_generic("dataset/letters/train", "ds_letters_train.pt")
+    # extract_generic("dataset/letters/val", "ds_letters_val.pt")
+    # extract_generic("dataset/letters/test", "ds_letters_test.pt")
+    exit()            
+    ###############################################
+    # EXTRACT FGVC_AIRCRAFT
+    # separate_fgvcaircraft()
+    # extract_generic("dataset/fgvc_aircraft/fgvc-aircraft-2013b/data/train", "ds_fgvc_aircraft_train.pt")
+    # extract_generic("dataset/fgvc_aircraft/fgvc-aircraft-2013b/data/val", "ds_fgvc_aircraft_val.pt")
+    # extract_generic("dataset/fgvc_aircraft/fgvc-aircraft-2013b/data/test", "ds_fgvc_aircraft_test.pt")
+    exit()        
+    ###############################################
+    # EXTRACT iNATURALIST
+    extract_inaturalist()
+    exit()    
+    ###############################################
+    # EXTRACT CUB
+    # separate_stanfordcars()
+    # extract_generic("dataset/stanford_cars/train", "ds_stanford_cars_train.pt")
+    # extract_generic("dataset/stanford_cars/test", "ds_stanford_cars_test.pt")
+    exit()         
+    ###############################################
+    # EXTRACT CUB
+    # separate_cub()    
+    # extract_generic("dataset/cub/CUB_200_2011/train", "ds_cub_train.pt")
+    # extract_generic("dataset/cub/CUB_200_2011/test", "ds_cub_test.pt")
+    exit()        
+    ###############################################
+    # EXTRACT MIT SCENES
+    # extract_mitscenes()
+    # split_mitscenes()
+    exit()    
+    ###############################################
+    # EXTRACT OXFORD FLOWERS
+    extract_oxflowers()
+    exit()
+    ###############################################
+    # EXTRACT CORE50
+    extract_core50()
+    exit()
+    ###############################################
+
     train_embedding_path = "cifar100_train_embedding.pt"
     test_embedding_path = "cifar100_test_embedding.pt"
     val_embedding_path = None
@@ -321,6 +746,7 @@ if __name__ == "__main__":
         None, 
         val_embedding_path=test_embedding_path,
         num_tasks=n_experts, # num_tasks == n_experts
+        expert=True
     )
 
     print(class_order)
