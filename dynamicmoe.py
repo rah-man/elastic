@@ -12,6 +12,7 @@ import copy
 import numpy as np
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 from torch.distributions.normal import Normal
 
@@ -85,7 +86,7 @@ class SparseDispatcher(object):
         lab_split = torch.split(lab_exp, self._part_sizes, dim=0)
         return inp_split, lab_split
 
-    def combine(self, expert_out, expert_labels=None, multiply_by_gates=True):
+    def combine(self, expert_out, multiply_by_gates=True):
         """Sum together the expert output, weighted by the gates.
         The slice corresponding to a particular batch element `b` is computed
         as the sum over all experts `i` of the expert output, weighted by the
@@ -98,7 +99,11 @@ class SparseDispatcher(object):
         Returns:
           a `Tensor` with shape `[batch_size, <extra_output_dims>]`.
         """
+        # print("LEN(expert_out): ", len(expert_out))
+        # for i in range(len(expert_out)):
+        #     print(f"\t\texpert_out[{i}].size(): {expert_out[i].size()}")
         stitched = torch.cat(expert_out, 0)
+        # print("stitched.size():", stitched.size())
         if multiply_by_gates:
             stitched = stitched.mul(self._nonzero_gates)
              
@@ -106,6 +111,8 @@ class SparseDispatcher(object):
             out_size_ = expert_out[-1].size(1)
             zeros = torch.zeros(self._gates.size(0), out_size_, requires_grad=True, device=stitched.device)            
             combined = zeros.index_add(0, self._batch_index, stitched)
+            # print("\tCOMBINED", combined.size())
+            # print("\t", combined)
 
         combined[combined == 0] = np.finfo(float).eps
         return combined
@@ -119,9 +126,33 @@ class SparseDispatcher(object):
         # split nonzero gates for each expert
         return torch.split(self._nonzero_gates, self._part_sizes, dim=0)
 
+class BiasLayer(torch.nn.Module):
+    """Bias layers with alpha and beta parameters"""
+
+    def __init__(self):
+        super(BiasLayer, self).__init__()
+        # Initialize alpha and beta with requires_grad=False and only set to True during Stage 2
+        self.alpha = torch.nn.Parameter(torch.ones(1, requires_grad=False))
+        self.beta = torch.nn.Parameter(torch.zeros(1, requires_grad=False))
+
+    def forward(self, x):
+        return self.alpha * x + self.beta
+
 class MLPDynamic(nn.Module):
     def __init__(self, input_size=768, hidden_size=256, output_size=2, projected_output_size=2):
         super().__init__()
+        """
+        new experiment 20230106:
+            - uniform hidden unit size = 20 (for 5 task)
+        """
+        # self.fc1 = nn.Linear(in_features=input_size, out_features=20)
+        # self.fc2 = nn.Linear(in_features=20, out_features=output_size)        
+        # self.mapper = nn.Linear(in_features=output_size, out_features=projected_output_size, bias=False)
+        # self.batchnorm = nn.InstanceNorm1d(num_features=20, affine=False)
+
+        """
+        old way below
+        """
         self.fc1 = nn.Linear(in_features=input_size, out_features=1000)
         self.fc2 = nn.Linear(in_features=1000, out_features=1000)
         self.fc3 = nn.Linear(in_features=1000, out_features=1000)
@@ -130,17 +161,23 @@ class MLPDynamic(nn.Module):
         self.mapper = nn.Linear(in_features=output_size, out_features=projected_output_size, bias=False)
         self.relu = nn.ReLU()
         self.batchnorm = nn.InstanceNorm1d(num_features=1000, affine=False)
-        self.dropout = nn.Dropout(p=0.2)
-        # self.selu = nn.SELU()
-        # self.alphadropout = nn.AlphaDropout(p=0.2)
-        # self.batchnorm = nn.LayerNorm(1000, elementwise_affine=False)
+        self.dropout = nn.Dropout(p=0.2)        
 
     def forward(self, x):
-        out = self.batchnorm(self.dropout(self.relu(self.fc1(x))))
-        out = self.batchnorm(self.dropout(self.relu(self.fc2(out))))
-        out = self.batchnorm(self.dropout(self.relu(self.fc3(out))))
-        out = self.batchnorm(self.relu(self.fc4(out)))
-        out = self.mapper(self.fc5(out))
+        """
+        new experiments
+        """
+        # out = self.batchnorm(F.relu(self.fc1(x)))
+        # out = self.mapper(self.fc2(out))
+
+        """
+        old way below
+        """
+        out = self.relu(self.batchnorm(self.fc1(x)))
+        out = self.relu(self.batchnorm(self.fc2(out)))
+        out = self.relu(self.batchnorm(self.fc3(out)))
+        out = self.relu(self.batchnorm(self.fc4(out)))
+        out = self.mapper(self.fc5(out))        
         return out
 
 class DynamycMoE(nn.Module):
@@ -162,16 +199,21 @@ class DynamycMoE(nn.Module):
         self.noisy_gating = noisy_gating
         self.k = k
         self.kind = kind
-        self.experts = None
-        self.register_buffer("mean", torch.tensor([0.0]))
-        self.register_buffer("std", torch.tensor([1.0]))                
+        self.experts = None            
         self.softplus = nn.Softplus()
         self.softmax = nn.Softmax(1)
         self.ce_loss = nn.CrossEntropyLoss()
+        self.register_buffer("mean", torch.tensor([0.0]))
+        self.register_buffer("std", torch.tensor([1.0]))
+        self.bias_layers = None
 
     def expand_expert(self, seen_cls, new_cls, k=2):
         self.seen_cls = seen_cls
         self.new_cls = new_cls
+
+        """
+        20230106: add final BiC layer along with expansion
+        """
 
         # extending existing ones (choosing which one?)
         # grow as below
@@ -180,9 +222,10 @@ class DynamycMoE(nn.Module):
             # only executed once for the first task
             experts = nn.ModuleList([MLPDynamic(input_size=self.input_size, hidden_size=self.hidden_size, output_size=new_cls, projected_output_size=new_cls)])
             self.num_experts = len(experts)
+            self.bias_layers = nn.ModuleList([BiasLayer()])
 
-            w_gate = nn.Parameter(torch.zeros(self.input_size, self.num_experts), requires_grad=True)
-            w_noise = nn.Parameter(torch.zeros(self.input_size, self.num_experts), requires_grad=True)            
+            w_gate = nn.Parameter(torch.zeros(self.input_size, self.num_experts, requires_grad=True), requires_grad=True)
+            w_noise = nn.Parameter(torch.zeros(self.input_size, self.num_experts, requires_grad=True), requires_grad=True)            
         else:
             # UPDATE THE MAPPER LAYER FOR EACH OF THE PREVIOUS EXPERT
             # 1. old_mapper.out_features = old_mapper.out_features + self.new_cls
@@ -191,6 +234,7 @@ class DynamycMoE(nn.Module):
             experts = copy.deepcopy(self.experts)
             experts.append(MLPDynamic(input_size=self.input_size, hidden_size=self.hidden_size, output_size=new_cls, projected_output_size=new_cls))
             self.num_experts = len(experts)
+            self.bias_layers.append(BiasLayer())
             
             for expert_index, module in enumerate(experts):
                 weight = module.mapper.weight
@@ -203,19 +247,22 @@ class DynamycMoE(nn.Module):
                     module.mapper.weight[new_cls * expert_index:new_cls * expert_index + new_cls, :] = weight if weight.size(0) <= new_cls else weight[new_cls * expert_index:new_cls * expert_index + new_cls, :]
                     module.mapper.weight[list(removed_)] = 0.
 
-            w_gate = nn.Parameter(torch.zeros(self.input_size, self.num_experts), requires_grad=True)
-            w_noise = nn.Parameter(torch.zeros(self.input_size, self.num_experts), requires_grad=True)
+            w_gate = nn.Parameter(torch.zeros(self.input_size, self.num_experts, requires_grad=True), requires_grad=True)
+            w_noise = nn.Parameter(torch.zeros(self.input_size, self.num_experts, requires_grad=True), requires_grad=True)
             
             with torch.no_grad():
                 w_gate.data[:, :self.w_gate.size(1)] = self.w_gate
-                w_noise.data[:, :self.w_gate.size(1)] = self.w_noise
-
+                w_noise.data[:, :self.w_gate.size(1)] = self.w_noise        
         
         self.k = min(k, self.num_experts) if k > self.num_experts else k        
         self.w_gate = w_gate
         self.w_noise = w_noise
         self.experts = experts
-    
+
+    def bias_forward(self, task, output):
+        """Modified version from FACIL"""
+        return self.bias_layers[task](output)  
+
     def not_none(self):
         return self.experts != None
 
@@ -225,9 +272,17 @@ class DynamycMoE(nn.Module):
             for param in e.parameters():
                 param.requires_grad = False
 
+    def set_gate(self, grad):
+        for name, param in self.named_parameters():
+            if name == "w_gate":
+                param.requires_grad = grad
+            if name == "w_noise":
+                param.requires_grad = grad
+
+
     def freeze_all(self):
         for e in self.experts:
-            for param in e.parameters():
+            for name, param in e.named_parameters():
                 param.requires_grad = False
 
     def unfreeze_all(self):
@@ -364,13 +419,20 @@ class DynamycMoE(nn.Module):
         expert_inputs, expert_labels = dispatcher.dispatch(x, labels)
         # gates = dispatcher.expert_to_gates()
         expert_outputs = [self.experts[i](expert_inputs[i]) for i in range(self.num_experts)]
+        # print("EXPERT OUTPUTS:")
+        # print(expert_outputs)
+        # print(expert_outputs.size())
         # expert_losses = dispatcher.calculate_expert_loss(expert_outputs, expert_labels)
         expert_losses = []
         for eo, el in zip(expert_outputs, expert_labels):
             expert_losses.append(self.ce_loss(eo, el))
 
-        y = dispatcher.combine(expert_outputs, expert_labels)
-        return y, gate_loss, expert_losses, gates
+        # y = self.bic(dispatcher.combine(expert_outputs))
+        y = dispatcher.combine(expert_outputs)
+        # print("========")
+        # print("y.size():", y.size())
+        # print("========")
+        return y, gate_loss, expert_losses, gates, expert_outputs
 
 if __name__ == "__main__":
     moe = DynamycMoE(k=2)
