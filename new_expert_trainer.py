@@ -70,7 +70,6 @@ class Trainer:
         if "ordered" in self.dataset:
             self.subclass_mapper = self.dataset["ordered"]
 
-        # hidden_size = int(self.total_cls / (len(self.dataset)-1))
         hidden_size = int(1000 / self.n_task)
         self.model = DynamicExpert(hidden_size=hidden_size)
 
@@ -84,17 +83,18 @@ class Trainer:
         val_loaders = []        
         final_train_batch = []
         for task in range(self.n_task):
-            print("\tBEGIN_CLS2IDX:", self.cls2idx)
+            # print("\tBEGIN_CLS2IDX:", self.cls2idx)
             early_stop = EarlyStopping(verbose=True)
+            
             # update the model for new classes in each iteration
             new_cls = len(self.dataset[task]["classes"])
             self.update_classmap(self.dataset[task]["classes"])
 
             self.model.expand_expert(self.seen_cls, new_cls)
 
-            print("=====GATE WEIGHT BEGIN=====")
-            self.model.calculate_gate_norm()
-            print("==========================")
+            # print("=====GATE WEIGHT BEGIN=====")
+            # self.model.calculate_gate_norm()
+            # print("==========================")
 
             if task > 0:
                 self.previous_model = copy.deepcopy(self.model)
@@ -102,7 +102,6 @@ class Trainer:
                 self.previous_model.eval()            
 
             self.model.to(self.device)            
-            # optimiser = optim.SGD(self.model.parameters(), lr=self.lr, momentum=0.8)
             optimiser = optim.Adam(self.model.parameters(), lr=self.lr, )
             
             if steps == 2:
@@ -115,7 +114,6 @@ class Trainer:
             self.model.freeze_previous_experts()
             self.model.set_gate(False)             
             train_loss = []
-            batch_store = []    # to store a small batch of train_set for evaluation
 
             for epoch in range(self.epochs):
                 ypreds, ytrue = [], []
@@ -123,38 +121,43 @@ class Trainer:
 
                 running_train_loss = [] # store train_loss per epoch
                 dataset_len = 0
+                pred_correct = 0.0
 
                 for x, y in trainloader:
                     x = x.to(self.device)
                     y = y.to(self.device)
-                    outputs, gate_outputs = self.model(x, y, task, train_step=1)    # gate_outputs will be None for train_step=1
-                    batch_store.append((x, y))
+
+                    # inputs, targets_a, targets_b, lam = self.mixup_data(x, y)
+
+                    outputs, gate_outputs = self.model(x, task, train_step=1)    # gate_outputs will be None for train_step=1
+                    # outputs_mix, gate_outputs_mix = self.model(inputs, task, train_step=1)
 
                     loss = self.criterion(outputs, y)
+                    # loss += self.mixup_criterion(self.criterion, outputs_mix, targets_a, targets_b, lam)
+
                     loss.backward()
                     optimiser.step()
                     optimiser.zero_grad()
                                   
-                    predicted = torch.argmax(outputs.data, 1)
-                    ypreds.extend(predicted.detach().cpu().tolist())
-                    ytrue.extend(y.detach().cpu().tolist())
+                    predicted = torch.argmax(outputs, 1)
+                    pred_correct += predicted.eq(y).cpu().sum().float()
+                    # predicted = torch.argmax(outputs_mix, 1)
+                    # pred_correct += (lam * predicted.eq(targets_a).cpu().sum().float() + (1 - lam) * predicted.eq(targets_b).cpu().sum().float())
 
-                    # running_train_loss += loss.item() * x.size(0)
-                    # dataset_len += x.size(0)
                     running_train_loss.append(loss.item())
+
+                    dataset_len += x.size(0) #+ inputs.size(0)
                 
-                # scheduler.step()
-                # train_loss.append(running_train_loss / dataset_len)            
                 train_loss.append(np.average(running_train_loss))
                 if (epoch + 1) % 10 == 0:
-                    print(f"STEP-1\tEpoch: {epoch+1}/{self.epochs}\tloss: {train_loss[-1]:.4f}\tstep1_train_accuracy: {(100 * accuracy_score(ytrue, ypreds)):.4f}")
+                    print(f"STEP-1\tEpoch: {epoch+1}/{self.epochs}\tloss: {train_loss[-1]:.4f}\tstep1_train_accuracy: {(100 * pred_correct / dataset_len):.4f}")
 
             self.train_loss1.append(train_loss)
 
             print("FINISH STEP 1")
 
+            # TRAIN THE GATE
             if steps == 2:
-                # print("\tSTEP2_CLS2IDX:", self.cls2idx)
                 print("STARTING STEP 2")
                 self.model.freeze_all_experts()
                 self.model.set_gate(True)
@@ -163,106 +166,111 @@ class Trainer:
                 train_loss = [] # store train_loss per epoch
                 gate_loss_ = [] # store gate_loss per epoch
 
-                # gate_optimiser = optim.SGD(self.model.parameters(), lr=self.lr)
                 gate_optimiser = optim.Adam(self.model.parameters(), lr=self.lr)
-                for epoch in range(self.epochs):
-                    # running_train_loss, running_gate_loss = 0.0, 0.0
+                # self.update_buffer(task, uniform=True)  # do it here once                
+                # for epoch in range(self.epochs):
+                for epoch in range(200):
                     running_train_loss, running_gate_loss = [], []
-                    dataset_len, gate_correct = 0, 0
+                    dataset_len, gate_correct, pred_correct = 0, 0.0, 0.0
                     ypreds, ytrue = [], []
-
+                    
                     for i, (x, y) in enumerate(trainloader):
-                        batch_gate_correct = 0
                         x = x.to(self.device)
                         y = y.to(self.device)
-                        # print(f"\tstep2_y: {y}")
+                        inputs, targets_a, targets_b, lam = self.mixup_data(x, y)
                         
-                        outputs, gate_outputs = self.model(x, y, train_step=2)  # train_step=2 will multiply gate_outputs and classification layer output
+                        # outputs_ori, gate_outputs_ori = self.model(x, train_step=2)
+                        outputs, gate_outputs = self.model(inputs, train_step=2)
 
                         if task > 0:
                             bias_outputs = []
+                            # bias_outputs_ori = []
                             prev = 0
                             for i, num_class in enumerate(self.previous_task_nums):
                                 outs = outputs[:, prev:(prev+num_class)]
+                                # outs_ori = outputs_ori[:, prev:(prev+num_class)]
+
                                 bias_outputs.append(self.model.bias_forward(task, outs))
+                                # bias_outputs_ori.append(self.model.bias_forward(task, outs_ori))
+
                                 prev += num_class
+
                             old_cls_outputs = torch.cat(bias_outputs, dim=1)
+                            # old_cls_outputs_ori = torch.cat(bias_outputs_ori, dim=1)
+
                             new_cls_outputs = self.model.bias_forward(task, outputs[:, prev:])  # prev should point to the last task
+                            # new_cls_outputs_ori = self.model.bias_forward(task, outputs_ori[:, prev:])  # prev should point to the last task
+
                             pred_all_classes = torch.cat([old_cls_outputs, new_cls_outputs], dim=1)
-                            loss = self.criterion(pred_all_classes, y)
+                            # pred_all_classes_ori = torch.cat([old_cls_outputs_ori, new_cls_outputs_ori], dim=1)
+                            # loss = self.criterion(pred_all_classes, y)
+                            # loss = self.mixup_criterion(self.criterion, pred_all_classes, y_ori, y_mix, lam)
+                            loss = self.mixup_criterion(self.criterion, pred_all_classes, targets_a, targets_b, lam)
+                            # loss += self.criterion(pred_all_classes_ori, y)
                             loss += 0.1 * ((self.model.bias_layers[task].beta[0] ** 2) / 2)
-                            # loss = self.criterion_(task, outputs, y, old_cls_outputs)
                         else:
                             if len(outputs.size()) == 1:
                                 outputs = outputs.view(-1, 1)
-                            loss = self.criterion(outputs, y)
-
-                        running_train_loss.append(loss.item())
+                                # outputs_ori = outputs_ori.view(-1, 1)
+                            # loss = self.criterion(outputs, y)
+                            # loss = self.mixup_criterion(self.criterion, outputs, y_ori, y_mix, lam)
+                            loss = self.mixup_criterion(self.criterion, outputs, targets_a, targets_b, lam)
+                            # loss += self.criterion(outputs_ori, y)
                         
-                        # CALCULATE GATE LOSS BY MAPPING Y TO GATE
-                        if self.subclass_mapper:
-                            # print("\tSTEP2_SUBCLASS_MAPPER:", self.subclass_mapper)
-                            gate_labels = torch.tensor(np.vectorize(self.subclass_mapper.get)(y.cpu().numpy())).type(torch.LongTensor).to(self.device)
-                            gate_loss = self.criterion(gate_outputs, gate_labels)
-                            # print(f"\tgate_loss: {gate_loss}")
+                        running_train_loss.append(loss.item())
 
-                            # running_gate_loss += gate_loss.item() * x.size(0)
+                        if self.subclass_mapper:
+                            # ori_labels = torch.tensor(np.vectorize(self.subclass_mapper.get)(y.cpu().numpy())).type(torch.LongTensor).to(self.device)
+                            gate_labels = torch.tensor(np.vectorize(self.subclass_mapper.get)(targets_a.cpu().numpy())).type(torch.LongTensor).to(self.device)
+                            mix_labels = torch.tensor(np.vectorize(self.subclass_mapper.get)(targets_b.cpu().numpy())).type(torch.LongTensor).to(self.device)
+                            # gate_loss = self.criterion(gate_outputs, gate_labels)
+                            gate_loss = self.mixup_criterion(self.criterion, gate_outputs, gate_labels, mix_labels, lam)
+                            # gate_loss += self.criterion(gate_outputs_ori, ori_labels)
+
                             running_gate_loss.append(gate_loss.item())
                             loss += gate_loss
-                            # loss = 0.5 * loss + 2 * gate_loss
 
                             gate_preds = torch.argmax(gate_outputs.data, 1)
-                            batch_gate_correct += (gate_preds == gate_labels).sum().item()
-                            gate_correct += (gate_preds == gate_labels).sum().item()
+                            # gate_preds_ori = torch.argmax(gate_outputs_ori.data, 1)
+                            gate_correct += (lam * gate_preds.eq(gate_labels).cpu().sum().float() + (1 - lam) * gate_preds.eq(mix_labels).cpu().sum().float())
+                            # gate_correct += gate_preds_ori.eq(ori_labels).cpu().sum().float()
 
-                            # if task > 0:
-                            #     print(f"\tTASK-{task} STEP-2 y: {y}")
-                            #     print(f"\tTASK-{task} STEP-2 GATE_LABELS: {gate_labels}")
-                            #     print(f"\tTASK-{task} STEP-2 GATE_PREDS: {gate_preds}")
-                            #     print(f"\tTASK-{task} STEP-2 GATE_LOSS: {gate_loss}")
-                                # print(f"\tTASK-{task} STEP-2 BATCH_GATE_CORRECT: {batch_gate_correct}")
-                                # print(f"\tTASK-{task} STEP-2 TOTAL_GATE_CORRECT: {gate_correct}")
-                            #     # print(f"\tTASK-{task} STEP-2 GATE_OUTPUTS: {gate_outputs}")
-                            #     print()                            
                         loss.backward()
                         gate_optimiser.step()
                         gate_optimiser.zero_grad()
 
-                        predicted = torch.argmax(outputs.data, 1)
-                        ypreds.extend(predicted.detach().cpu().tolist())
-                        ytrue.extend(y.detach().cpu().tolist())
+                        predicted = torch.argmax(outputs.data, 1) if task == 0 else torch.argmax(pred_all_classes, 1)
+                        pred_correct += (lam * predicted.eq(targets_a).cpu().sum().float() + (1 - lam) * predicted.eq(targets_b).cpu().sum().float())
+
+                        # predicted = torch.argmax(outputs_ori.data, 1) if task == 0 else torch.argmax(pred_all_classes_ori, 1)
+                        # pred_correct += predicted.eq(y).cpu().sum().float()
+
+                        # ypreds.extend(predicted.detach().cpu().tolist())
+                        # ytrue.extend(y_mix.detach().cpu().tolist())
                         
-                        dataset_len += x.size(0)
+                        dataset_len += x.size(0) #+ inputs.size(0)
                 
-                    step2_loss = 0.5 * np.average(running_train_loss) + 2 * np.average(running_gate_loss)
-                    early_stop(step2_loss, self.model)
-                    
-                    # train_loss.append(running_train_loss / dataset_len)
-                    # gate_loss_.append(running_gate_loss / dataset_len)
+                    # early_stop(loss, self.model)
+
                     train_loss.append(np.average(running_train_loss))
                     gate_loss_.append(np.average(running_gate_loss))
-                    # if task > 0:
-                    if (epoch + 1) % 10 == 0:
-                        print("data_len:", dataset_len)
-                        print("step2_gate_correct:", gate_correct)
-                        print(f"STEP-2\tEpoch: {epoch+1}/{self.epochs}\tclassification_loss: {train_loss[-1]:.4f}\tgate_loss: {gate_loss_[-1]:.4f}\tstep2_classification_accuracy: {(100 * accuracy_score(ytrue, ypreds)):.4f}\tstep_2_gate_accuracy: {100 * (gate_correct / dataset_len):.4f}")
-                    if early_stop.early_stop:
-                        print(f"Early stopping. Exit epoch {epoch+1}")
-                        break                    
+                    if (epoch + 1) % 10 == 0:                                
+                        print(f"STEP-2\tEpoch: {epoch+1}/{self.epochs}\tclassification_loss: {train_loss[-1]:.4f}\tgate_loss: {gate_loss_[-1]:.4f}\tstep2_classification_accuracy: {(100 * pred_correct.item() / dataset_len):.4f}\tstep_2_gate_accuracy: {100 * (gate_correct / dataset_len):.4f}")
+                    # if early_stop.early_stop:
+                    #     print(f"Early stopping. Exit epoch {epoch+1}")
+                    #     break                    
                 print("FINISH STEP 2")                
             self.model.unfreeze_all()
 
-            print("=====GATE WEIGHT END=====")
-            self.model.calculate_gate_norm()
-            print("========================")        
+            # print("=====GATE WEIGHT END=====")
+            # self.model.calculate_gate_norm()
+            # print("========================")        
 
-            if True:
-                # print("\tVAL_CLS2IDX:", self.cls2idx)
+            if val_loaders:
                 self.model.eval()
                 val_loss_ = []                
                 for nt, valloader in enumerate(val_loaders):
                     
-                    # running_val_loss = 0.0
                     running_val_loss = []
                     dataset_len = 0
                     gate_correct = 0
@@ -270,10 +278,9 @@ class Trainer:
                     for i, (x, y) in enumerate(valloader):                        
                         x = x.to(self.device)
                         y = y.to(self.device)
-                        # print(f"\tval_y: {y}")
 
                         with torch.no_grad():
-                            outputs, gate_outputs = self.model(x, y, task=nt)
+                            outputs, gate_outputs = self.model(x, task=nt)
 
                             if task > 0:
                                 bias_outputs = []
@@ -286,7 +293,6 @@ class Trainer:
                                 new_cls_outputs = self.model.bias_forward(task, outputs[:, prev:])
                                 pred_all_classes = torch.cat([old_cls_outputs, new_cls_outputs], dim=1)
 
-                                # loss = self.criterion_(task, outputs, y, old_cls_outputs)
                                 loss = self.criterion(pred_all_classes, y)
                                 loss += 0.1 * ((self.model.bias_layers[nt].beta[0] ** 2) / 2)
                             else:
@@ -295,11 +301,8 @@ class Trainer:
                                 loss = self.criterion(outputs, y)
 
                             if self.subclass_mapper:
-                                # one_hot_class = gate_outputs.size(1)
-                                # print("\tVAL_SUBCLASS_MAPPER:", self.subclass_mapper)
                                 gate_labels = torch.tensor(np.vectorize(self.subclass_mapper.get)(y.cpu().numpy())).type(torch.LongTensor).to(self.device)
                                 gate_loss = self.criterion(gate_outputs, gate_labels)
-                                # print(f"\tgate_loss: {gate_loss}")
                                 loss += gate_loss
 
                                 gate_preds = torch.argmax(gate_outputs.data, 1)
@@ -313,62 +316,20 @@ class Trainer:
                         ypreds.extend(predicted.detach().cpu().tolist())
                         ytrue.extend(y.detach().cpu().tolist())
 
-                    print("data_len:", dataset_len)
-                    print("val_gate_correct:", gate_correct)
                     val_loss_.append(np.average(running_val_loss))
                     task_accuracy = 100 * accuracy_score(ytrue, ypreds)
-                    print(f"\tTask-{nt} val_loss: {val_loss_[-1]:.4f}\tval_accuracy: {task_accuracy:.4f}\tgate_accuracy: {100 * (gate_correct / dataset_len):.4f}")
+                    print(f"\tTask-{nt}\tval_loss: {val_loss_[-1]:.4f}\tval_accuracy: {task_accuracy:.4f}\tgate_accuracy: {100 * (gate_correct / dataset_len):.4f}")
 
                     if self.metric:
                         self.metric.add_accuracy(task, task_accuracy)
                 self.val_loss.append(val_loss_)
 
-                final_train_batch.append(batch_store[0])
             if self.metric:
                 self.metric.add_forgetting(task)
             print()
 
             self.seen_cls += new_cls
             self.previous_task_nums.append(self.dataset[task]["ncla"])
-        
-        # for nt, (x, y) in enumerate(final_train_batch):
-        #     gate_correct = 0
-        #     x = x.to(self.device)
-        #     y = y.to(self.device)
-        #     with torch.no_grad():
-        #         outputs, gate_outputs = self.model(x, y, task=nt)
-        #         if nt > 0:
-        #             bias_outputs = []
-        #             prev = 0
-        #             for i, num_class in enumerate(self.previous_task_nums):
-        #                 outs = outputs[:, prev:(prev+num_class)]
-        #                 bias_outputs.append(self.model.bias_forward(nt, outs))
-        #                 prev += num_class
-        #             old_cls_outputs = torch.cat(bias_outputs, dim=1)
-        #             new_cls_outputs = self.model.bias_layers[nt](outputs[:, prev:])
-        #             pred_all_classes = torch.cat([old_cls_outputs, new_cls_outputs], dim=1)
-        #             loss = self.criterion(pred_all_classes, y)
-        #             loss += 0.1 * ((self.model.bias_layers[nt].beta[0] ** 2) / 2)
-        #         else:
-        #             if len(outputs.size()) == 1:
-        #                 outputs = outputs.view(-1, 1)                                
-        #             loss = self.criterion(outputs, y)
-
-        #         if self.subclass_mapper:
-        #             gate_labels = torch.tensor(np.vectorize(self.subclass_mapper.get)(y.cpu().numpy())).type(torch.LongTensor).to(self.device)
-        #             gate_loss = self.criterion(gate_outputs, gate_labels)
-        #             loss += gate_loss
-
-        #             gate_preds = torch.argmax(gate_outputs.data, 1)
-        #             gate_correct += (gate_preds == gate_labels).sum().item()
-
-        #             print(f"\ty: {y}")
-        #             print(f"\tGATE_LABELS: {gate_labels}")
-        #             print(f"\tGATE_OUTPUTS: {gate_outputs}")
-        #             print(f"\tGATE_LOSS: {gate_loss}")
-        #             print(f"\tGATE_PREDS: {gate_preds}")
-        #             print(f"\tGATE_CORRECT: {gate_correct}")
-        #             print()            
 
         return self.train_loss1, self.train_loss2, self.val_loss, self.model
 
@@ -388,7 +349,7 @@ class Trainer:
                 y = y.to(self.device)
 
                 with torch.no_grad():
-                    outputs, gate_outputs = self.model(x, y)
+                    outputs, gate_outputs = self.model(x)
                     if self.model.bias_layers:
                         bias_outputs = []
                         prev = 0
@@ -408,39 +369,22 @@ class Trainer:
             print(f"\tTASK-{task}\tCLASSES: {self.dataset[task]['classes']}\ttest_accuracy: {(100 * accuracy_score(ytrue, ypreds)):.4f}")
         print(f"All accuracy: {(100 * accuracy_score(all_true, all_preds)):.4f}")
 
-    def criterion_(self, t, outputs, targets, targets_old):
-        """Returns the loss value"""
+    def update_buffer(self, task, uniform=True):
+        current_dataset = self.dataset[task]
+        self.replay.update_buffer(current_dataset, uniform=True)
 
-        loss_dist = 0
-        if t > 0:
-            # loss_dist += self.cross_entropy_(torch.cat(outputs[:t], dim=1), torch.cat(targets_old[:t], dim=1), exp=1.0 / self.T)
-            old_size = targets_old[:t].size(1)
-            loss_dist += self.cross_entropy_(outputs[:t, :old_size], targets_old[:t], exp=1.0 / self.temperature)
-        
-        if self.lamb == -1:
-            # lamb = (self.previous_task_nums.float() / self.model.task_cls.sum()).to(self.device)
-            lamb = torch.tensor(float(sum(self.previous_task_nums)) / self.total_cls).to(self.device)
-            loss = (1.0 - lamb) * torch.nn.functional.cross_entropy(outputs, targets) + lamb * loss_dist
-            print("LOSS:", loss)
-            return loss
-        else:
-            return torch.nn.functional.cross_entropy(outputs, targets) + self.lamb * loss_dist  
+    def get_uniform_mixup(self, task):
+        x_train, y_train = self.replay.buffer["x"], self.replay.buffer["y"]
+        x_train, y_train = torch.stack(x_train), torch.tensor(y_train)
 
-    def cross_entropy_(self, outputs, targets, exp=1.0, size_average=True, eps=1e-5):
-        """Calculates cross-entropy with temperature scaling"""
-        out = torch.nn.functional.softmax(outputs, dim=1)
-        tar = torch.nn.functional.softmax(targets, dim=1)
-        if exp != 1:
-            out = out.pow(exp)
-            out = out / out.sum(1).view(-1, 1).expand_as(out)
-            tar = tar.pow(exp)
-            tar = tar / tar.sum(1).view(-1, 1).expand_as(tar)
-        out = out + eps / out.size(1)
-        out = out / out.sum(1).view(-1, 1).expand_as(out)
-        ce = -(tar * out.log()).sum(1)
-        if size_average:
-            ce = ce.mean()
-        return ce                  
+        mix_inputs, targets_true, targets_new, lam = self.mixup_data(x_train, y_train)
+        ori_dataloader = self._get_dataloader(x_train, targets_true.numpy(), shuffle=False, batch_size=64)   # shuffle=False so they both can be compared
+        mix_dataloader = self._get_dataloader(mix_inputs, targets_new.numpy(), shuffle=False, batch_size=64)
+
+        # print("\tORI_CLASS_COUNTER:", sorted(Counter(y_train.numpy()).items()))
+        # print("\tMIX_CLASS_COUNTER:", sorted(Counter(targets_new.numpy()).items()))
+
+        return ori_dataloader, mix_dataloader, lam
 
     def _get_current_dataloader(self, task, val=False, ignore_replay=False, uniform=False):
         current_dataset = self.dataset[task]
@@ -468,11 +412,31 @@ class Trainer:
 
         return trainloader, valloader
     
+    def mixup_data(self, x, y, alpha=1.0, use_cuda=True):
+        '''Returns mixed inputs, pairs of targets, and lambda'''
+        if alpha > 0:
+            lam = np.random.beta(alpha, alpha)
+        else:
+            lam = 1
+
+        batch_size = x.size()[0]
+        if use_cuda:
+            index = torch.randperm(batch_size).cuda()
+        else:
+            index = torch.randperm(batch_size)
+
+        mixed_x = lam * x + (1 - lam) * x[index, :]
+        y_a, y_b = y, y[index]
+        return mixed_x, y_a, y_b, lam
+
+
+    def mixup_criterion(self, criterion, pred, y_a, y_b, lam):
+        return lam * criterion(pred, y_a) + (1 - lam) * criterion(pred, y_b)
+
     def _get_dataloader(self, x, y, shuffle=False, batch_size=None):
         _dataset = BaseDataset(x, y, self.transform, self.cls2idx)
-        # print("\t\tDATALOADER_CREATION:", _dataset.cls2idx)
         batch_size = batch_size if batch_size else self.batch_size
-        _dataloader = DataLoader(_dataset, batch_size=self.batch_size, shuffle=False)
+        _dataloader = DataLoader(_dataset, batch_size=batch_size, shuffle=shuffle)
         return _dataloader
 
     def reduce_learning_rate(self, optimiser):        
