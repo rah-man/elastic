@@ -125,13 +125,13 @@ class DynamicExpert(nn.Module):
         """Modified version from FACIL"""
         return self.bias_layers[task](output)
 
-    def freeze_previous(self):
+    def freeze_previous_experts(self):
         for i in range(len(self.experts) - 1):
             e = self.experts[i]
             for param in e.parameters():
                 param.requires_grad = False
 
-    def freeze_all(self):
+    def freeze_all_experts(self):
         for e in self.experts:
             for param in e.parameters():
                 param.requires_grad = False
@@ -147,12 +147,9 @@ class DynamicExpert(nn.Module):
                 param.requires_grad = True
 
     def forward(self, x, y, task=None, train_step=2):
-        # print("\tx.size():", x.size())
-        
         gate_outputs = None
         if train_step == 1:
             expert_outputs = self.experts[task](x)
-            # print("\tstep1 expert_outputs.size():", expert_outputs.size())
         else:
             gate_outputs = self.gate(x)
             gate_outputs_uns = torch.unsqueeze(gate_outputs, 1)
@@ -161,11 +158,6 @@ class DynamicExpert(nn.Module):
             expert_outputs = torch.stack(expert_outputs, 1)
             expert_outputs = gate_outputs_uns@expert_outputs
             expert_outputs = torch.squeeze(expert_outputs)
-            # print("\tstep2 expert_outputs.size():", expert_outputs.size())
-        
-
-        # print("\texpert_outputs.size():", expert_outputs.size())
-        # python new_expert_trainer.py -d 2 -b 256 -s 2 -m 500 -e 200 -n 20 -p "z.pkl"
 
         return expert_outputs, gate_outputs
         
