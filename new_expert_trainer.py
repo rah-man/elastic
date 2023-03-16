@@ -18,8 +18,10 @@ from earlystopping import EarlyStopping
 from new_expert import DynamicExpert
 from mets import Metrics
 from replay import RandomReplay
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, silhouette_score, calinski_harabasz_score, davies_bouldin_score
 
+# from gmm import GaussianMixture
+from sklearn.mixture import GaussianMixture
 
 WEIGHT_DECAY = 5e-4
 
@@ -83,7 +85,6 @@ class Trainer:
         val_loaders = []        
         final_train_batch = []
         for task in range(self.n_task):
-            # print("\tBEGIN_CLS2IDX:", self.cls2idx)
             early_stop = EarlyStopping(verbose=True)
             
             # update the model for new classes in each iteration
@@ -103,7 +104,9 @@ class Trainer:
 
             self.model.to(self.device)            
             optimiser = optim.Adam(self.model.parameters(), lr=self.lr, )
-            
+
+            self._gmm(task)
+
             if steps == 2:
                 trainloader, valloader = self._get_current_dataloader(task, val=True, ignore_replay=True) 
             elif steps == 1:
@@ -126,31 +129,26 @@ class Trainer:
                 for x, y in trainloader:
                     x = x.to(self.device)
                     y = y.to(self.device)
-
-                    # inputs, targets_a, targets_b, lam = self.mixup_data(x, y)
-
                     outputs, gate_outputs = self.model(x, task, train_step=1)    # gate_outputs will be None for train_step=1
-                    # outputs_mix, gate_outputs_mix = self.model(inputs, task, train_step=1)
-
+                    
                     loss = self.criterion(outputs, y)
-                    # loss += self.mixup_criterion(self.criterion, outputs_mix, targets_a, targets_b, lam)
-
                     loss.backward()
                     optimiser.step()
                     optimiser.zero_grad()
                                   
                     predicted = torch.argmax(outputs, 1)
                     pred_correct += predicted.eq(y).cpu().sum().float()
-                    # predicted = torch.argmax(outputs_mix, 1)
-                    # pred_correct += (lam * predicted.eq(targets_a).cpu().sum().float() + (1 - lam) * predicted.eq(targets_b).cpu().sum().float())
 
                     running_train_loss.append(loss.item())
-
                     dataset_len += x.size(0) #+ inputs.size(0)
                 
+                early_stop(loss, self.model)
                 train_loss.append(np.average(running_train_loss))
                 if (epoch + 1) % 10 == 0:
                     print(f"STEP-1\tEpoch: {epoch+1}/{self.epochs}\tloss: {train_loss[-1]:.4f}\tstep1_train_accuracy: {(100 * pred_correct / dataset_len):.4f}")
+                if early_stop.early_stop:
+                    print(f"Early stopping. Exit epoch {epoch+1}")
+                    break
 
             self.train_loss1.append(train_loss)
 
@@ -167,8 +165,7 @@ class Trainer:
                 gate_loss_ = [] # store gate_loss per epoch
 
                 gate_optimiser = optim.Adam(self.model.parameters(), lr=self.lr)
-                # self.update_buffer(task, uniform=True)  # do it here once                
-                # for epoch in range(self.epochs):
+                early_stop = EarlyStopping(verbose=True)
                 for epoch in range(200):
                     running_train_loss, running_gate_loss = [], []
                     dataset_len, gate_correct, pred_correct = 0, 0.0, 0.0
@@ -177,88 +174,58 @@ class Trainer:
                     for i, (x, y) in enumerate(trainloader):
                         x = x.to(self.device)
                         y = y.to(self.device)
-                        inputs, targets_a, targets_b, lam = self.mixup_data(x, y)
                         
-                        # outputs_ori, gate_outputs_ori = self.model(x, train_step=2)
-                        outputs, gate_outputs = self.model(inputs, train_step=2)
+                        outputs, gate_outputs = self.model(x, train_step=2)
 
                         if task > 0:
                             bias_outputs = []
-                            # bias_outputs_ori = []
                             prev = 0
                             for i, num_class in enumerate(self.previous_task_nums):
                                 outs = outputs[:, prev:(prev+num_class)]
-                                # outs_ori = outputs_ori[:, prev:(prev+num_class)]
-
                                 bias_outputs.append(self.model.bias_forward(task, outs))
-                                # bias_outputs_ori.append(self.model.bias_forward(task, outs_ori))
-
                                 prev += num_class
-
                             old_cls_outputs = torch.cat(bias_outputs, dim=1)
-                            # old_cls_outputs_ori = torch.cat(bias_outputs_ori, dim=1)
-
                             new_cls_outputs = self.model.bias_forward(task, outputs[:, prev:])  # prev should point to the last task
-                            # new_cls_outputs_ori = self.model.bias_forward(task, outputs_ori[:, prev:])  # prev should point to the last task
-
                             pred_all_classes = torch.cat([old_cls_outputs, new_cls_outputs], dim=1)
-                            # pred_all_classes_ori = torch.cat([old_cls_outputs_ori, new_cls_outputs_ori], dim=1)
-                            # loss = self.criterion(pred_all_classes, y)
-                            # loss = self.mixup_criterion(self.criterion, pred_all_classes, y_ori, y_mix, lam)
-                            loss = self.mixup_criterion(self.criterion, pred_all_classes, targets_a, targets_b, lam)
-                            # loss += self.criterion(pred_all_classes_ori, y)
+                            loss = self.criterion(pred_all_classes, y)
                             loss += 0.1 * ((self.model.bias_layers[task].beta[0] ** 2) / 2)
                         else:
                             if len(outputs.size()) == 1:
                                 outputs = outputs.view(-1, 1)
-                                # outputs_ori = outputs_ori.view(-1, 1)
-                            # loss = self.criterion(outputs, y)
-                            # loss = self.mixup_criterion(self.criterion, outputs, y_ori, y_mix, lam)
-                            loss = self.mixup_criterion(self.criterion, outputs, targets_a, targets_b, lam)
-                            # loss += self.criterion(outputs_ori, y)
+                            loss = self.criterion(outputs, y)
                         
                         running_train_loss.append(loss.item())
 
                         if self.subclass_mapper:
-                            # ori_labels = torch.tensor(np.vectorize(self.subclass_mapper.get)(y.cpu().numpy())).type(torch.LongTensor).to(self.device)
-                            gate_labels = torch.tensor(np.vectorize(self.subclass_mapper.get)(targets_a.cpu().numpy())).type(torch.LongTensor).to(self.device)
-                            mix_labels = torch.tensor(np.vectorize(self.subclass_mapper.get)(targets_b.cpu().numpy())).type(torch.LongTensor).to(self.device)
-                            # gate_loss = self.criterion(gate_outputs, gate_labels)
-                            gate_loss = self.mixup_criterion(self.criterion, gate_outputs, gate_labels, mix_labels, lam)
-                            # gate_loss += self.criterion(gate_outputs_ori, ori_labels)
+                            gate_labels = torch.tensor(np.vectorize(self.subclass_mapper.get)(y.cpu().numpy())).type(torch.LongTensor).to(self.device)
+                            gate_loss = self.criterion(gate_outputs, gate_labels)
 
                             running_gate_loss.append(gate_loss.item())
                             loss += gate_loss
-
                             gate_preds = torch.argmax(gate_outputs.data, 1)
-                            # gate_preds_ori = torch.argmax(gate_outputs_ori.data, 1)
-                            gate_correct += (lam * gate_preds.eq(gate_labels).cpu().sum().float() + (1 - lam) * gate_preds.eq(mix_labels).cpu().sum().float())
-                            # gate_correct += gate_preds_ori.eq(ori_labels).cpu().sum().float()
+                            gate_correct += gate_preds.eq(gate_labels).cpu().sum().float()
 
                         loss.backward()
                         gate_optimiser.step()
                         gate_optimiser.zero_grad()
 
-                        predicted = torch.argmax(outputs.data, 1) if task == 0 else torch.argmax(pred_all_classes, 1)
-                        pred_correct += (lam * predicted.eq(targets_a).cpu().sum().float() + (1 - lam) * predicted.eq(targets_b).cpu().sum().float())
+                        predicted = torch.argmax(outputs.data, 1) if task == 0 else torch.argmax(pred_all_classes, 1)                        
+                        pred_correct += predicted.eq(y).cpu().sum().float()
 
-                        # predicted = torch.argmax(outputs_ori.data, 1) if task == 0 else torch.argmax(pred_all_classes_ori, 1)
-                        # pred_correct += predicted.eq(y).cpu().sum().float()
-
-                        # ypreds.extend(predicted.detach().cpu().tolist())
-                        # ytrue.extend(y_mix.detach().cpu().tolist())
+                        ypreds.extend(predicted.detach().cpu().tolist())
+                        ytrue.extend(y.detach().cpu().tolist())
                         
                         dataset_len += x.size(0) #+ inputs.size(0)
                 
-                    # early_stop(loss, self.model)
+                    early_stop(loss, self.model)
 
                     train_loss.append(np.average(running_train_loss))
                     gate_loss_.append(np.average(running_gate_loss))
                     if (epoch + 1) % 10 == 0:                                
                         print(f"STEP-2\tEpoch: {epoch+1}/{self.epochs}\tclassification_loss: {train_loss[-1]:.4f}\tgate_loss: {gate_loss_[-1]:.4f}\tstep2_classification_accuracy: {(100 * pred_correct.item() / dataset_len):.4f}\tstep_2_gate_accuracy: {100 * (gate_correct / dataset_len):.4f}")
-                    # if early_stop.early_stop:
-                    #     print(f"Early stopping. Exit epoch {epoch+1}")
-                    #     break                    
+                    if early_stop.early_stop:
+                        print(f"Early stopping. Exit epoch {epoch+1}")
+                        break                    
                 print("FINISH STEP 2")                
             self.model.unfreeze_all()
 
@@ -368,6 +335,30 @@ class Trainer:
 
             print(f"\tTASK-{task}\tCLASSES: {self.dataset[task]['classes']}\ttest_accuracy: {(100 * accuracy_score(ytrue, ypreds)):.4f}")
         print(f"All accuracy: {(100 * accuracy_score(all_true, all_preds)):.4f}")
+
+    def _gmm(self, task):
+        n_components = np.arange(2, 11)
+        current_dataset = self.dataset[task]
+        x_train = torch.vstack(current_dataset["trn"]["x"]).numpy()
+        y_train = torch.tensor(current_dataset["trn"]["y"]).numpy()
+        size = x_train.shape[0]
+        d = x_train.shape[1]
+        silhouette, ch, dav, predictions = [], [], [], []
+        
+        models = []
+        for n in n_components:
+            m = GaussianMixture(n, covariance_type='full', random_state=0).fit(x_train)
+            predictions.append(m.predict(x_train))
+            models.append(m)
+            print(f"Finish training {n} components.")
+            silhouette.append(silhouette_score(x_train, predictions[-1]))
+            ch.append(calinski_harabasz_score(x_train, predictions[-1]))
+            dav.append(davies_bouldin_score(x_train, predictions[-1]))
+            print(f"\tSilhouette: {silhouette[-1]:.4f}\tCalinski: {ch[-1]:.4f}\tDavies: {dav[-1]:.4f}")
+
+        print()
+        print(f"Silhouette highest n_components: {silhouette.index(max(silhouette))+2}\tCalinski highest n_components: {ch.index(max(ch))+2}\tDavies lowest n_component: {dav.index(min(dav))+2}")
+        exit()
 
     def update_buffer(self, task, uniform=True):
         current_dataset = self.dataset[task]
