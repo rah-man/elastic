@@ -12,6 +12,7 @@ import torchvision.models as models
 import wandb
 
 from collections import Counter
+from matplotlib import pyplot as plt
 from torch.utils.data import DataLoader
 from torchvision.models.feature_extraction import create_feature_extractor
 
@@ -20,7 +21,7 @@ from earlystopping import EarlyStopping
 from cluster_expert import DynamicExpert
 from mets import Metrics
 from replay import RandomReplay
-from sklearn.metrics import accuracy_score, silhouette_score, calinski_harabasz_score, davies_bouldin_score
+from sklearn.metrics import accuracy_score, silhouette_score, calinski_harabasz_score, davies_bouldin_score, ConfusionMatrixDisplay, confusion_matrix, classification_report
 
 WEIGHT_DECAY = 5e-4
 
@@ -79,7 +80,7 @@ class Trainer:
         self.cluster2rawcls = {}
         self.finecls2cluster = {}
         self.cluster2finecls = {}
-        self.clsgmm = {}
+        self.clsgmm = {}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
         self.buffer_x = {}  # {0: [], 1: []}
         self.buffer_y = {}  # {0: [0, 0, 0, 0, 0], 1: [1, 1, 1, 1, 1]}
         self.buffer = {}    # {"x": [], "y": []}
@@ -136,11 +137,27 @@ class Trainer:
             temp[k] = np.vectorize(self.cls2idx.get)(v).tolist()
         self.cluster2finecls = temp
 
-    def get_uniformloader(self, x, y):
+    def get_uniformloader(self, x, y, all=True):
         """
         Take self.mem_size / len(current_seen_classes)
         """
-        sample_per_class = self.mem_size // len(self.cls2idx)
+        sample_per_class = 0
+        x_t, y_t = None, None
+        if all:
+            sample_per_class = self.mem_size // len(self.cls2idx)
+        else:
+            # take old existing class from buffer (if exists)
+            # add with current classes
+            total_class = 0
+            if self.buffer_x:
+                total_class += len(self.buffer_y.keys())
+            total_class += len(np.unique(y))
+            sample_per_class = self.mem_size // total_class
+
+            x_t = np.array(x)
+            y_t = np.array(y)
+
+
         # if buffer not empty, reduce buffer to current size
         if self.buffer_x:
             # for existing buffer
@@ -150,12 +167,12 @@ class Trainer:
                 self.buffer_y[y_] = self.populate_buffer(members, sample_per_class)
 
             # for new buffer
-            class_data = self.dataset_by_class(x, y)
+            class_data = self.dataset_by_class(x, y) if all else self.dataset_by_class(x_t, y_t)
             for label, dataset in class_data.items():
                 self.buffer_x[label] = self.populate_buffer(dataset["x"], sample_per_class)
                 self.buffer_y[label] = self.populate_buffer(dataset["y"], sample_per_class)
         else:
-            class_data = self.dataset_by_class(x, y)
+            class_data = self.dataset_by_class(x, y) if all else self.dataset_by_class(x_t, y_t)
             for label, dataset in class_data.items():
                 self.buffer_x[label] = dataset["x"]
                 self.buffer_y[label] = dataset["y"]
@@ -174,7 +191,6 @@ class Trainer:
 
         dataloader = self._get_dataloader(x_, y_, shuffle=True, batch_size=64)
         return dataloader
-        
 
     def populate_buffer(self, members, sample_per_class):
         members = np.random.permutation(members)
@@ -190,12 +206,28 @@ class Trainer:
             class_data[label] = {"x": x_, "y": y_}
         return class_data
 
+    def draw_heatmap(self, y_true, y_pred, task, filename, title="", big=False):
+        print(f"=== drawing heatmap {filename}")
+        leg = sorted(np.unique(y_true))
+        cmat = confusion_matrix(y_true, y_pred)
+
+        fig, ax = plt.subplots() if not big else plt.subplots(figsize=(20, 15))
+        display = ConfusionMatrixDisplay(cmat, display_labels=leg)
+
+        ax.set_title(title)
+        display.plot(ax=ax)
+        fig.tight_layout()
+        # plt.savefig(f"gate_accuracy_task-{task}.png", dpi=300)
+        plt.savefig(f"{filename}.png", dpi=300)
+        print("=== finish drawing heatmap")
+
     def train_loop(self, steps=2):
-        val_loaders = []        
+        val_loaders = []
+        cur_task = 0 # pointer for bias correction in Step 2 (only needed for TRAIN_STEP_2_PER_SUBTASK)
         for task in range(self.n_task):            
             # cluster using class mean
             x, y = self.get_numpy_from_dataset(task, type="trn")            
-            gmm, cls2cluster_ = clusterlib.class_mean_cluster(x, y, self.cluster2rawcls)
+            gmm, cls2cluster_ = clusterlib.class_mean_cluster(x, y, self.cluster2rawcls, seed=42)
             self.update_cls2cluster(cls2cluster_)
             self.update_cluster2cls(cls2cluster_)
             self.update_classmap()
@@ -205,7 +237,7 @@ class Trainer:
             # print(f"cluster2rawcls: {self.cluster2rawcls}")
             # print(f"cls2idx: {self.cls2idx}")
             # print(f"idx2cls: {self.idx2cls}")
-            # print(f"finecls2cluster: {self.finecls2cluster}")
+            print(f"finecls2cluster: {self.finecls2cluster}")
             # print(f"cluster2finecls: {self.cluster2finecls}")
 
             # take the same x, y but with new class mapping
@@ -217,14 +249,19 @@ class Trainer:
             subtask_val = self.split2subtask(xval, yval, cls2cluster_)
 
             # create loader for Step 2
-            step2loader = self.get_uniformloader(x, y)
+            # only when Step 2 is done after all sub-tasks haves been trained
+            # otherwise go to TRAIN_STEP_2_PER_SUBTASK block
+            # step2loader = self.get_uniformloader(x, y)
+
+            hmap_true, hmap_pred = [], []
+            true_labels, expert_output = [], []
 
             # TRAIN STEP 1
             for subtask_t in sorted(subtask_train.keys()):
                 this_x, this_y = subtask_train[subtask_t]["x"], subtask_train[subtask_t]["y"]
                 this_xval, this_yval = subtask_val[subtask_t]["x"], subtask_val[subtask_t]["y"]
                 
-                print(f"SUB-TASK: {subtask_t}\tCLASS: {np.unique(this_y)}")
+                print(f"SUB-TASK: {subtask_t}\tCLASS: {np.unique(this_y)}\tNUM-CLASS: {len(np.unique(this_y))}")
 
                 this_task_classes = sorted(np.unique(this_y))
                 self.model.expand_gmm(this_task_classes)
@@ -233,12 +270,12 @@ class Trainer:
                 optimiser = optim.Adam(self.model.parameters(), lr=self.lr)                                                    
                 trainloader = self.get_dataloader(this_x, this_y)
                 valloader = self.get_dataloader(this_xval, this_yval)
-                val_loaders.append(valloader)
+                val_loaders.append(valloader)                
 
                 print("STARTING STEP 1")
                 self.model.freeze_previous_experts()
                 self.model.set_gate(False)
-
+                
                 early_stop = EarlyStopping(verbose=False)
                 train_loss = []
                 for epoch in range(self.epochs):
@@ -252,7 +289,10 @@ class Trainer:
                     for inputs, labels in trainloader:
                         inputs = inputs.to(self.device)
                         labels = labels.to(self.device)
-                        outputs, gate_outputs = self.model(inputs, subtask_t, train_step=1)    # gate_outputs will be None for train_step=1
+                        
+                        # gate_outputs will be None for train_step=1
+                        # original_expert_outputs will be ignored for train_step=1
+                        outputs, gate_outputs, original_expert_outputs = self.model(inputs, subtask_t, train_step=1)    
                                                 
                         # print(outputs)
                         # print(labels)
@@ -275,88 +315,134 @@ class Trainer:
                     if early_stop.early_stop:
                         print(f"Early stopping. Exit epoch {epoch+1}")
                         break
-
                 self.train_loss1.append(train_loss)
-
                 print("FINISH STEP 1\n")
 
-            # TRAIN THE GATE
-            if steps == 2:
-                print("STARTING STEP 2")
-                self.model.freeze_all_experts()
-                self.model.set_gate(True)
+                # TRAIN THE GATE
+                # unindent 1 if Step 2 is done after all subtasks have been trained
 
-                train_loss = [] # store train_loss per epoch
-                gate_loss_ = [] # store gate_loss per epoch
+                # TRAIN_STEP_2_PER_SUBTASK
+                step2loader = self.get_uniformloader(this_x, this_y, all=False)
+                if steps == 2:
+                    print("STARTING STEP 2")
+                    self.model.freeze_all_experts()
+                    self.model.set_gate(True)
 
-                gate_optimiser = optim.Adam(self.model.parameters(), lr=self.lr)
-                # early_stop = EarlyStopping(verbose=False)
-                for epoch in range(self.epochs):
-                    running_train_loss, running_gate_loss = [], []
-                    dataset_len, gate_correct, pred_correct = 0, 0.0, 0.0
-                    ypreds, ytrue = [], []
-                    
-                    for i, (images, labels) in enumerate(step2loader):
-                        images = images.to(self.device)
-                        labels = labels.to(self.device)
+                    train_loss = [] # store train_loss per epoch
+                    gate_loss_ = [] # store gate_loss per epoch
+
+                    gate_optimiser = optim.Adam(self.model.parameters(), lr=self.lr)
+                    early_stop = EarlyStopping(verbose=False)
+                    for epoch in range(self.epochs):
+                        running_train_loss, running_gate_loss = [], []
+                        dataset_len, gate_correct, pred_correct = 0, 0.0, 0.0
+                        ypreds, ytrue = [], []
                         
-                        outputs, gate_outputs = self.model(images, train_step=2)
+                        this_epoch_gate_true, this_epoch_gate_pred = [], []
+                        this_epoch_labels, this_epoch_expert_pred = [], []
 
-                        # RUN BIAS CORRECTION FOR ALL EXPERTS
-                        bias_outputs = []
-                        prev = 0
-                        for i, clust_i in enumerate(sorted(self.cluster2finecls.keys())):
-                            num_class = len(self.cluster2finecls[clust_i])
-                            outs = outputs[:, prev:(prev+num_class)]
-                            bias_outputs.append(self.model.bias_forward(clust_i, outs))
-                            prev += num_class
-                        old_cls_outputs = torch.cat(bias_outputs, dim=1)
-                        new_cls_outputs = self.model.bias_forward(clust_i, outputs[:, prev:])  # prev should point to the last subtask
-                        pred_all_classes = torch.cat([old_cls_outputs, new_cls_outputs], dim=1)
-                        loss = self.criterion(pred_all_classes, labels)
-                        loss += 0.1 * ((self.model.bias_layers[clust_i].beta[0] ** 2) / 2)
-                        
-                        running_train_loss.append(loss.item())
-                        
-                        gate_labels = torch.tensor(np.vectorize(self.finecls2cluster.get)(labels.cpu().numpy())).type(torch.LongTensor).to(self.device)
-                        gate_loss = self.criterion(gate_outputs, gate_labels)
+                        total_sample = 0
+                        for i, (images, labels) in enumerate(step2loader):
+                            images = images.to(self.device)
+                            labels = labels.to(self.device)
+                            
+                            outputs, gate_outputs, original_expert_outputs = self.model(images, train_step=2)
 
-                        running_gate_loss.append(gate_loss.item())
-                        loss += gate_loss
-                        gate_preds = torch.argmax(gate_outputs.data, 1)
-                        gate_correct += gate_preds.eq(gate_labels).cpu().sum().float()
+                            for out in original_expert_outputs:
+                                print(out.size())
+                                total_sample += out.size(0)
 
-                        loss.backward()
-                        gate_optimiser.step()
-                        gate_optimiser.zero_grad()
+                            if cur_task > 0:
+                            # RUN BIAS CORRECTION FOR ALL EXPERTS
+                                bias_outputs = []
+                                prev = 0
+                                # for i, clust_i in enumerate(sorted(self.cluster2finecls.keys())):
+                                for clust_i in range(cur_task):
+                                    num_class = len(self.cluster2finecls[clust_i])
+                                    outs = outputs[:, prev:(prev+num_class)]
+                                    bias_outputs.append(self.model.bias_forward(clust_i, outs))
+                                    prev += num_class
+                                old_cls_outputs = torch.cat(bias_outputs, dim=1)
+                                new_cls_outputs = self.model.bias_forward(clust_i, outputs[:, prev:])  # prev should point to the last subtask
+                                pred_all_classes = torch.cat([old_cls_outputs, new_cls_outputs], dim=1)
+                                loss = self.criterion(pred_all_classes, labels)
+                                loss += 0.1 * ((self.model.bias_layers[clust_i].beta[0] ** 2) / 2)
+                            else:
+                                if len(outputs.size()) == 1:
+                                    outputs = outputs.view(-1, 1)
+                                loss = self.criterion(outputs, labels)
+                            
+                            running_train_loss.append(loss.item())
+                            
+                            gate_labels = torch.tensor(np.vectorize(self.finecls2cluster.get)(labels.cpu().numpy())).type(torch.LongTensor).to(self.device)
+                            gate_loss = self.criterion(gate_outputs, gate_labels)
 
-                        # predicted = torch.argmax(outputs.data, 1) if clust_i == 0 else torch.argmax(pred_all_classes, 1)
-                        # predicted = torch.argmax(outputs.data, 1)
-                        predicted = torch.argmax(pred_all_classes, 1)
-                        # print(predicted)
-                        # print(labels)
-                        # print()
-                        pred_correct += predicted.eq(labels).cpu().sum().float()
+                            running_gate_loss.append(gate_loss.item())
+                            loss += gate_loss
+                            gate_preds = torch.argmax(gate_outputs.data, 1)
+                            gate_correct += gate_preds.eq(gate_labels).cpu().sum().float()
 
-                        ypreds.extend(predicted.detach().cpu().tolist())
-                        ytrue.extend(labels.detach().cpu().tolist())
-                        
-                        dataset_len += images.size(0)
-                
-                    # early_stop(loss, self.model)
+                            # book keeping for gate prediction
+                            # this_epoch_gate_true.extend(gate_labels.cpu().numpy().tolist())
+                            # this_epoch_gate_pred.extend(gate_preds.cpu().numpy().tolist())
+                            # print(f"\t\t\tFine labels: {labels.cpu().numpy()}\n\t\t\tGate labels: {gate_labels.cpu().numpy()}\n\t\t\tGate preds: {gate_preds.cpu().numpy()}\n\t\t\tGate correct: {len(gate_labels)}/{gate_preds.eq(gate_labels).cpu().sum().int()}\n")
 
-                    train_loss.append(np.average(running_train_loss))
-                    gate_loss_.append(np.average(running_gate_loss))
-                    # if (epoch + 1) % 10 == 0:                                
-                    print(f"STEP-2\tEpoch: {epoch+1}/{self.epochs}\tclassification_loss: {train_loss[-1]:.4f}\tgate_loss: {gate_loss_[-1]:.4f}\tstep2_classification_accuracy: {(100 * pred_correct.item() / dataset_len):.4f}\tstep_2_gate_accuracy: {100 * (gate_correct / dataset_len):.4f}")
-                        # print(f"STEP-2\tEpoch: {epoch+1}/{self.epochs}\tclassification_loss: {train_loss[-1]:.4f}\tstep2_classification_accuracy: {(100 * pred_correct.item() / dataset_len):.4f}")
-                    # if early_stop.early_stop:
-                    #     print(f"Early stopping. Exit epoch {epoch+1}")
-                    #     break                    
-                print("FINISH STEP 2\n")                
-            self.model.unfreeze_all()
+                            # book keeping for expert output
+                            # this_epoch_expert_pred.extend(torch.argmax(outputs.data, 1).cpu().numpy().tolist())
+                            # this_epoch_labels.extend(labels.cpu().numpy().tolist())                            
 
+                            loss.backward()
+                            gate_optimiser.step()
+                            gate_optimiser.zero_grad()
 
+                            # predicted = torch.argmax(outputs.data, 1) if clust_i == 0 else torch.argmax(pred_all_classes, 1)
+                            # predicted = torch.argmax(outputs.data, 1)
+
+                            # predicted = torch.argmax(pred_all_classes, 1)
+                            # TRAIN_STEP_2_PER_SUBTASK
+                            predicted = torch.argmax(outputs.data, 1) if cur_task == 0 else torch.argmax(pred_all_classes, 1)
+                            
+                            # print(predicted)
+                            # print(labels)
+                            # print()
+                            pred_correct += predicted.eq(labels).cpu().sum().float()
+
+                            ypreds.extend(predicted.detach().cpu().tolist())
+                            ytrue.extend(labels.detach().cpu().tolist())
+                            
+                            dataset_len += images.size(0)                    
+
+                        # hmap_true.append(this_epoch_gate_true)
+                        # hmap_pred.append(this_epoch_gate_pred)
+
+                        expert_output.append(this_epoch_expert_pred)
+                        true_labels.append(this_epoch_labels)
+
+                        early_stop(loss, self.model)
+
+                        train_loss.append(np.average(running_train_loss))
+                        gate_loss_.append(np.average(running_gate_loss))
+                        # if (epoch + 1) % 10 == 0:                                
+                        print(f"STEP-2\tEpoch: {epoch+1}/{self.epochs}\tclassification_loss: {train_loss[-1]:.4f}\tgate_loss: {gate_loss_[-1]:.4f}\tstep2_classification_accuracy: {(100 * pred_correct.item() / dataset_len):.4f}\tstep_2_gate_accuracy: {100 * (gate_correct / dataset_len):.4f}")
+                            # print(f"STEP-2\tEpoch: {epoch+1}/{self.epochs}\tclassification_loss: {train_loss[-1]:.4f}\tstep2_classification_accuracy: {(100 * pred_correct.item() / dataset_len):.4f}")
+                        if early_stop.early_stop:
+                            print(f"Early stopping. Exit epoch {epoch+1}")
+                            break
+                    print("FINISH STEP 2\n")                    
+                self.model.unfreeze_all()                
+                cur_task += 1
+
+            # self.draw_heatmap(hmap_true[-1], hmap_pred[-1], task, f"gate_accuracy_task-{task}", title=f"Gate Accuracy Task-{task}")            
+            # self.draw_heatmap(true_labels[-1], expert_output[-1], task, f"expert_accuracy_task-{task}", title=f"Expert Accuracy Task-{task}", big=True)
+
+            # print(f"\n===TRUE LABELS VS. EXPERT OUTPUT TASK-{task}===")
+            # print(classification_report(y_true=true_labels[-1], y_pred=expert_output[-1]))
+            # print("================================================\n")
+
+            exit()
+
+            """
+            CLOSE HERE
             if val_loaders:
                 self.model.eval()
                 val_loss_ = []                
@@ -375,8 +461,9 @@ class Trainer:
 
                         bias_outputs = []
                         prev = 0
-                        for i, clust_i in enumerate(sorted(self.cluster2rawcls.keys())):
-                            num_class = len(self.cluster2rawcls[clust_i])
+                        # for i, clust_i in enumerate(sorted(self.cluster2rawcls.keys())):
+                        for clust_i in range(cur_task):
+                            num_class = len(self.cluster2finecls[clust_i])
                             outs = outputs[:, prev:(prev+num_class)]
                             bias_outputs.append(self.model.bias_forward(clust_i, outs))
                             prev += num_class
@@ -412,7 +499,8 @@ class Trainer:
 
                 # if self.metric:
                 #     self.metric.add_forgetting(subtask)
-        # print()
+            UNTIL HERE
+            """
 
             # self.seen_cls += new_cls
             # self.previous_task_nums.append(self.dataset[task]["ncla"])
@@ -563,7 +651,8 @@ if __name__ == "__main__":
             test_embedding_path, 
             validation=0.2,
             num_tasks=n_experts,
-            expert=True)
+            expert=True,
+            seed=42)
     else:
         test_embedding_path = test_path[d]
         # data, task_cla, class_order = get_cifar100_coarse(train_embedding_path, test_embedding_path, None, validation=0.2)
@@ -653,3 +742,5 @@ if __name__ == "__main__":
 # l = nn.Linear(2, 4)
 # w1 = weight_norm(l, name="weight")
 # w1.weight_g
+
+# python cluster_expert_trainer.py -d 0 -b 256 -s 2 -m 500 -e 100 -n 5 -p "z.pkl"

@@ -17,7 +17,7 @@ from cluster import cluster_diff_alg, clusterKMEANS
 from earlystopping import EarlyStopping
 from sklearn.metrics import accuracy_score, silhouette_score, calinski_harabasz_score, davies_bouldin_score
 
-def gmm(x):
+def gmm(x, seed=None):
     """
     Run GMM for the given x.
     The number of components are 2 and 3.
@@ -29,7 +29,7 @@ def gmm(x):
     models = []
     silhouette, predictions = [], []
     for n in n_components:
-        m = GaussianMixture(n, covariance_type="full")
+        m = GaussianMixture(n, covariance_type="full", random_state=seed)
         pred = m.fit_predict(x)
         models.append(m)
         predictions.append(pred)       
@@ -70,7 +70,7 @@ def get_class_mean(x, y):
         cls_means.append(m_)
     return cls_means, cls_order
 
-def class_mean_cluster(x, y, cls2cluster):
+def class_mean_cluster(x, y, cls2cluster, seed=None):
     """
     Run class mean clustering for the given x and y
     Return:
@@ -81,7 +81,7 @@ def class_mean_cluster(x, y, cls2cluster):
     cls2cluster_ = {}
     cluster_shift = max(cls2cluster, key=int) + 1 if cls2cluster else 0
     cls_means, cls_order = get_class_mean(x, y)
-    model, predictions = gmm(cls_means)
+    model, predictions = gmm(cls_means, seed)
 
     cls2cluster_ = {y_: (p + cluster_shift) for y_, p in zip(cls_order, predictions)}
     # cls2gmm = class_gmm(x, y)

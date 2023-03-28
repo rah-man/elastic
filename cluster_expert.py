@@ -178,17 +178,20 @@ class DynamicExpert(nn.Module):
 
     def forward(self, x, task=None, train_step=2):
         gate_outputs = None
+        original_expert_outputs = None
 
         if train_step == 1:
             expert_outputs = self.experts[task](x)
+            original_expert_outputs = copy.deepcopy(expert_outputs) # no need to do this but to make it uniform
         else:
             gate_outputs = self.gate(x)
             gate_outputs_uns = torch.unsqueeze(gate_outputs, 1)
             
             expert_outputs = [self.experts[i](x) for i in range(self.num_experts)]
+            original_expert_outputs = copy.deepcopy(expert_outputs)
             expert_outputs = torch.stack(expert_outputs, 1)
             expert_outputs = gate_outputs_uns@expert_outputs
             expert_outputs = torch.squeeze(expert_outputs)
 
-        return expert_outputs, gate_outputs
+        return expert_outputs, gate_outputs, original_expert_outputs
         
