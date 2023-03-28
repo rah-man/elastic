@@ -341,16 +341,12 @@ class Trainer:
                         this_epoch_gate_true, this_epoch_gate_pred = [], []
                         this_epoch_labels, this_epoch_expert_pred = [], []
 
-                        total_sample = 0
+                        x_ctr, lab_ctr, pred_ctr = 0, 0, 0
                         for i, (images, labels) in enumerate(step2loader):
                             images = images.to(self.device)
                             labels = labels.to(self.device)
                             
                             outputs, gate_outputs, original_expert_outputs = self.model(images, train_step=2)
-
-                            for out in original_expert_outputs:
-                                print(out.size())
-                                total_sample += out.size(0)
 
                             if cur_task > 0:
                             # RUN BIAS CORRECTION FOR ALL EXPERTS
@@ -377,19 +373,35 @@ class Trainer:
                             gate_labels = torch.tensor(np.vectorize(self.finecls2cluster.get)(labels.cpu().numpy())).type(torch.LongTensor).to(self.device)
                             gate_loss = self.criterion(gate_outputs, gate_labels)
 
-                            running_gate_loss.append(gate_loss.item())
-                            loss += gate_loss
                             gate_preds = torch.argmax(gate_outputs.data, 1)
                             gate_correct += gate_preds.eq(gate_labels).cpu().sum().float()
 
-                            # book keeping for gate prediction
+                            running_gate_loss.append(gate_loss.item())
+                            loss += gate_loss
+                            
+                            # original_expert_predictions = torch.argmax(original_expert_outputs.data, 1)
+                            # x_ctr += images.size(0)
+                            # lab_ctr += labels.size(0)
+                            # pred_ctr += original_expert_predictions.size(0)
+                            # print(f"\t\t{x_ctr}\t{lab_ctr}\t{pred_ctr}")
+
+                            # # book keeping for gate prediction
                             # this_epoch_gate_true.extend(gate_labels.cpu().numpy().tolist())
                             # this_epoch_gate_pred.extend(gate_preds.cpu().numpy().tolist())
                             # print(f"\t\t\tFine labels: {labels.cpu().numpy()}\n\t\t\tGate labels: {gate_labels.cpu().numpy()}\n\t\t\tGate preds: {gate_preds.cpu().numpy()}\n\t\t\tGate correct: {len(gate_labels)}/{gate_preds.eq(gate_labels).cpu().sum().int()}\n")
 
-                            # book keeping for expert output
-                            # this_epoch_expert_pred.extend(torch.argmax(outputs.data, 1).cpu().numpy().tolist())
-                            # this_epoch_labels.extend(labels.cpu().numpy().tolist())                            
+                            out_temp = []
+                            for i, lab in enumerate(labels.cpu().numpy()):
+                                clust = self.finecls2cluster[lab]
+                                out_temp.append(original_expert_outputs[clust][i])
+                            
+                            # print(f"\t\tlen(OUT_TEMP): {len(out_temp)}\tout_temp[0].size(): {out_temp[0].size()}")
+                            out_temp = torch.vstack(out_temp)
+                            out_temp = torch.argmax(out_temp.data, 1)
+
+                            # # book keeping for expert output
+                            this_epoch_expert_pred.extend(out_temp.cpu().numpy().tolist())
+                            this_epoch_labels.extend(labels.cpu().numpy().tolist())
 
                             loss.backward()
                             gate_optimiser.step()
@@ -433,16 +445,14 @@ class Trainer:
                 cur_task += 1
 
             # self.draw_heatmap(hmap_true[-1], hmap_pred[-1], task, f"gate_accuracy_task-{task}", title=f"Gate Accuracy Task-{task}")            
-            # self.draw_heatmap(true_labels[-1], expert_output[-1], task, f"expert_accuracy_task-{task}", title=f"Expert Accuracy Task-{task}", big=True)
+            self.draw_heatmap(true_labels[-1], expert_output[-1], task, f"expert_accuracy_task-{task}", title=f"Expert Accuracy Task-{task}", big=True)
 
             # print(f"\n===TRUE LABELS VS. EXPERT OUTPUT TASK-{task}===")
             # print(classification_report(y_true=true_labels[-1], y_pred=expert_output[-1]))
             # print("================================================\n")
 
-            exit()
-
-            """
-            CLOSE HERE
+            # """
+            # CLOSE HERE
             if val_loaders:
                 self.model.eval()
                 val_loss_ = []                
@@ -457,7 +467,7 @@ class Trainer:
                         labels = labels.to(self.device)
 
                         with torch.no_grad():
-                            outputs, gate_outputs = self.model(images, train_step=2)
+                            outputs, gate_outputs, _ = self.model(images, train_step=2)
 
                         bias_outputs = []
                         prev = 0
@@ -499,8 +509,8 @@ class Trainer:
 
                 # if self.metric:
                 #     self.metric.add_forgetting(subtask)
-            UNTIL HERE
-            """
+            # UNTIL HERE
+            # """
 
             # self.seen_cls += new_cls
             # self.previous_task_nums.append(self.dataset[task]["ncla"])
