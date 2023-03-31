@@ -315,7 +315,7 @@ class Trainer:
                     
                     early_stop(loss, self.model)
                     train_loss.append(np.average(running_train_loss))
-                    if (epoch + 1) % 10 == 0:
+                    if (epoch + 1) % 5 == 0:
                         print(f"STEP-1\tEpoch: {epoch+1}/{self.epochs}\tloss: {train_loss[-1]:.4f}\tstep1_train_accuracy: {(100 * pred_correct / dataset_len):.4f}")
                     if early_stop.early_stop:
                         print(f"Early stopping. Exit epoch {epoch+1}")
@@ -335,6 +335,9 @@ class Trainer:
                     preds.extend(outs.cpu().numpy().tolist())
                 self.draw_heatmap(true, preds, task, f"after_subtask-{subtask_t}", title=f"experts_on_training_data_after_subtask-{subtask_t}", big=True)
                 self.model.train()
+
+                self.model.calculate_expert_weight_distance()
+                self.model.print_weight_distance()
 
                 # print("\n\n========================\n\n")
                 # for expert_index, module in enumerate(self.model.experts):
@@ -417,19 +420,17 @@ class Trainer:
                             # this_epoch_gate_true.extend(gate_labels.cpu().numpy().tolist())
                             # this_epoch_gate_pred.extend(gate_preds.cpu().numpy().tolist())
                             # print(f"\t\t\tFine labels: {labels.cpu().numpy()}\n\t\t\tGate labels: {gate_labels.cpu().numpy()}\n\t\t\tGate preds: {gate_preds.cpu().numpy()}\n\t\t\tGate correct: {len(gate_labels)}/{gate_preds.eq(gate_labels).cpu().sum().int()}\n")
-
-                            out_temp = []
-                            for i, lab in enumerate(labels.cpu().numpy()):
-                                clust = self.finecls2cluster[lab]
-                                out_temp.append(original_expert_outputs[clust][i])
                             
-                            # print(f"\t\tlen(OUT_TEMP): {len(out_temp)}\tout_temp[0].size(): {out_temp[0].size()}")
-                            out_temp = torch.vstack(out_temp)
-                            out_temp = torch.argmax(out_temp.data, 1)
-
                             # # book keeping for expert output
-                            this_epoch_expert_pred.extend(out_temp.cpu().numpy().tolist())
-                            this_epoch_labels.extend(labels.cpu().numpy().tolist())
+                            # out_temp = []
+                            # for i, lab in enumerate(labels.cpu().numpy()):
+                            #     clust = self.finecls2cluster[lab]
+                            #     out_temp.append(original_expert_outputs[clust][i])                        
+                            # print(f"\t\tlen(OUT_TEMP): {len(out_temp)}\tout_temp[0].size(): {out_temp[0].size()}")
+                            # out_temp = torch.vstack(out_temp)
+                            # out_temp = torch.argmax(out_temp.data, 1)                            
+                            # this_epoch_expert_pred.extend(out_temp.cpu().numpy().tolist())
+                            # this_epoch_labels.extend(labels.cpu().numpy().tolist())
 
                             loss.backward()
                             gate_optimiser.step()
@@ -462,8 +463,8 @@ class Trainer:
 
                         train_loss.append(np.average(running_train_loss))
                         gate_loss_.append(np.average(running_gate_loss))
-                        # if (epoch + 1) % 10 == 0:                                
-                        print(f"STEP-2\tEpoch: {epoch+1}/{self.epochs}\tclassification_loss: {train_loss[-1]:.4f}\tgate_loss: {gate_loss_[-1]:.4f}\tstep2_classification_accuracy: {(100 * pred_correct.item() / dataset_len):.4f}\tstep_2_gate_accuracy: {100 * (gate_correct / dataset_len):.4f}")
+                        if (epoch + 1) % 5 == 0:
+                            print(f"STEP-2\tEpoch: {epoch+1}/{self.epochs}\tclassification_loss: {train_loss[-1]:.4f}\tgate_loss: {gate_loss_[-1]:.4f}\tstep2_classification_accuracy: {(100 * pred_correct.item() / dataset_len):.4f}\tstep_2_gate_accuracy: {100 * (gate_correct / dataset_len):.4f}")
                             # print(f"STEP-2\tEpoch: {epoch+1}/{self.epochs}\tclassification_loss: {train_loss[-1]:.4f}\tstep2_classification_accuracy: {(100 * pred_correct.item() / dataset_len):.4f}")
                         if early_stop.early_stop:
                             print(f"Early stopping. Exit epoch {epoch+1}")
@@ -542,8 +543,6 @@ class Trainer:
             # UNTIL HERE
             # """
 
-            # self.seen_cls += new_cls
-            # self.previous_task_nums.append(self.dataset[task]["ncla"])
 
             # if task > 0:
             #     # stop after the first two task
@@ -559,7 +558,7 @@ class Trainer:
             #         outs = torch.argmax(outs.data, 1)
             #         preds.extend(outs.cpu().numpy().tolist())
             #     self.draw_heatmap(true, preds, task, f"after_task-{task}", title=f"experts_on_training_data_after_task-{task}", big=True)                
-            #     exit()
+                # exit()
 
         print("done for all tasks")
         exit()

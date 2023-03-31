@@ -48,7 +48,8 @@ class DynamicExpert(nn.Module):
         self.bias_layers = None
         self.all_classes = []
         self.expert_classes = []
-        # self.cum_classes = set()
+        self.cossim = {}
+        self.old_weight = {} # for weight distance calculation
 
     def expand_gmm(self, this_task_classes):
         if not self.experts:
@@ -59,7 +60,6 @@ class DynamicExpert(nn.Module):
             self.num_experts = len(experts)
             self.all_classes.extend(sorted(this_task_classes))
             self.expert_classes.append(sorted(this_task_classes))
-            # self.cum_classes.update(this_task_classes)
         else:
             gate = nn.Linear(in_features=self.input_size, out_features=self.num_experts+1)
             hidden_size = int((self.hidden_size / self.class_per_task) * len(this_task_classes))
@@ -69,23 +69,17 @@ class DynamicExpert(nn.Module):
             self.num_experts = len(experts)
             self.all_classes.extend(sorted(this_task_classes))
             self.expert_classes.append(sorted(this_task_classes))
-            # self.cum_classes.update(this_task_classes)
-
-            # print(f"\t\t\tEXPERT_CLASSES: {self.expert_classes}")
 
             low, high = 0, 0
-
             for expert_index, module in enumerate(experts):
                 weight = copy.deepcopy(module.mapper.weight)
                 input_size = module.mapper.in_features
-
-                # print(f"\t\tOLD_WEIGHT: {weight.data}\n\t\t{weight.size()}")
-
                 high += len(self.expert_classes[expert_index])
+
                 with torch.no_grad():
                     temp = torch.zeros_like(torch.empty(len(self.all_classes), input_size))
                     if expert_index < len(experts) - 1:
-                        # for previous experts, copy the weight as it is
+                        # for previous experts, copy the weight following the indices
                         temp[low:high, :] = weight[low:high, :]
                     else:
                         # for new expert, move the random non-zero to the end
@@ -106,6 +100,38 @@ class DynamicExpert(nn.Module):
         # print(f"task-{self.num_experts-1} EXPERT_TOTAL_PARAMS: {expert_total_params}")
         bias_total_params = sum(p.numel() for p in self.bias_layers.parameters())
         # print(f"task-{self.num_experts-1} bias_TOTAL_PARAMS: {bias_total_params}")
+
+    def calculate_expert_weight_distance(self):
+        # call after subtask
+        # take only the index where the value is (like when expanding the mapper) --> NO NEED, AS THIS IS THE FC WEIGHT, NOT THE MAPPER WEIGHT
+
+        cos = nn.CosineSimilarity(dim=1)
+
+        # self.old_weight contains {expert_index: [fc1_weight, fc2_weight]}
+        # self.cossim contains {expert_index: [fc1_dist, fc2_dist]} for every expert
+
+        for expert_index, module in enumerate(self.experts):
+            temp = self.old_weight.get(expert_index, [])
+            if temp:
+                # previous weight exists
+                fc1_old, fc2_old = temp[0], temp[1]
+            else:
+                # previous one doesn't exist
+                fc1_old, fc2_old = module.fc1.weight.data, module.fc2.weight.data
+
+            fc1_weight, fc2_weight = module.fc1.weight.data, module.fc2.weight.data
+            fc1_dist = cos(fc1_old, fc1_weight).sum() / fc1_weight.size(0)
+            fc2_dist = cos(fc2_old, fc2_weight).sum() / fc2_weight.size(0)
+            fc1_dist = fc1_dist.item()
+            fc2_dist = fc2_dist.item()
+
+            self.cossim[expert_index] = [fc1_dist, fc2_dist]
+            self.old_weight[expert_index] = [fc1_weight, fc2_weight]
+
+    def print_weight_distance(self):
+        for expert_index in sorted(self.cossim.keys()):
+            print(f"\tExpert-{expert_index} weight distance: {self.cossim[expert_index]}")
+        print()
 
     def calculate_gate_norm(self):
         w1 = nn.utils.weight_norm(self.gate, name="weight")
