@@ -224,6 +224,8 @@ class Trainer:
     def train_loop(self, steps=2):
         val_loaders = []
         cur_task = 0 # pointer for bias correction in Step 2 (only needed for TRAIN_STEP_2_PER_SUBTASK)
+        train_dataset = [] # for checking if the experts' weights change
+
         for task in range(self.n_task):            
             # cluster using class mean
             x, y = self.get_numpy_from_dataset(task, type="trn")            
@@ -261,6 +263,9 @@ class Trainer:
                 this_x, this_y = subtask_train[subtask_t]["x"], subtask_train[subtask_t]["y"]
                 this_xval, this_yval = subtask_val[subtask_t]["x"], subtask_val[subtask_t]["y"]
                 
+                # # for checking if the experts' weights change
+                train_dataset.append({"x": this_x, "y": this_y})
+
                 print(f"SUB-TASK: {subtask_t}\tCLASS: {np.unique(this_y)}\tNUM-CLASS: {len(np.unique(this_y))}")
 
                 this_task_classes = sorted(np.unique(this_y))
@@ -318,10 +323,33 @@ class Trainer:
                 self.train_loss1.append(train_loss)
                 print("FINISH STEP 1\n")
 
+                true, preds = [], []                
+                self.model.eval()
+                for i, sub in enumerate(train_dataset):
+                    images = torch.tensor(np.array(sub["x"])).to(device)
+                    true.extend(np.array(sub["y"]).tolist())
+
+                    with torch.no_grad():    
+                        outs = self.model.experts[i](images)
+                    outs = torch.argmax(outs.data, 1)
+                    preds.extend(outs.cpu().numpy().tolist())
+                self.draw_heatmap(true, preds, task, f"after_subtask-{subtask_t}", title=f"experts_on_training_data_after_subtask-{subtask_t}", big=True)
+                self.model.train()
+
+                # print("\n\n========================\n\n")
+                # for expert_index, module in enumerate(self.model.experts):
+                #     print("AFTER FINISHING STEP 1")
+                #     print(f"WEIGHT: {module.mapper.weight.data}\n\t\t{module.mapper.weight.size()}")
+                # print("\n\n========================\n\n")
+
+                # self.model.clean_mapper()
+
                 # TRAIN THE GATE
                 # unindent 1 if Step 2 is done after all subtasks have been trained
 
                 # TRAIN_STEP_2_PER_SUBTASK
+                # """
+                # CLOSE HERE
                 step2loader = self.get_uniformloader(this_x, this_y, all=False)
                 if steps == 2:
                     print("STARTING STEP 2")
@@ -443,9 +471,11 @@ class Trainer:
                     print("FINISH STEP 2\n")                    
                 self.model.unfreeze_all()                
                 cur_task += 1
+                # UNTIL HERE
+                # """
 
             # self.draw_heatmap(hmap_true[-1], hmap_pred[-1], task, f"gate_accuracy_task-{task}", title=f"Gate Accuracy Task-{task}")            
-            self.draw_heatmap(true_labels[-1], expert_output[-1], task, f"expert_accuracy_task-{task}", title=f"Expert Accuracy Task-{task}", big=True)
+            # self.draw_heatmap(true_labels[-1], expert_output[-1], task, f"expert_accuracy_task-{task}", title=f"Expert Accuracy Task-{task}", big=True)
 
             # print(f"\n===TRUE LABELS VS. EXPERT OUTPUT TASK-{task}===")
             # print(classification_report(y_true=true_labels[-1], y_pred=expert_output[-1]))
@@ -514,6 +544,22 @@ class Trainer:
 
             # self.seen_cls += new_cls
             # self.previous_task_nums.append(self.dataset[task]["ncla"])
+
+            # if task > 0:
+            #     # stop after the first two task
+            #     # to check if the experts' weight change
+            #     true, preds = [], []                
+            #     self.model.eval()
+            #     for i, sub in enumerate(train_dataset):
+            #         images = torch.tensor(np.array(sub["x"])).to(self.device)
+            #         true.extend(np.array(sub["y"]).tolist())
+
+            #         with torch.no_grad():    
+            #             outs = self.model.experts[i](images)
+            #         outs = torch.argmax(outs.data, 1)
+            #         preds.extend(outs.cpu().numpy().tolist())
+            #     self.draw_heatmap(true, preds, task, f"after_task-{task}", title=f"experts_on_training_data_after_task-{task}", big=True)                
+            #     exit()
 
         print("done for all tasks")
         exit()
