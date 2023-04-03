@@ -19,6 +19,11 @@ class Metrics:
 
     def add_forgetting(self, taskid):
         temp_ = {}
+
+        print()
+        print("metric.accuracy:", self.accuracy)
+        print()
+
         for cur in range(taskid):
             for each in range(cur+1):                
                 # print(each, cur, taskid, sep=", ")
@@ -39,6 +44,27 @@ class Metrics:
 
     def final_forgetting(self):
         return self.forgetting(len(self.forget)-1)
+
+class Metrics2:
+    def __init__(self):
+        self.accuracy = {}
+
+    def add_accuracy(self, taskid, acc):
+        cur = self.accuracy.get(taskid, [])
+        cur.append(acc)
+        self.accuracy[taskid] = cur
+
+    def final_average_accuracy(self):
+        fa = []
+        for k, v in self.accuracy.items():
+            fa.append(v[-1])
+        return np.average(fa)
+
+    def final_forgetting(self):
+        ff = []
+        for k, v in self.accuracy.items():
+            ff.append(max(v) - min(v))
+        return np.average(ff)
 
 if __name__ == "__main__":
     met = Metrics()
