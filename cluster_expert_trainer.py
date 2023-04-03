@@ -19,7 +19,7 @@ from torchvision.models.feature_extraction import create_feature_extractor
 from base import BaseDataset, get_data, get_cifar100_coarse
 from earlystopping import EarlyStopping
 from cluster_expert import DynamicExpert
-from mets import Metrics
+from mets import Metrics2
 from replay import RandomReplay
 from sklearn.metrics import accuracy_score, silhouette_score, calinski_harabasz_score, davies_bouldin_score, ConfusionMatrixDisplay, confusion_matrix, classification_report
 
@@ -211,7 +211,7 @@ class Trainer:
         leg = sorted(np.unique(y_true))
         cmat = confusion_matrix(y_true, y_pred)
 
-        fig, ax = plt.subplots() if not big else plt.subplots(figsize=(20, 15))
+        fig, ax = plt.subplots() if not big else plt.subplots(figsize=(25, 20))
         display = ConfusionMatrixDisplay(cmat, display_labels=leg)
 
         ax.set_title(title)
@@ -258,6 +258,7 @@ class Trainer:
             hmap_true, hmap_pred = [], []
             true_labels, expert_output = [], []
 
+            
             # TRAIN STEP 1
             for subtask_t in sorted(subtask_train.keys()):
                 this_x, this_y = subtask_train[subtask_t]["x"], subtask_train[subtask_t]["y"]
@@ -275,12 +276,15 @@ class Trainer:
                 optimiser = optim.Adam(self.model.parameters(), lr=self.lr)                                                    
                 trainloader = self.get_dataloader(this_x, this_y)
                 valloader = self.get_dataloader(this_xval, this_yval)
-                val_loaders.append(valloader)                
+                # print(f"APPENDING SUB-TASK-{subtask_t} TO VAL_LOADERS")
+                val_loaders.append(valloader)
 
                 print("STARTING STEP 1")
                 self.model.freeze_previous_experts()
                 self.model.set_gate(False)
                 
+                # """
+                # CLOSE HERE
                 early_stop = EarlyStopping(verbose=False)
                 train_loss = []
                 for epoch in range(self.epochs):
@@ -338,6 +342,10 @@ class Trainer:
 
                 self.model.calculate_expert_weight_distance()
                 self.model.print_weight_distance()
+
+                # UNTIL HERE
+                # """
+
 
                 # print("\n\n========================\n\n")
                 # for expert_index, module in enumerate(self.model.experts):
@@ -475,6 +483,71 @@ class Trainer:
                 # UNTIL HERE
                 # """
 
+                # """
+                # CLOSE HERE
+                if val_loaders:
+                    self.model.eval()
+                    val_loss_ = []                
+                    for subtask, valloader in enumerate(val_loaders):                    
+                        running_val_loss = []
+                        dataset_len = 0
+                        gate_correct = 0
+                        pred_correct = 0.0
+                        ypreds, ytrue = [], []
+                        for i, (images, labels) in enumerate(valloader):                        
+                            images = images.to(self.device)
+                            labels = labels.to(self.device)
+
+                            with torch.no_grad():
+                                outputs, gate_outputs, _ = self.model(images, train_step=2)
+
+                            bias_outputs = []
+                            prev = 0
+                            # for i, clust_i in enumerate(sorted(self.cluster2rawcls.keys())):
+                            for clust_i in range(cur_task):
+                                num_class = len(self.cluster2finecls[clust_i])
+                                outs = outputs[:, prev:(prev+num_class)]
+                                bias_outputs.append(self.model.bias_forward(clust_i, outs))
+                                prev += num_class
+                            old_cls_outputs = torch.cat(bias_outputs, dim=1)
+                            new_cls_outputs = self.model.bias_forward(clust_i, outputs[:, prev:])  # prev should point to the last task
+                            pred_all_classes = torch.cat([old_cls_outputs, new_cls_outputs], dim=1)
+                            loss = self.criterion(pred_all_classes, labels)
+                            loss += 0.1 * ((self.model.bias_layers[clust_i].beta[0] ** 2) / 2)
+
+                            gate_labels = torch.tensor(np.vectorize(self.finecls2cluster.get)(labels.cpu().numpy())).type(torch.LongTensor).to(self.device)
+                            gate_loss = self.criterion(gate_outputs, gate_labels)
+
+                            loss += gate_loss
+                            gate_preds = torch.argmax(gate_outputs.data, 1)
+                            gate_correct += gate_preds.eq(gate_labels).cpu().sum().float()                                
+
+                            running_val_loss.append(loss.item())
+                            dataset_len += images.size(0)
+
+                            predicted = torch.argmax(pred_all_classes, 1)
+                            pred_correct += predicted.eq(labels).cpu().sum().float()
+                            ytrue.extend(labels.detach().cpu().tolist())
+
+                            # print(f"\t\tpred_correct: {pred_correct}\tdataset_len: {dataset_len}")
+
+                        val_loss_.append(np.average(running_val_loss))
+                        task_accuracy = 100 * (pred_correct / dataset_len)
+                        print(f"\tSubtask-{subtask}\tval_loss: {val_loss_[-1]:.4f}\tval_accuracy: {task_accuracy:.4f}\tgate_accuracy: {100 * (gate_correct / dataset_len):.4f}")
+                    
+                        if self.metric:
+                            self.metric.add_accuracy(subtask, task_accuracy.item())
+
+                    print()
+                    # self.val_loss.append(val_loss_)
+
+                # if self.metric:
+                #     self.metric.add_forgetting(subtask_t)
+                # UNTIL HERE
+                # """                
+
+            
+
             # self.draw_heatmap(hmap_true[-1], hmap_pred[-1], task, f"gate_accuracy_task-{task}", title=f"Gate Accuracy Task-{task}")            
             # self.draw_heatmap(true_labels[-1], expert_output[-1], task, f"expert_accuracy_task-{task}", title=f"Expert Accuracy Task-{task}", big=True)
 
@@ -482,87 +555,30 @@ class Trainer:
             # print(classification_report(y_true=true_labels[-1], y_pred=expert_output[-1]))
             # print("================================================\n")
 
-            # """
-            # CLOSE HERE
-            if val_loaders:
-                self.model.eval()
-                val_loss_ = []                
-                for subtask, valloader in enumerate(val_loaders):                    
-                    running_val_loss = []
-                    dataset_len = 0
-                    gate_correct = 0
-                    pred_correct = 0.0
-                    ypreds, ytrue = [], []
-                    for i, (images, labels) in enumerate(valloader):                        
-                        images = images.to(self.device)
-                        labels = labels.to(self.device)
+            # print(f"len(val_loaders): {len(val_loaders)}")
+            # for vl in val_loaders:
+            #     print(f"\tlen(vl): {len(vl)}")
 
-                        with torch.no_grad():
-                            outputs, gate_outputs, _ = self.model(images, train_step=2)
+            """
+            CLOSE HERE TO STOP DRAWING THE TRAINING SET CLASSIFICATION AFTER EACH TASK
+            true, preds = [], []                
+            self.model.eval()
+            for i, sub in enumerate(train_dataset):
+                images = torch.tensor(np.array(sub["x"])).to(self.device)
+                true.extend(np.array(sub["y"]).tolist())
 
-                        bias_outputs = []
-                        prev = 0
-                        # for i, clust_i in enumerate(sorted(self.cluster2rawcls.keys())):
-                        for clust_i in range(cur_task):
-                            num_class = len(self.cluster2finecls[clust_i])
-                            outs = outputs[:, prev:(prev+num_class)]
-                            bias_outputs.append(self.model.bias_forward(clust_i, outs))
-                            prev += num_class
-                        old_cls_outputs = torch.cat(bias_outputs, dim=1)
-                        new_cls_outputs = self.model.bias_forward(clust_i, outputs[:, prev:])  # prev should point to the last task
-                        pred_all_classes = torch.cat([old_cls_outputs, new_cls_outputs], dim=1)
-                        loss = self.criterion(pred_all_classes, labels)
-                        loss += 0.1 * ((self.model.bias_layers[clust_i].beta[0] ** 2) / 2)
-
-                        gate_labels = torch.tensor(np.vectorize(self.finecls2cluster.get)(labels.cpu().numpy())).type(torch.LongTensor).to(self.device)
-                        gate_loss = self.criterion(gate_outputs, gate_labels)
-
-                        loss += gate_loss
-                        gate_preds = torch.argmax(gate_outputs.data, 1)
-                        gate_correct += gate_preds.eq(gate_labels).cpu().sum().float()                                
-
-                        running_val_loss.append(loss.item())
-                        dataset_len += images.size(0)
-
-                        predicted = torch.argmax(pred_all_classes, 1)
-                        pred_correct += predicted.eq(labels).cpu().sum().float()
-                        ytrue.extend(labels.detach().cpu().tolist())
-
-                        # print(f"\t\tpred_correct: {pred_correct}\tdataset_len: {dataset_len}")
-
-                    val_loss_.append(np.average(running_val_loss))
-                    task_accuracy = 100 * (pred_correct / dataset_len)
-                    print(f"\tSubtask-{subtask}\tval_loss: {val_loss_[-1]:.4f}\tval_accuracy: {task_accuracy:.4f}\tgate_accuracy: {100 * (gate_correct / dataset_len):.4f}")
-                print()
-                #     if self.metric:
-                #         self.metric.add_accuracy(subtask, task_accuracy)
-                # self.val_loss.append(val_loss_)
-
-                # if self.metric:
-                #     self.metric.add_forgetting(subtask)
-            # UNTIL HERE
-            # """
-
-
-            # if task > 0:
-            #     # stop after the first two task
-            #     # to check if the experts' weight change
-            #     true, preds = [], []                
-            #     self.model.eval()
-            #     for i, sub in enumerate(train_dataset):
-            #         images = torch.tensor(np.array(sub["x"])).to(self.device)
-            #         true.extend(np.array(sub["y"]).tolist())
-
-            #         with torch.no_grad():    
-            #             outs = self.model.experts[i](images)
-            #         outs = torch.argmax(outs.data, 1)
-            #         preds.extend(outs.cpu().numpy().tolist())
-            #     self.draw_heatmap(true, preds, task, f"after_task-{task}", title=f"experts_on_training_data_after_task-{task}", big=True)                
-                # exit()
+                with torch.no_grad():    
+                    outs = self.model.experts[i](images)
+                outs = torch.argmax(outs.data, 1)
+                preds.extend(outs.cpu().numpy().tolist())
+            self.draw_heatmap(true, preds, task, f"after_task-{task}", title=f"experts_on_training_data_after_task-{task}", big=True)
+            UNTIL HERE
+            """
+        print(self.metric.accuracy)
 
         print("done for all tasks")
-        exit()
-        return self.train_loss1, self.train_loss2, self.val_loss, self.model
+        # exit()
+        # return self.train_loss1, self.train_loss2, self.val_loss, self.model
 
     def test_loop(self):
         self.model.to(self.device)
@@ -686,7 +702,7 @@ if __name__ == "__main__":
     epochs = int(args.epochs)
     n_experts = int(args.n_experts)
     # k = int(args.k)
-    pickle_file = args.pickle 
+    # pickle_file = args.pickle 
     wandb_project = args.wandb_project
 
     train_path = ["cifar100_train_embedding.pt", "imagenet1000_train_embedding.pt", "cifar100_coarse_train_embedding_nn.pt"]
@@ -713,7 +729,7 @@ if __name__ == "__main__":
         # data, task_cla, class_order = get_cifar100_coarse(train_embedding_path, test_embedding_path, None, validation=0.2)
         data, task_cla, class_order = get_cifar100_coarse(train_embedding_path, test_embedding_path, None)
         
-    met = Metrics()
+    met = Metrics2()
     trainer = Trainer(
         criterion, data, lr, 
         n_class, class_order, 
@@ -732,7 +748,7 @@ if __name__ == "__main__":
         "epochs": epochs,
         "num_experts": n_experts,
         # "k": k,
-        "pickle_file": pickle_file,
+        # "pickle_file": pickle_file,
         "train_embedding_path": train_embedding_path,
         "test_embedding_path": val_embedding_path,
         "n_class": n_class,
@@ -758,7 +774,8 @@ if __name__ == "__main__":
     ##############################################
 
     walltime_start, processtime_start = time.time(), time.process_time()
-    train_loss1, train_loss2, val_loss, model = trainer.train_loop(steps=steps)
+    # train_loss1, train_loss2, val_loss, model = trainer.train_loop(steps=steps)
+    trainer.train_loop(steps=steps)
     walltime_end, processtime_end = time.time(), time.process_time()
     elapsed_walltime = walltime_end - walltime_start
     elapsed_processtime = processtime_end - processtime_start
@@ -776,16 +793,16 @@ if __name__ == "__main__":
         print(f"{k}: {v}")
     print()
     # print(trainer.metric.accuracy)
-    print("TRAINER.METRIC.FORGET")
-    for k, v in trainer.metric.forget.items():
-        print(f"{k}: {v}")
+    # print("TRAINER.METRIC.FORGET")
+    # for k, v in trainer.metric.forget.items():
+    #     print(f"{k}: {v}")
     # print(trainer.metric.forget)    
     print()
-    if test_embedding_path:
-        trainer.test_loop()
+    # if test_embedding_path:
+    #     trainer.test_loop()
 
-    losses = {"train_loss1": train_loss1, "train_loss2": train_loss2, "val_loss": val_loss, "metric_acc": met.accuracy, "metric_forget": met.forget}
-    pickle.dump(losses, open(pickle_file, "wb"))
+    # losses = {"train_loss1": train_loss1, "train_loss2": train_loss2, "val_loss": val_loss, "metric_acc": met.accuracy, "metric_forget": met.forget}
+    # pickle.dump(losses, open(pickle_file, "wb"))
 
     # model_path = pickle_file.split(".")[0]
     # torch.save(model, f"{model_path}.pth")
