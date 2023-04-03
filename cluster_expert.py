@@ -54,6 +54,9 @@ class DynamicExpert(nn.Module):
     def expand_gmm(self, this_task_classes):
         if not self.experts:
             gate = nn.Linear(in_features=self.input_size, out_features=1)
+            # gate = nn.Sequential(nn.Linear(in_features=self.input_size, out_features=self.input_size//2),
+            #                     nn.ReLU(),
+            #                     nn.Linear(in_features=self.input_size//2, out_features=1))
             hidden_size = int((self.hidden_size / self.class_per_task) * len(this_task_classes))
             experts = nn.ModuleList([Expert(input_size=self.input_size, hidden_size=hidden_size, output_size=len(this_task_classes), projected_output_size=len(this_task_classes))])
             self.bias_layers = nn.ModuleList([BiasLayer()])
@@ -62,6 +65,9 @@ class DynamicExpert(nn.Module):
             self.expert_classes.append(sorted(this_task_classes))
         else:
             gate = nn.Linear(in_features=self.input_size, out_features=self.num_experts+1)
+            # gate = nn.Sequential(nn.Linear(in_features=self.input_size, out_features=self.input_size//2),
+            #                     nn.ReLU(),
+            #                     nn.Linear(in_features=self.input_size//2, out_features=self.num_experts+1))
             hidden_size = int((self.hidden_size / self.class_per_task) * len(this_task_classes))
             experts = copy.deepcopy(self.experts)
             experts.append(Expert(input_size=self.input_size, hidden_size=hidden_size, output_size=len(this_task_classes), projected_output_size=len(this_task_classes)))

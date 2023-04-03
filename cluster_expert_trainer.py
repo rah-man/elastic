@@ -330,6 +330,8 @@ class Trainer:
                 self.train_loss1.append(train_loss)
                 print("FINISH STEP 1\n")
 
+                # """
+                # DIRECT TRAINING-EXPERT CALCULATION
                 true, preds = [], []
                 self.model.eval()
                 for i, sub in enumerate(train_dataset):
@@ -340,8 +342,11 @@ class Trainer:
                         outs = self.model.experts[i](images)
                     outs = torch.argmax(outs.data, 1)
                     preds.extend(outs.cpu().numpy().tolist())
-                self.draw_heatmap(true, preds, f"after_training_subtask-{subtask_t}", title=f"experts_on_training_data_subtask-{subtask_t}", big=True)
+                acc = 100 * (np.array(true) == np.array(preds)).sum() / len(true)
+                self.draw_heatmap(true, preds, f"direct_training_subtask-{subtask_t}", title=f"experts_on_training_data_subtask-{subtask_t}: {acc:.2f}", big=True)
                 self.model.train()
+                # UNTIL HERE
+                # """
 
                 self.model.calculate_expert_weight_distance()
                 self.model.print_weight_distance()
@@ -427,7 +432,7 @@ class Trainer:
                             # pred_ctr += original_expert_predictions.size(0)
                             # print(f"\t\t{x_ctr}\t{lab_ctr}\t{pred_ctr}")
 
-                            # # book keeping for gate prediction
+                            # book keeping for gate prediction
                             # this_epoch_gate_true.extend(gate_labels.cpu().numpy().tolist())
                             # this_epoch_gate_pred.extend(gate_preds.cpu().numpy().tolist())
                             # print(f"\t\t\tFine labels: {labels.cpu().numpy()}\n\t\t\tGate labels: {gate_labels.cpu().numpy()}\n\t\t\tGate preds: {gate_preds.cpu().numpy()}\n\t\t\tGate correct: {len(gate_labels)}/{gate_preds.eq(gate_labels).cpu().sum().int()}\n")
@@ -467,8 +472,8 @@ class Trainer:
                         # hmap_true.append(this_epoch_gate_true)
                         # hmap_pred.append(this_epoch_gate_pred)
 
-                        expert_output.append(this_epoch_expert_pred)
-                        true_labels.append(this_epoch_labels)
+                        # expert_output.append(this_epoch_expert_pred)
+                        # true_labels.append(this_epoch_labels)
 
                         early_stop(loss, self.model)
 
@@ -485,9 +490,29 @@ class Trainer:
                 cur_task += 1
                 # UNTIL HERE
                 # """
-
+                
+                # """
+                # TRAINING-BIAS CALCULATION
                 true, preds = [], []
-                crt = 0.0
+                self.model.eval()
+                for i, sub in enumerate(train_dataset):
+                    images = torch.tensor(np.array(sub["x"])).to(device)
+                    true.extend(np.array(sub["y"]).tolist())
+
+                    with torch.no_grad():    
+                        outs = self.model.experts[i](images)
+                        outs = self.model.bias_forward(i, outs)
+                    outs = torch.argmax(outs.data, 1)
+                    preds.extend(outs.cpu().numpy().tolist())
+                acc = 100 * (np.array(true) == np.array(preds)).sum() / len(true)
+                self.draw_heatmap(true, preds, f"direct_bias_subtask-{subtask_t}", title=f"experts_bias_training_data_subtask-{subtask_t}: {acc:.2f}", big=True)
+                self.model.train()
+                # UNTIL HERE
+                # """
+
+                # """
+                # DIRECT VALIDATION-EXPERT CALCULATION
+                true, preds = [], []
                 self.model.eval()
                 for i, sub in enumerate(val_dataset):
                     images = torch.tensor(np.array(sub["x"])).to(device)
@@ -497,9 +522,11 @@ class Trainer:
                         outs = self.model.experts[i](images)
                     outs = torch.argmax(outs.data, 1)
                     preds.extend(outs.cpu().numpy().tolist())
-                    acc = 100 * (np.array(true) == np.array(preds)).sum() / len(true)
-                self.draw_heatmap(true, preds, f"expert_validation_sub-task-{subtask_t}", title=f"experts_on_validation_data_subtask-{subtask_t}\naccuracy: {acc:.4f}", big=True)
+                acc = 100 * (np.array(true) == np.array(preds)).sum() / len(true)
+                self.draw_heatmap(true, preds, f"direct_validation_sub-task-{subtask_t}", title=f"experts_on_validation_data_subtask-{subtask_t}\naccuracy: {acc:.4f}", big=True)
                 self.model.train()
+                # UNTIL HERE
+                # """
 
                 # """
                 # CLOSE HERE
@@ -565,9 +592,9 @@ class Trainer:
                 # """                
 
             
-
-            # self.draw_heatmap(hmap_true[-1], hmap_pred[-1], task, f"gate_accuracy_task-{task}", title=f"Gate Accuracy Task-{task}")            
-            # self.draw_heatmap(true_labels[-1], expert_output[-1], task, f"expert_accuracy_task-{task}", title=f"Expert Accuracy Task-{task}", big=True)
+            # gacc = 100 * (np.array(hmap_true[-1]) == np.array(hmap_pred[-1])).sum() / len(hmap_true[-1])
+            # self.draw_heatmap(hmap_true[-1], hmap_pred[-1], f"gate_accuracy_task-{task}", title=f"Gate Accuracy Task-{task}: {gacc:.2f}")
+            # self.draw_heatmap(true_labels[-1], expert_output[-1], f"expert_accuracy_task-{task}", title=f"Expert Accuracy Task-{task}", big=True)
 
             # print(f"\n===TRUE LABELS VS. EXPERT OUTPUT TASK-{task}===")
             # print(classification_report(y_true=true_labels[-1], y_pred=expert_output[-1]))
@@ -593,7 +620,7 @@ class Trainer:
             UNTIL HERE
             """
 
-        print(f"CLASS_GMM_KEYS: {sorted(self.clsgmm.keys())}")
+        # print(f"CLASS_GMM_KEYS: {sorted(self.clsgmm.keys())}")
         # pickle.dump(self.clsgmm, open("expert_clsgmm.pkl", "wb"))
         # print(self.metric.accuracy)
 
