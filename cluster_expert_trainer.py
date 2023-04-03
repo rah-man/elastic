@@ -184,6 +184,7 @@ class Trainer:
         x_ = [item for sublist in x_ for item in sublist]
         y_ = [item for sublist in y_ for item in sublist]
         
+        print(f"\tGENERATING UNIFORM LOADER FOR STEP 2")
         print(f"\tBUFFER_CLASS: {Counter(y_)}")
 
         x_ = np.array(x_)
@@ -224,7 +225,8 @@ class Trainer:
     def train_loop(self, steps=2):
         val_loaders = []
         cur_task = 0 # pointer for bias correction in Step 2 (only needed for TRAIN_STEP_2_PER_SUBTASK)
-        train_dataset = [] # for checking if the experts' weights change
+        train_dataset = []  # for checking if the experts' weights change
+        val_dataset = []    # for checking if the experts' performance consistent with validation data
 
         for task in range(self.n_task):            
             # cluster using class mean
@@ -266,6 +268,7 @@ class Trainer:
                 
                 # # for checking if the experts' weights change
                 train_dataset.append({"x": this_x, "y": this_y})
+                val_dataset.append({"x": this_xval, "y": this_yval})
 
                 print(f"SUB-TASK: {subtask_t}\tCLASS: {np.unique(this_y)}\tNUM-CLASS: {len(np.unique(this_y))}")
 
@@ -483,12 +486,12 @@ class Trainer:
                 # UNTIL HERE
                 # """
 
-                # """
-                # CLOSE HERE
+                """
+                CLOSE HERE
                 if val_loaders:
                     self.model.eval()
                     val_loss_ = []                
-                    for subtask, valloader in enumerate(val_loaders):                    
+                    for subtask, valloader in enumerate(val_loaders):
                         running_val_loss = []
                         dataset_len = 0
                         gate_correct = 0
@@ -543,8 +546,8 @@ class Trainer:
 
                 # if self.metric:
                 #     self.metric.add_forgetting(subtask_t)
-                # UNTIL HERE
-                # """                
+                UNTIL HERE
+                """                
 
             
 
@@ -574,6 +577,24 @@ class Trainer:
             self.draw_heatmap(true, preds, task, f"after_task-{task}", title=f"experts_on_training_data_after_task-{task}", big=True)
             UNTIL HERE
             """
+
+            """
+            CLOSE HERE TO STOP DRAWING THE TRAINING SET CLASSIFICATION AFTER EACH TASK
+            true, preds = [], []                
+            self.model.eval()
+            for i, sub in enumerate(val_dataset):
+                images = torch.tensor(np.array(sub["x"])).to(self.device)
+                true.extend(np.array(sub["y"]).tolist())
+
+                with torch.no_grad():    
+                    outs = self.model.experts[i](images)
+                outs = torch.argmax(outs.data, 1)
+                preds.extend(outs.cpu().numpy().tolist())
+            self.draw_heatmap(true, preds, task, f"expert_validation_task-{task}", title=f"experts_on_validation_data_after_task-{task}", big=True)
+            UNTIL HERE
+            """            
+
+
         print(self.metric.accuracy)
 
         print("done for all tasks")
