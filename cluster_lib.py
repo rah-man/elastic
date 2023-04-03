@@ -84,6 +84,6 @@ def class_mean_cluster(x, y, cls2cluster, seed=None):
     model, predictions = gmm(cls_means, seed)
 
     cls2cluster_ = {y_: (p + cluster_shift) for y_, p in zip(cls_order, predictions)}
-    # cls2gmm = class_gmm(x, y)
-    # return model, cls2cluster_, cls2gmm
-    return model, cls2cluster_
+    cls2gmm = class_gmm(x, y)
+    return model, cls2cluster_, cls2gmm
+    # return model, cls2cluster_

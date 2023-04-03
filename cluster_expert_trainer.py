@@ -207,7 +207,7 @@ class Trainer:
             class_data[label] = {"x": x_, "y": y_}
         return class_data
 
-    def draw_heatmap(self, y_true, y_pred, task, filename, title="", big=False):
+    def draw_heatmap(self, y_true, y_pred, filename, title="", big=False):
         print(f"=== drawing heatmap {filename}")
         leg = sorted(np.unique(y_true))
         cmat = confusion_matrix(y_true, y_pred)
@@ -218,7 +218,6 @@ class Trainer:
         ax.set_title(title)
         display.plot(ax=ax)
         fig.tight_layout()
-        # plt.savefig(f"gate_accuracy_task-{task}.png", dpi=300)
         plt.savefig(f"{filename}.png", dpi=300)
         print("=== finish drawing heatmap")
 
@@ -231,11 +230,12 @@ class Trainer:
         for task in range(self.n_task):            
             # cluster using class mean
             x, y = self.get_numpy_from_dataset(task, type="trn")            
-            gmm, cls2cluster_ = clusterlib.class_mean_cluster(x, y, self.cluster2rawcls, seed=42)
+            gmm, cls2cluster_, clsgmm_ = clusterlib.class_mean_cluster(x, y, self.cluster2rawcls, seed=42)
             self.update_cls2cluster(cls2cluster_)
             self.update_cluster2cls(cls2cluster_)
             self.update_classmap()
             self.update_finemap()
+            self.update_clsgmm(clsgmm_)
 
             # print(f"rawcls2cluster: {self.rawcls2cluster}")
             # print(f"cluster2rawcls: {self.cluster2rawcls}")
@@ -330,7 +330,7 @@ class Trainer:
                 self.train_loss1.append(train_loss)
                 print("FINISH STEP 1\n")
 
-                true, preds = [], []                
+                true, preds = [], []
                 self.model.eval()
                 for i, sub in enumerate(train_dataset):
                     images = torch.tensor(np.array(sub["x"])).to(device)
@@ -340,7 +340,7 @@ class Trainer:
                         outs = self.model.experts[i](images)
                     outs = torch.argmax(outs.data, 1)
                     preds.extend(outs.cpu().numpy().tolist())
-                self.draw_heatmap(true, preds, task, f"after_subtask-{subtask_t}", title=f"experts_on_training_data_after_subtask-{subtask_t}", big=True)
+                self.draw_heatmap(true, preds, f"after_training_subtask-{subtask_t}", title=f"experts_on_training_data_subtask-{subtask_t}", big=True)
                 self.model.train()
 
                 self.model.calculate_expert_weight_distance()
@@ -486,8 +486,23 @@ class Trainer:
                 # UNTIL HERE
                 # """
 
-                """
-                CLOSE HERE
+                true, preds = [], []
+                crt = 0.0
+                self.model.eval()
+                for i, sub in enumerate(val_dataset):
+                    images = torch.tensor(np.array(sub["x"])).to(device)
+                    true.extend(np.array(sub["y"]).tolist())
+
+                    with torch.no_grad():    
+                        outs = self.model.experts[i](images)
+                    outs = torch.argmax(outs.data, 1)
+                    preds.extend(outs.cpu().numpy().tolist())
+                    acc = 100 * (np.array(true) == np.array(preds)).sum() / len(true)
+                self.draw_heatmap(true, preds, f"expert_validation_sub-task-{subtask_t}", title=f"experts_on_validation_data_subtask-{subtask_t}\naccuracy: {acc:.4f}", big=True)
+                self.model.train()
+
+                # """
+                # CLOSE HERE
                 if val_loaders:
                     self.model.eval()
                     val_loss_ = []                
@@ -546,8 +561,8 @@ class Trainer:
 
                 # if self.metric:
                 #     self.metric.add_forgetting(subtask_t)
-                UNTIL HERE
-                """                
+                # UNTIL HERE
+                # """                
 
             
 
@@ -574,28 +589,13 @@ class Trainer:
                     outs = self.model.experts[i](images)
                 outs = torch.argmax(outs.data, 1)
                 preds.extend(outs.cpu().numpy().tolist())
-            self.draw_heatmap(true, preds, task, f"after_task-{task}", title=f"experts_on_training_data_after_task-{task}", big=True)
+            self.draw_heatmap(true, preds, f"after_task-{task}", title=f"experts_on_training_data_after_task-{task}", big=True)
             UNTIL HERE
             """
 
-            """
-            CLOSE HERE TO STOP DRAWING THE TRAINING SET CLASSIFICATION AFTER EACH TASK
-            true, preds = [], []                
-            self.model.eval()
-            for i, sub in enumerate(val_dataset):
-                images = torch.tensor(np.array(sub["x"])).to(self.device)
-                true.extend(np.array(sub["y"]).tolist())
-
-                with torch.no_grad():    
-                    outs = self.model.experts[i](images)
-                outs = torch.argmax(outs.data, 1)
-                preds.extend(outs.cpu().numpy().tolist())
-            self.draw_heatmap(true, preds, task, f"expert_validation_task-{task}", title=f"experts_on_validation_data_after_task-{task}", big=True)
-            UNTIL HERE
-            """            
-
-
-        print(self.metric.accuracy)
+        print(f"CLASS_GMM_KEYS: {sorted(self.clsgmm.keys())}")
+        # pickle.dump(self.clsgmm, open("expert_clsgmm.pkl", "wb"))
+        # print(self.metric.accuracy)
 
         print("done for all tasks")
         # exit()
