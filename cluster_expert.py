@@ -141,7 +141,7 @@ class DynamicExpert(nn.Module):
 
     def calculate_gate_norm(self):
         w1 = nn.utils.weight_norm(self.gate, name="weight")
-        print(w1.weight_g)
+        # print(w1.weight_g)
         nn.utils.remove_weight_norm(w1)
 
     def bias_forward(self, task, output):

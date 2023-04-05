@@ -1,12 +1,14 @@
 import argparse
 import clusterlib
 import copy
+import itertools
 import numpy as np
 import pickle
 import statistics
 import time
 import torch
 import torch.nn as nn
+import torch.nn.utils as utils
 import torch.optim as optim
 import torchvision.models as models
 import wandb
@@ -84,6 +86,9 @@ class Trainer:
         self.buffer_x = {}  # {0: [], 1: []}
         self.buffer_y = {}  # {0: [0, 0, 0, 0, 0], 1: [1, 1, 1, 1, 1]}
         self.buffer = {}    # {"x": [], "y": []}
+        self.fisher = {}    # {n: p} for n is the number of trainable named_parameters() of the gate and p is the torch.zeros
+        self.alpha = 0.5    # hardcode for fisher
+        self.ewc_lamb = 5000
 
         # if "ordered" in self.dataset:
         #     self.subclass_mapper = self.dataset["ordered"]
@@ -221,11 +226,94 @@ class Trainer:
         plt.savefig(f"{filename}.png", dpi=300)
         print("=== finish drawing heatmap")
 
+    def compute_fisher_matrix(self, trainloader):
+        """
+        Calculate fisher matrix for EWC
+        Adapted from FACIL
+        """
+        # Store Fisher Information
+        fisher = {n: torch.zeros(p.shape).to(self.device) for n, p in self.model.gate.named_parameters()
+                  if p.requires_grad}
+
+        # Compute fisher information for specified number of samples -- rounded to the batch size
+        n_samples_batches = (len(trainloader.dataset) // trainloader.batch_size)
+
+        # Do forward and backward pass to compute the fisher information
+        self.model.train()
+        # TURN OFF OTHER THAN THE GATE AS IN THE BEGINNING OF STEP 2
+        self.model.freeze_all_experts()
+        self.model.set_gate(True)
+        gate_optimiser = optim.Adam(self.model.parameters(), lr=self.lr)
+
+        for images, labels in itertools.islice(trainloader, n_samples_batches):
+            # Only forward to the gate
+            outputs = self.model.gate(images.to(self.device))
+            gate_labels = torch.tensor(np.vectorize(self.finecls2cluster.get)(labels.cpu().numpy())).type(torch.LongTensor).to(self.device)
+            # print("outputs.size():", outputs.size())
+            # print("gate_labels.size():", gate_labels.size())
+            loss = self.criterion(outputs, gate_labels)
+            gate_optimiser.zero_grad()
+            loss.backward()
+
+            # Accumulate all gradients from loss with regularization
+            for n, p in self.model.gate.named_parameters():
+                if p.grad is not None:
+                    fisher[n] += p.grad.pow(2) * len(labels)
+
+        # Apply mean across all samples
+        n_samples = n_samples_batches * trainloader.batch_size
+        fisher = {n: (p / n_samples) for n, p in fisher.items()}
+        return fisher   
+
+    def post_train_process(self, trainloader):
+        """
+        Runs after training all the epochs of the task (after the train session)
+        Adapted from FACIL
+        """
+        # Store current parameters for the next task
+        self.older_params = {n: p.clone().detach() for n, p in self.model.gate.named_parameters() if p.requires_grad}
+
+        # calculate Fisher information
+        curr_fisher = self.compute_fisher_matrix(trainloader)
+        # merge fisher information, we do not want to keep fisher information for each task in memory
+
+        if self.fisher:
+            # Update n-1 (old fisher)
+            # Store n as it is
+            for n in self.fisher.keys():
+                old_len = self.fisher[n].size(0)
+                if len(self.fisher[n].size()) > 1:
+                    # for weight
+                    temp = (self.alpha * self.fisher[n] + (1 - self.alpha) * curr_fisher[n][:old_len, :])
+                    temp = torch.cat((temp, curr_fisher[n][-1:, :]))
+                else:
+                    # for bias                    
+                    temp = (self.alpha * self.fisher[n] + (1 - self.alpha) * curr_fisher[n][:old_len])
+                    temp = torch.cat((temp, torch.unsqueeze(curr_fisher[n][-1], 0)))
+                self.fisher[n] = temp
+        else:
+            self.fisher = {**self.fisher, **curr_fisher}
+
+    def ewc_loss(self):
+        """Returns the loss value"""
+        loss_reg = 0        
+        # Eq. 3: elastic weight consolidation quadratic penalty
+        for n, p in self.model.gate.named_parameters():
+            old_len = self.fisher[n].size(0)
+            if len(self.fisher[n].size()) > 1:
+                # for weight
+                loss_reg += torch.sum(self.fisher[n] * (p[:old_len, :] - self.older_params[n]).pow(2)) / 2
+            else:
+                # for bias
+                loss_reg += torch.sum(self.fisher[n] * (p[:old_len] - self.older_params[n]).pow(2)) / 2
+        return loss_reg
+
     def train_loop(self, steps=2):
         val_loaders = []
         cur_task = 0 # pointer for bias correction in Step 2 (only needed for TRAIN_STEP_2_PER_SUBTASK)
         train_dataset = []  # for checking if the experts' weights change
         val_dataset = []    # for checking if the experts' performance consistent with validation data
+        use_ewc = True
 
         for task in range(self.n_task):            
             # cluster using class mean
@@ -329,9 +417,11 @@ class Trainer:
                         break
                 self.train_loss1.append(train_loss)
                 print("FINISH STEP 1\n")
-
+                # UNTIL HERE
                 # """
-                # DIRECT TRAINING-EXPERT CALCULATION
+
+                """
+                DIRECT TRAINING-EXPERT CALCULATION
                 true, preds = [], []
                 self.model.eval()
                 for i, sub in enumerate(train_dataset):
@@ -345,8 +435,8 @@ class Trainer:
                 acc = 100 * (np.array(true) == np.array(preds)).sum() / len(true)
                 self.draw_heatmap(true, preds, f"direct_training_subtask-{subtask_t}", title=f"experts_on_training_data_subtask-{subtask_t}: {acc:.2f}", big=True)
                 self.model.train()
-                # UNTIL HERE
-                # """
+                UNTIL HERE
+                """
 
                 self.model.calculate_expert_weight_distance()
                 self.model.print_weight_distance()
@@ -420,6 +510,9 @@ class Trainer:
                             gate_labels = torch.tensor(np.vectorize(self.finecls2cluster.get)(labels.cpu().numpy())).type(torch.LongTensor).to(self.device)
                             gate_loss = self.criterion(gate_outputs, gate_labels)
 
+                            if cur_task > 0 and use_ewc:
+                                gate_loss += self.ewc_loss()
+
                             gate_preds = torch.argmax(gate_outputs.data, 1)
                             gate_correct += gate_preds.eq(gate_labels).cpu().sum().float()
 
@@ -486,13 +579,28 @@ class Trainer:
                             print(f"Early stopping. Exit epoch {epoch+1}")
                             break
                     print("FINISH STEP 2\n")                    
-                self.model.unfreeze_all()                
+                self.model.unfreeze_all()
                 cur_task += 1
                 # UNTIL HERE
                 # """
-                
+
                 # """
-                # TRAINING-BIAS CALCULATION
+                # EWC on gate
+                # print(f"calculating fisher subtask-{subtask_t}")
+                # fisher = self.calculate_fisher(trainloader)
+                # print(fisher)
+                # print()
+                if use_ewc:
+                    print(f"CALCULATE FISHER {subtask_t}\n")
+                    self.post_train_process(trainloader)
+                    # print(f"FINISH POST_TRAIN_PROCESS {subtask_t}\n")
+                # UNTIL HERE
+                # """
+
+                # print(f"\tWEIGHT_NORM: {self.model.calculate_gate_norm()}")
+                
+                """
+                TRAINING-BIAS CALCULATION
                 true, preds = [], []
                 self.model.eval()
                 for i, sub in enumerate(train_dataset):
@@ -507,11 +615,11 @@ class Trainer:
                 acc = 100 * (np.array(true) == np.array(preds)).sum() / len(true)
                 self.draw_heatmap(true, preds, f"direct_bias_subtask-{subtask_t}", title=f"experts_bias_training_data_subtask-{subtask_t}: {acc:.2f}", big=True)
                 self.model.train()
-                # UNTIL HERE
-                # """
+                UNTIL HERE
+                """
 
-                # """
-                # DIRECT VALIDATION-EXPERT CALCULATION
+                """
+                DIRECT VALIDATION-EXPERT CALCULATION
                 true, preds = [], []
                 self.model.eval()
                 for i, sub in enumerate(val_dataset):
@@ -525,8 +633,8 @@ class Trainer:
                 acc = 100 * (np.array(true) == np.array(preds)).sum() / len(true)
                 self.draw_heatmap(true, preds, f"direct_validation_sub-task-{subtask_t}", title=f"experts_on_validation_data_subtask-{subtask_t}\naccuracy: {acc:.4f}", big=True)
                 self.model.train()
-                # UNTIL HERE
-                # """
+                UNTIL HERE
+                """
 
                 # """
                 # CLOSE HERE
