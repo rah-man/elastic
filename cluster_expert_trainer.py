@@ -310,6 +310,7 @@ class Trainer:
 
     def train_loop(self, steps=2):
         val_loaders = []
+        train_loaders = []
         cur_task = 0 # pointer for bias correction in Step 2 (only needed for TRAIN_STEP_2_PER_SUBTASK)
         train_dataset = []  # for checking if the experts' weights change
         val_dataset = []    # for checking if the experts' performance consistent with validation data
@@ -320,14 +321,16 @@ class Trainer:
         use_direct_bias = False
         use_direct_val = False
         use_output_without_bias = False
-        use_train_gate_with_bias = True
-        use_train_gate_without_bias = True
+        use_train_gate_with_bias = False
+        use_train_gate_without_bias = False
 
         use_val_direct_bias = False
         use_val_direct_expert = False
         use_val_without_bias = False
         use_val_gate_direct_bias = False
         cheat = True
+
+        use_gate = True
 
         for task in range(self.n_task):            
             # cluster using class mean
@@ -383,6 +386,7 @@ class Trainer:
                 valloader = self.get_dataloader(this_xval, this_yval)
                 # print(f"APPENDING SUB-TASK-{subtask_t} TO VAL_LOADERS")
                 val_loaders.append(valloader)
+                train_loaders.append(trainloader)
 
                 print("STARTING STEP 1")
                 self.model.freeze_previous_experts()
@@ -878,11 +882,58 @@ class Trainer:
             UNTIL HERE
             """
 
+        if use_gate:
+            self.model.eval()
+            gate_correct, gate_predict = [], []            
+            for subtask, valloader in enumerate(val_loaders):                
+                for i, (images, labels) in enumerate(valloader):
+                    images = images.to(self.device)
+
+                    with torch.no_grad():
+                        outputs, gate_outputs, _ = self.model(images, train_step=2)
+
+                    gate_labels = torch.tensor(np.vectorize(self.finecls2cluster.get)(labels.numpy())).type(torch.LongTensor).to(self.device)
+                    gate_preds = torch.argmax(gate_outputs.data, 1)
+
+                    gate_correct.extend(gate_labels.detach().cpu().tolist())
+                    gate_predict.extend(gate_preds.detach().cpu().tolist())
+
+            acc = 100 * (np.array(gate_correct) == np.array(gate_predict)).sum() / len(gate_correct)
+            self.draw_heatmap(gate_correct, gate_predict, f"gate_projection_validation_25000", title=f"gate_projection_validation: {acc:.2f}", big=False)
+
+            gate_correct, gate_predict = [], []            
+            for subtask, trainloader in enumerate(train_loaders):                
+                for i, (images, labels) in enumerate(trainloader):
+                    images = images.to(self.device)
+
+                    with torch.no_grad():
+                        outputs, gate_outputs, _ = self.model(images, train_step=2)
+
+                    gate_labels = torch.tensor(np.vectorize(self.finecls2cluster.get)(labels.numpy())).type(torch.LongTensor).to(self.device)
+                    gate_preds = torch.argmax(gate_outputs.data, 1)
+
+                    gate_correct.extend(gate_labels.detach().cpu().tolist())
+                    gate_predict.extend(gate_preds.detach().cpu().tolist())
+
+            acc = 100 * (np.array(gate_correct) == np.array(gate_predict)).sum() / len(gate_correct)
+            self.draw_heatmap(gate_correct, gate_predict, f"gate_projection_train_25000", title=f"gate_projection_train: {acc:.2f}", big=False)
+
+
+
         # print(f"CLASS_GMM_KEYS: {sorted(self.clsgmm.keys())}")
         # pickle.dump(self.clsgmm, open("expert_clsgmm.pkl", "wb"))
         # print(self.metric.accuracy)
 
         print("done for all tasks")
+        print("saving model")
+        torch.save(self.model, "experts_25000.pt")
+        print("done saving model to 'experts_25000.pt'")
+        print("saving val_loaders")
+        torch.save(val_loaders, "val_loaders_25000.pt")
+        print("done saving val_loaders to 'val_loaders_25000.pt'")
+        print("saving train_loaders")
+        torch.save(train_loaders, "train_loaders_25000.pt")
+        print("done saving train_loaders to 'train_loaders_25000.pt'")        
         # exit()
         # return self.train_loss1, self.train_loss2, self.val_loss, self.model
 
@@ -984,6 +1035,39 @@ class Trainer:
         for name, param in self.model.named_parameters():
             print(name, param.requires_grad)
 
+def experimental_prediction(model_path, loader_path):
+    model = torch.load(model_path).eval()
+    loaders = torch.load(loader_path)
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+
+    true, preds = [], []
+    for subtask, valloader in enumerate(loaders):
+        for i, (images, labels) in enumerate(valloader):
+            images = images.to(device)
+            true.extend(labels.cpu().numpy().tolist())
+
+            with torch.no_grad():
+                outputs, gate_outputs, _ = model(images, train_step=2)
+                print("GATE OUTPUTS")
+                print(gate_outputs)
+                exit()
+
+            #     if len(outputs.size()) == 1:
+            #         temp_ = outputs.view(-1, 1)
+            #         # temp_ = torch.argmax(temp_.data, 1)
+            #     else:
+            #         # temp_ = torch.argmax(outputs.data, 1)
+            #         temp_ = outputs
+
+            #     outs = self.model.bias_forward(subtask, temp_)
+
+            # outs = torch.argmax(outs.data, 1)
+            # preds.extend(outs.cpu().numpy().tolist())
+    # acc = 100 * (np.array(true) == np.array(preds)).sum() / len(true)
+    # self.draw_heatmap(true, preds, f"validation_gate@expert_bias_subtask-{subtask_t}", title=f"gate@expert_bias_on_val_data_subtask-{subtask_t}: {acc:.2f}", big=True)
+    # print()    
+    
+    
 
 if __name__ == "__main__":        
     parser = argparse.ArgumentParser()
