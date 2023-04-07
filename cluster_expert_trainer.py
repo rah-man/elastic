@@ -223,7 +223,7 @@ class Trainer:
         ax.set_title(title)
         display.plot(ax=ax)
         fig.tight_layout()
-        plt.savefig(f"{filename}.png", dpi=300)
+        plt.savefig(f"heatmaps/{filename}.png", dpi=300)
         print("=== finish drawing heatmap")
 
     def compute_fisher_matrix(self, trainloader):
@@ -320,10 +320,14 @@ class Trainer:
         use_direct_bias = False
         use_direct_val = False
         use_output_without_bias = False
+        use_train_gate_with_bias = True
+        use_train_gate_without_bias = True
 
         use_val_direct_bias = False
         use_val_direct_expert = False
-        use_val_without_bias = True
+        use_val_without_bias = False
+        use_val_gate_direct_bias = False
+        cheat = True
 
         for task in range(self.n_task):            
             # cluster using class mean
@@ -528,7 +532,6 @@ class Trainer:
                                     temp_ = torch.argmax(outputs.data, 1)
                                 this_epoch_expert_pred.extend(temp_.cpu().numpy().tolist())
                                 this_epoch_labels.extend(labels.cpu().numpy().tolist())
-                                
 
                             if cur_task > 0 and use_ewc:
                                 gate_loss += self.ewc_loss()
@@ -652,6 +655,43 @@ class Trainer:
                     acc = 100 * (np.array(true_labels[-1]) == np.array(expert_output[-1])).sum() / len(true_labels[-1])
                     self.draw_heatmap(true_labels[-1], expert_output[-1], f"direct_validation_without_bias-{subtask_t}", title=f"experts_validation_withou_bias_subtask-{subtask_t}: {acc:.4f}", big=True)
 
+                # Direct gate-train-to-bias
+                if use_train_gate_with_bias:
+                    true, preds = [], []
+                    self.model.eval()
+                    for i, sub in enumerate(train_dataset):
+                        images = torch.tensor(np.array(sub["x"])).to(device)
+                        true.extend(np.array(sub["y"]).tolist())
+
+                        with torch.no_grad():
+                            outputs, _, _ = self.model(images, train_step=2)
+                            outputs = self.model.bias_forward(i, outputs)
+                        outputs = torch.argmax(outputs.data, 1)
+                        preds.extend(outputs.cpu().numpy().tolist())
+                    acc = 100 * (np.array(true) == np.array(preds)).sum() / len(true)
+                    self.draw_heatmap(true, preds, f"direct_gate@expert_bias_train_subtask-{subtask_t}", title=f"gate@expert_bias_train_subtask-{subtask_t}: {acc:.2f}", big=True)
+                    self.model.train()
+                
+                if use_train_gate_without_bias:
+                    self.model.eval()
+                    true, preds = [], []
+                    for i, sub in enumerate(train_dataset):
+                        images = torch.tensor(np.array(sub["x"])).to(device)
+                        true.extend(np.array(sub["y"]).tolist())
+
+                        with torch.no_grad():
+                            outputs, _, _ = self.model(images, train_step=2)
+
+                        if len(outputs.size()) == 1:
+                            outputs = outputs.view(-1, 1)
+                        
+                        outputs = torch.argmax(outputs.data, 1)
+                        preds.extend(outputs.cpu().numpy().tolist())
+                    acc = 100 * (np.array(true) == np.array(preds)).sum() / len(true)
+                    self.draw_heatmap(true, preds, f"direct_gate@expert_train_subtask-{subtask_t}", title=f"gate@expert_train_subtask-{subtask_t}: {acc:.2f}", big=True)
+                    print()
+                    self.model.train()
+
                 # """
                 # CLOSE HERE
                 if val_loaders:                
@@ -717,7 +757,7 @@ class Trainer:
                 if use_val_direct_expert:                    
                     self.model.eval()
                     true, preds = [], []
-                    for subtask, valloader in enumerate(val_loaders):                        
+                    for subtask, valloader in enumerate(val_loaders):
                         for i, (images, labels) in enumerate(valloader):
                             images = images.to(self.device)
                             true.extend(labels.cpu().numpy().tolist())
@@ -772,7 +812,36 @@ class Trainer:
                             preds.extend(temp_.cpu().numpy().tolist())
                     acc = 100 * (np.array(true) == np.array(preds)).sum() / len(true)
                     self.draw_heatmap(true, preds, f"direct_validation_gate@expert_subtask-{subtask_t}", title=f"gate@expert_on_val_data_subtask-{subtask_t}: {acc:.2f}", big=True)
-                    print()                            
+                    print()
+
+                if use_val_gate_direct_bias:
+                    self.model.eval()
+                    true, preds = [], []
+                    for subtask, valloader in enumerate(val_loaders):
+                        for i, (images, labels) in enumerate(valloader):
+                            images = images.to(self.device)
+                            true.extend(labels.cpu().numpy().tolist())
+
+                            with torch.no_grad():
+                                outputs, gate_outputs, original_expert_outputs = self.model(images, train_step=2)
+
+                                if len(outputs.size()) == 1:
+                                    temp_ = outputs.view(-1, 1)
+                                    # temp_ = torch.argmax(temp_.data, 1)
+                                else:
+                                    # temp_ = torch.argmax(outputs.data, 1)
+                                    temp_ = outputs
+
+                                outs = self.model.bias_forward(subtask, temp_)
+
+                            outs = torch.argmax(outs.data, 1)
+                            preds.extend(outs.cpu().numpy().tolist())
+                    acc = 100 * (np.array(true) == np.array(preds)).sum() / len(true)
+                    self.draw_heatmap(true, preds, f"validation_gate@expert_bias_subtask-{subtask_t}", title=f"gate@expert_bias_on_val_data_subtask-{subtask_t}: {acc:.2f}", big=True)
+                    print()
+
+                if cheat:
+                    pass
 
 
                 # if self.metric:
