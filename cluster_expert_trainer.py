@@ -569,7 +569,6 @@ class Trainer:
                         this_epoch_gate_true, this_epoch_gate_pred = [], []
                         this_epoch_labels, this_epoch_expert_pred = [], []
 
-                        x_ctr, lab_ctr, pred_ctr = 0, 0, 0
                         for i, (images, labels) in enumerate(step2loader):
                             images = images.to(self.device)
                             labels = labels.to(self.device)
@@ -634,6 +633,96 @@ class Trainer:
                 cur_task += 1
                 # UNTIL HERE
                 # """
+
+                """
+                CLOSE HERE
+                step2loader = self.get_uniformloader(this_x, this_y, all=False)
+                if steps == 2:
+                    print("STARTING STEP 2")
+                    self.model.freeze_all_experts()
+                    self.model.set_gate(True)
+
+                    train_loss = [] # store train_loss per epoch
+                    gate_loss_ = [] # store gate_loss per epoch
+
+                    gate_optimiser = optim.Adam(self.model.parameters(), lr=self.lr)
+                    early_stop = EarlyStopping(verbose=False)
+                    for epoch in range(self.epochs):
+                        running_train_loss, running_gate_loss = [], []
+                        dataset_len, gate_correct, pred_correct = 0, 0.0, 0.0
+                        ypreds, ytrue = [], []
+                        
+                        this_epoch_gate_true, this_epoch_gate_pred = [], []
+                        this_epoch_labels, this_epoch_expert_pred = [], []
+
+                        for i, (images, labels) in enumerate(step2loader):
+                            chosen_preds = []
+                            images = images.to(self.device)
+                            labels = labels.to(self.device)
+                            
+                            outputs, gate_outputs, original_expert_outputs = self.model(images, train_step=2)
+                            gate_preds = torch.argmax(gate_outputs.data, 1)
+
+                            for sample_index, exp in zip(range(len(gate_preds)), gate_preds.cpu().numpy()):
+                                chosen_preds.append(original_expert_outputs[exp][sample_index])                            
+
+                            if cur_task > 0:                                
+                            # RUN BIAS CORRECTION FOR ALL EXPERTS
+                                outputs = torch.stack(chosen_preds)
+                                bias_outputs = []
+                                prev = 0
+                                # for i, clust_i in enumerate(sorted(self.cluster2finecls.keys())):
+                                for clust_i in range(cur_task):
+                                    num_class = len(self.cluster2finecls[clust_i])
+                                    outs = outputs[:, prev:(prev+num_class)]
+                                    bias_outputs.append(self.model.bias_forward(clust_i, outs))
+                                    prev += num_class
+                                old_cls_outputs = torch.cat(bias_outputs, dim=1)
+                                new_cls_outputs = self.model.bias_forward(clust_i, outputs[:, prev:])  # prev should point to the last subtask
+                                pred_all_classes = torch.cat([old_cls_outputs, new_cls_outputs], dim=1)
+                                loss = self.criterion(pred_all_classes, labels)
+                                loss += 0.1 * ((self.model.bias_layers[clust_i].beta[0] ** 2) / 2)
+                            else:
+                                if len(outputs.size()) == 1:
+                                    outputs = outputs.view(-1, 1)
+                                loss = self.criterion(outputs, labels)
+                            
+                            running_train_loss.append(loss.item())
+                            
+                            gate_labels = torch.tensor(np.vectorize(self.finecls2cluster.get)(labels.cpu().numpy())).type(torch.LongTensor).to(self.device)
+                            gate_loss = self.criterion(gate_outputs, gate_labels)
+                            gate_correct += gate_preds.eq(gate_labels).cpu().sum().float()
+
+                            running_gate_loss.append(gate_loss.item())
+                            loss += gate_loss
+                            
+                            loss.backward()
+                            gate_optimiser.step()
+                            gate_optimiser.zero_grad()
+                            predicted = torch.argmax(pred_all_classes, 1) if cur_task > 0 else torch.argmax(outputs.data, 1)
+                            
+                            pred_correct += predicted.eq(labels).cpu().sum().float()
+
+                            ypreds.extend(predicted.detach().cpu().tolist())
+                            ytrue.extend(labels.detach().cpu().tolist())
+                            
+                            dataset_len += images.size(0)
+
+                        early_stop(loss, self.model)
+
+                        train_loss.append(np.average(running_train_loss))
+                        gate_loss_.append(np.average(running_gate_loss))
+                        if (epoch + 1) % 5 == 0:
+                            print(f"STEP-2\tEpoch: {epoch+1}/{self.epochs}\tclassification_loss: {train_loss[-1]:.4f}\tgate_loss: {gate_loss_[-1]:.4f}\tstep2_classification_accuracy: {(100 * pred_correct.item() / dataset_len):.4f}\tstep_2_gate_accuracy: {100 * (gate_correct / dataset_len):.4f}")
+                            # print(f"STEP-2\tEpoch: {epoch+1}/{self.epochs}\tclassification_loss: {train_loss[-1]:.4f}\tstep2_classification_accuracy: {(100 * pred_correct.item() / dataset_len):.4f}")
+                        if early_stop.early_stop:
+                            print(f"Early stopping. Exit epoch {epoch+1}")
+                            break
+                    print("FINISH STEP 2\n")                    
+                self.model.unfreeze_all()
+                cur_task += 1
+                UNTIL HERE
+                """                
 
                 # print(f"\tWEIGHT_NORM: {self.model.calculate_gate_norm()}")
                                 
