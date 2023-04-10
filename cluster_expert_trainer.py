@@ -413,23 +413,6 @@ class Trainer:
         cur_task = 0 # pointer for bias correction in Step 2 (only needed for TRAIN_STEP_2_PER_SUBTASK)
         train_dataset = []  # for checking if the experts' weights change
         val_dataset = []    # for checking if the experts' performance consistent with validation data
-        
-        # use_bias = True
-        use_ewc = False
-        use_direct_train = False
-        use_direct_bias = False
-        use_direct_val = False
-        use_output_without_bias = False
-        use_train_gate_with_bias = False
-        use_train_gate_without_bias = False
-
-        use_val_direct_bias = False
-        use_val_direct_expert = False
-        use_val_without_bias = False
-        use_val_gate_direct_bias = False
-        cheat = True
-
-        use_gate = False
 
         # start from beginning
         check_gate_train = True
@@ -653,9 +636,9 @@ class Trainer:
                 # """
 
                 # print(f"\tWEIGHT_NORM: {self.model.calculate_gate_norm()}")
-                
-                # """
-                # CLOSE HERE
+                                
+                """
+                CLOSE HERE
                 if val_loaders:                
                     self.model.eval()
                     val_loss_ = []                
@@ -672,33 +655,30 @@ class Trainer:
                             with torch.no_grad():
                                 outputs, gate_outputs, _ = self.model(images, train_step=2)
 
-                            if use_bias:
-                                bias_outputs = []
-                                prev = 0
-                                for clust_i in range(cur_task):
-                                    num_class = len(self.cluster2finecls[clust_i])
-                                    outs = outputs[:, prev:(prev+num_class)]
-                                    bias_outputs.append(self.model.bias_forward(clust_i, outs))
-                                    prev += num_class
-                                old_cls_outputs = torch.cat(bias_outputs, dim=1)
-                                new_cls_outputs = self.model.bias_forward(clust_i, outputs[:, prev:])  # prev should point to the last task
-                                pred_all_classes = torch.cat([old_cls_outputs, new_cls_outputs], dim=1)
-                                loss = self.criterion(pred_all_classes, labels)
-                                loss += 0.1 * ((self.model.bias_layers[clust_i].beta[0] ** 2) / 2)
-                            else:
-                                loss = self.criterion(outputs, labels)
+                            bias_outputs = []
+                            prev = 0
+                            for clust_i in range(cur_task):
+                                num_class = len(self.cluster2finecls[clust_i])
+                                outs = outputs[:, prev:(prev+num_class)]
+                                bias_outputs.append(self.model.bias_forward(clust_i, outs))
+                                prev += num_class
+                            old_cls_outputs = torch.cat(bias_outputs, dim=1)
+                            new_cls_outputs = self.model.bias_forward(clust_i, outputs[:, prev:])  # prev should point to the last task
+                            pred_all_classes = torch.cat([old_cls_outputs, new_cls_outputs], dim=1)
+                            loss = self.criterion(pred_all_classes, labels)
+                            loss += 0.1 * ((self.model.bias_layers[clust_i].beta[0] ** 2) / 2)
 
                             gate_labels = torch.tensor(np.vectorize(self.finecls2cluster.get)(labels.cpu().numpy())).type(torch.LongTensor).to(self.device)
                             gate_loss = self.criterion(gate_outputs, gate_labels)
 
                             loss += gate_loss
                             gate_preds = torch.argmax(gate_outputs.data, 1)
-                            gate_correct += gate_preds.eq(gate_labels).cpu().sum().float()                                
+                            gate_correct += gate_preds.eq(gate_labels).cpu().sum().float()
 
                             running_val_loss.append(loss.item())
                             dataset_len += images.size(0)
 
-                            predicted = torch.argmax(pred_all_classes, 1) if use_bias else torch.argmax(outputs.data, 1)
+                            predicted = torch.argmax(pred_all_classes, 1)
                             pred_correct += predicted.eq(labels).cpu().sum().float()
                             ytrue.extend(labels.detach().cpu().tolist())
 
@@ -715,44 +695,91 @@ class Trainer:
 
                     # self.val_loss.append(val_loss_)
 
-                if cheat:
-                    pass
-
-
                 # if self.metric:
                 #     self.metric.add_forgetting(subtask_t)
-                # UNTIL HERE
-                # """                
+                UNTIL HERE
+                """                
+
+                if val_loaders:
+                    # use gate_outputs to predict the expert
+                    # use the original_expert_output based on the expert chosen by the gate
+                    self.model.eval()
+                    val_loss_ = []                
+                    for subtask, valloader in enumerate(val_loaders):
+                        running_val_loss = []
+                        dataset_len = 0
+                        gate_correct = 0
+                        pred_correct = 0.0
+                        ypreds, ytrue = [], []                        
+
+                        for i, (images, labels) in enumerate(valloader):
+                            chosen_preds = []
+                            images = images.to(self.device)
+                            labels = labels.to(self.device)
+
+                            with torch.no_grad():
+                                outputs, gate_outputs, original_expert_outputs = self.model(images, train_step=2)
+                            
+                            gate_preds = torch.argmax(gate_outputs.data, 1)
+
+                            for sample_index, exp in zip(range(len(gate_preds)), gate_preds.cpu().numpy()):
+                                chosen_preds.append(original_expert_outputs[exp][sample_index])
+                            
+                            pred_all_classes = torch.stack(chosen_preds)
+                            loss = self.criterion(pred_all_classes, labels)
+
+                            gate_labels = torch.tensor(np.vectorize(self.finecls2cluster.get)(labels.cpu().numpy())).type(torch.LongTensor).to(self.device)
+                            gate_loss = self.criterion(gate_outputs, gate_labels)
+
+                            loss += gate_loss
+                            gate_preds = torch.argmax(gate_outputs.data, 1)
+                            gate_correct += gate_preds.eq(gate_labels).cpu().sum().float()
+
+                            running_val_loss.append(loss.item())
+                            dataset_len += images.size(0)
+
+                            predicted = torch.argmax(pred_all_classes, 1)
+                            pred_correct += predicted.eq(labels).cpu().sum().float()
+                            ytrue.extend(labels.detach().cpu().tolist())
+
+                        val_loss_.append(np.average(running_val_loss))
+                        task_accuracy = 100 * (pred_correct / dataset_len)
+                        print(f"\tSubtask-{subtask}\tval_loss: {val_loss_[-1]:.4f}\tval_accuracy: {task_accuracy:.4f}\tgate_accuracy: {100 * (gate_correct / dataset_len):.4f}")
+
+                        if self.metric:
+                            self.metric.add_accuracy(subtask, task_accuracy.item())
+                    print()
+
 
         if check_gate_train:
-            self.check_gate(train_loaders, "01_gate_projection_train_500", "gate_projection_train_500")
+            self.check_gate(train_loaders, f"01_gate_projection_train_{self.mem_size}", f"gate_projection_train_{self.mem_size}")
 
         if check_gate_val:
-            self.check_gate(val_loaders, "02_gate_projection_val_500", "gate_projection_val_500")
+            self.check_gate(val_loaders, f"02_gate_projection_val_{self.mem_size}", f"gate_projection_val_{self.mem_size}")
 
         if check_expert_train:
-            self.check_expert(train_loaders, "03_train_expert_direct_500", "train_expert_direct_500")
+            self.check_expert(train_loaders, f"03_train_expert_direct_{self.mem_size}", f"train_expert_direct_{self.mem_size}")
 
         if check_expert_val:
-            self.check_expert(val_loaders, "04_val_expert_direct_500", "val_expert_direct_500")
+            self.check_expert(val_loaders, f"04_val_expert_direct_{self.mem_size}", f"val_expert_direct_{self.mem_size}")
 
         if check_expert_bias_train:
-            self.check_expert_bias(train_loaders, "05_train_expert_bias_direct_500", "train_expert_bias_direct_500")
+            self.check_expert_bias(train_loaders, f"05_train_expert_bias_direct_{self.mem_size}", f"train_expert_bias_direct_{self.mem_size}")
 
         if check_expert_bias_val:
-            self.check_expert_bias(val_loaders, "06_val_expert_bias_direct_500", "val_expert_bias_direct_500")
+            self.check_expert_bias(val_loaders, f"06_val_expert_bias_direct_{self.mem_size}", f"val_expert_bias_direct_{self.mem_size}")
 
         if check_expert_gate_train:
-            self.check_expert_gate(train_loaders, "07_train_gate@expert_500", "train_gate@expert_500")
+            self.check_expert_gate(train_loaders, f"07_train_gate@expert_{self.mem_size}", f"train_gate@expert_{self.mem_size}")
 
         if check_expert_gate_val:
-            self.check_expert_gate(val_loaders, "08_val_gate@expert_500", "val_gate@expert_500")
+            self.check_expert_gate(val_loaders, f"08_val_gate@expert_{self.mem_size}", f"val_gate@expert_{self.mem_size}")
 
         if check_expert_gate_bias_train:
-            self.check_expert_gate_bias(train_loaders, "09_train_gate@expert_bias_500", "train_gate@expert_bias_500")
+            self.check_expert_gate_bias(train_loaders, f"09_train_gate@expert_bias_{self.mem_size}", f"train_gate@expert_bias_{self.mem_size}")
 
         if check_expert_gate_bias_val:
-            self.check_expert_gate_bias(val_loaders, "10_val_gate@expert_bias_500", "val_gate@expert_bias_500")
+            self.check_expert_gate_bias(val_loaders, f"10_val_gate@expert_bias_{self.mem_size}", f"val_gate@expert_bias_{self.mem_size}")
 
         # print(f"CLASS_GMM_KEYS: {sorted(self.clsgmm.keys())}")
         # pickle.dump(self.clsgmm, open("expert_clsgmm.pkl", "wb"))
@@ -868,39 +895,6 @@ class Trainer:
     def print_params(self):
         for name, param in self.model.named_parameters():
             print(name, param.requires_grad)
-
-def experimental_prediction(model_path, loader_path):
-    model = torch.load(model_path).eval()
-    loaders = torch.load(loader_path)
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-
-    true, preds = [], []
-    for subtask, valloader in enumerate(loaders):
-        for i, (images, labels) in enumerate(valloader):
-            images = images.to(device)
-            true.extend(labels.cpu().numpy().tolist())
-
-            with torch.no_grad():
-                outputs, gate_outputs, _ = model(images, train_step=2)
-                print("GATE OUTPUTS")
-                print(gate_outputs)
-                exit()
-
-            #     if len(outputs.size()) == 1:
-            #         temp_ = outputs.view(-1, 1)
-            #         # temp_ = torch.argmax(temp_.data, 1)
-            #     else:
-            #         # temp_ = torch.argmax(outputs.data, 1)
-            #         temp_ = outputs
-
-            #     outs = self.model.bias_forward(subtask, temp_)
-
-            # outs = torch.argmax(outs.data, 1)
-            # preds.extend(outs.cpu().numpy().tolist())
-    # acc = 100 * (np.array(true) == np.array(preds)).sum() / len(true)
-    # self.draw_heatmap(true, preds, f"validation_gate@expert_bias_subtask-{subtask_t}", title=f"gate@expert_bias_on_val_data_subtask-{subtask_t}: {acc:.2f}", big=True)
-    # print()    
-    
     
 
 if __name__ == "__main__":        
