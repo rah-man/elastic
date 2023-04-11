@@ -193,23 +193,33 @@ class DynamicExpert(nn.Module):
 
         return expert_outputs, gate_outputs, original_expert_outputs
 
-    def predict(self, x, k=None):
+    def predict(self, x, type="logits"):
+        # UPDATE ON GATE_OUTPUTS REFERENCE WILL ALSO UPDATE THE ORIGINAL VALUES
         self.eval()
         gate_outputs = self.gate(x).cpu()
         original_gate_outputs = torch.clone(gate_outputs).detach()
 
-        if k is None:
-            # get top-k using elbow
+        if type == "logits":
+            # get top-k using elbow based on logits and no scale
             for out in gate_outputs:
                 data = out.numpy()
-                data_rev = np.array([[i, sorted(data)[i]] for i in range(data.shape[0])])
+                data_rev = np.array([[i, sorted(data, reverse=True)[i]] for i in range(data.shape[0])])
                 rotor = Rotor()
-                rotor.fit_rotate(data_rev)
-                # val = data_rev[rotor.get_elbow_index()][-1]
+                rotor.fit_rotate(data_rev, scale=False)
                 val = data_rev[rotor.get_elbow_index()][-1]
                 data[data < val] = 0
+        elif type == "softmax":
+            # using softmax on logits and no scale
+            smax = torch.softmax(gate_outputs, 1)
+            for sm, ga in zip(smax, gate_outputs):
+                data = sm.numpy()
+                data_ = ga
+                data_sorted = np.array([[i, sorted(data, reverse=True)[i]] for i in range(data.shape[0])])
+                rotor = Rotor()
+                rotor.fit_rotate(data_sorted, scale=False)
+                data_[data_ < data_[np.where(data == data_sorted[rotor.get_elbow_index()][-1])[0][0]]] = 0        
         else:
-            # k = 1, no other value
+            # type could be "one"
             k_idx = torch.argmax(gate_outputs, 1)
             for idx, out in zip(k_idx, gate_outputs):
                 out[out != out[idx.item()]] = 0.0
