@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from kneebow.rotor import Rotor
 from torch.distributions.normal import Normal
 
 class Expert(nn.Module):
@@ -37,12 +38,13 @@ class BiasLayer(torch.nn.Module):
         return self.alpha * x + self.beta        
 
 class DynamicExpert(nn.Module):
-    def __init__(self, input_size=768, hidden_size=20, total_cls=100, class_per_task=20):
+    def __init__(self, input_size=768, hidden_size=20, total_cls=100, class_per_task=20, device="cpu"):
         super().__init__()
         self.input_size = input_size
         self.hidden_size = hidden_size
         self.total_cls = total_cls
         self.class_per_task = class_per_task
+        self.device = device
         self.gate = None
         self.experts = None
         self.bias_layers = None
@@ -190,4 +192,30 @@ class DynamicExpert(nn.Module):
             expert_outputs = torch.squeeze(expert_outputs)
 
         return expert_outputs, gate_outputs, original_expert_outputs
+
+    def predict(self, x):
+        self.eval()
+        gate_outputs = self.gate(x).cpu()
+        original_gate_outputs = torch.clone(gate_outputs).detach()
+
+        # get top-k using elbow
+        for out in gate_outputs:
+            data = out.numpy()
+            data_rev = np.array([[i, sorted(data)[i]] for i in range(data.shape[0])])
+            rotor = Rotor()
+            rotor.fit_rotate(data_rev)
+            # val = data_rev[rotor.get_elbow_index()][-1]
+            val = data_rev[rotor.get_knee_index()][-1]
+            data[data < val] = 0
+
+        gate_outputs = gate_outputs.to(self.device)
+        gate_outputs_uns = torch.unsqueeze(gate_outputs, 1)
+
+        expert_outputs = [self.experts[i](x) for i in range(self.num_experts)]
+        original_expert_outputs = [torch.clone(e).detach() for e in expert_outputs]
         
+        expert_outputs = torch.stack(expert_outputs, 1)
+        expert_outputs = gate_outputs_uns@expert_outputs
+        expert_outputs = torch.squeeze(expert_outputs)
+
+        return expert_outputs, gate_outputs, original_expert_outputs, original_gate_outputs
