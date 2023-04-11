@@ -662,35 +662,35 @@ class Trainer:
                         if self.metric:
                             self.metric.add_accuracy(subtask, task_accuracy.item())
 
-        if check_gate_train:
-            self.check_gate(train_loaders, f"01_gate_projection_train_{self.mem_size}", f"gate_projection_train_{self.mem_size}")
+        # if check_gate_train:
+        #     self.check_gate(train_loaders, f"01_gate_projection_train_{self.mem_size}", f"gate_projection_train_{self.mem_size}")
 
-        if check_gate_val:
-            self.check_gate(val_loaders, f"02_gate_projection_val_{self.mem_size}", f"gate_projection_val_{self.mem_size}")
+        # if check_gate_val:
+        #     self.check_gate(val_loaders, f"02_gate_projection_val_{self.mem_size}", f"gate_projection_val_{self.mem_size}")
 
-        if check_expert_train:
-            self.check_expert(train_loaders, f"03_train_expert_direct_{self.mem_size}", f"train_expert_direct_{self.mem_size}")
+        # if check_expert_train:
+        #     self.check_expert(train_loaders, f"03_train_expert_direct_{self.mem_size}", f"train_expert_direct_{self.mem_size}")
 
-        if check_expert_val:
-            self.check_expert(val_loaders, f"04_val_expert_direct_{self.mem_size}", f"val_expert_direct_{self.mem_size}")
+        # if check_expert_val:
+        #     self.check_expert(val_loaders, f"04_val_expert_direct_{self.mem_size}", f"val_expert_direct_{self.mem_size}")
 
-        if check_expert_bias_train:
-            self.check_expert_bias(train_loaders, f"05_train_expert_bias_direct_{self.mem_size}", f"train_expert_bias_direct_{self.mem_size}")
+        # if check_expert_bias_train:
+        #     self.check_expert_bias(train_loaders, f"05_train_expert_bias_direct_{self.mem_size}", f"train_expert_bias_direct_{self.mem_size}")
 
-        if check_expert_bias_val:
-            self.check_expert_bias(val_loaders, f"06_val_expert_bias_direct_{self.mem_size}", f"val_expert_bias_direct_{self.mem_size}")
+        # if check_expert_bias_val:
+        #     self.check_expert_bias(val_loaders, f"06_val_expert_bias_direct_{self.mem_size}", f"val_expert_bias_direct_{self.mem_size}")
 
-        if check_expert_gate_train:
-            self.check_expert_gate(train_loaders, f"07_train_gate@expert_{self.mem_size}", f"train_gate@expert_{self.mem_size}")
+        # if check_expert_gate_train:
+        #     self.check_expert_gate(train_loaders, f"07_train_gate@expert_{self.mem_size}", f"train_gate@expert_{self.mem_size}")
 
-        if check_expert_gate_val:
-            self.check_expert_gate(val_loaders, f"08_val_gate@expert_{self.mem_size}", f"val_gate@expert_{self.mem_size}")
+        # if check_expert_gate_val:
+        #     self.check_expert_gate(val_loaders, f"08_val_gate@expert_{self.mem_size}", f"val_gate@expert_{self.mem_size}")
 
-        if check_expert_gate_bias_train:
-            self.check_expert_gate_bias(train_loaders, f"09_train_gate@expert_bias_{self.mem_size}", f"train_gate@expert_bias_{self.mem_size}")
+        # if check_expert_gate_bias_train:
+        #     self.check_expert_gate_bias(train_loaders, f"09_train_gate@expert_bias_{self.mem_size}", f"train_gate@expert_bias_{self.mem_size}")
 
-        if check_expert_gate_bias_val:
-            self.check_expert_gate_bias(val_loaders, f"10_val_gate@expert_bias_{self.mem_size}", f"val_gate@expert_bias_{self.mem_size}")
+        # if check_expert_gate_bias_val:
+        #     self.check_expert_gate_bias(val_loaders, f"10_val_gate@expert_bias_{self.mem_size}", f"val_gate@expert_bias_{self.mem_size}")
 
         # print(f"CLASS_GMM_KEYS: {sorted(self.clsgmm.keys())}")
         # pickle.dump(self.clsgmm, open("expert_clsgmm.pkl", "wb"))

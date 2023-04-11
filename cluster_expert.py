@@ -193,20 +193,26 @@ class DynamicExpert(nn.Module):
 
         return expert_outputs, gate_outputs, original_expert_outputs
 
-    def predict(self, x):
+    def predict(self, x, k=None):
         self.eval()
         gate_outputs = self.gate(x).cpu()
         original_gate_outputs = torch.clone(gate_outputs).detach()
 
-        # get top-k using elbow
-        for out in gate_outputs:
-            data = out.numpy()
-            data_rev = np.array([[i, sorted(data)[i]] for i in range(data.shape[0])])
-            rotor = Rotor()
-            rotor.fit_rotate(data_rev)
-            # val = data_rev[rotor.get_elbow_index()][-1]
-            val = data_rev[rotor.get_knee_index()][-1]
-            data[data < val] = 0
+        if k is None:
+            # get top-k using elbow
+            for out in gate_outputs:
+                data = out.numpy()
+                data_rev = np.array([[i, sorted(data)[i]] for i in range(data.shape[0])])
+                rotor = Rotor()
+                rotor.fit_rotate(data_rev)
+                # val = data_rev[rotor.get_elbow_index()][-1]
+                val = data_rev[rotor.get_elbow_index()][-1]
+                data[data < val] = 0
+        else:
+            # k = 1, no other value
+            k_idx = torch.argmax(gate_outputs, 1)
+            for idx, out in zip(k_idx, gate_outputs):
+                out[out != out[idx.item()]] = 0.0
 
         gate_outputs = gate_outputs.to(self.device)
         gate_outputs_uns = torch.unsqueeze(gate_outputs, 1)
