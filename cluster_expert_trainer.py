@@ -586,6 +586,9 @@ class Trainer:
                                 if len(outputs.size()) == 1:
                                     outputs = outputs.view(-1, 1)
                                 loss = self.criterion(outputs, labels)
+
+                            # if cur_task > 0:
+                            #     loss += self.model.kd_loss(images, gate_outputs)
                             
                             running_train_loss.append(loss.item())
                             
@@ -622,7 +625,7 @@ class Trainer:
                             break
                     print("FINISH STEP 2\n")                    
                 self.model.unfreeze_all()
-                cur_task += 1
+                
                 # UNTIL HERE
                 # """
 
@@ -639,20 +642,23 @@ class Trainer:
                             labels = labels.to(self.device)
 
                             with torch.no_grad():
-                                outputs, gate_outputs, original_expert_outputs, original_gate_outputs = self.model.predict(images)
+                                outputs, gate_outputs, original_expert_outputs, original_gate_outputs = self.model.predict(images, type="logits")
 
                             bias_outputs = []
                             prev = 0
-                            for clust_i in range(cur_task):
-                                num_class = len(self.cluster2finecls[clust_i])
-                                outs = outputs[:, prev:(prev+num_class)]
-                                bias_outputs.append(self.model.bias_forward(clust_i, outs))
-                                prev += num_class
-                            old_cls_outputs = torch.cat(bias_outputs, dim=1)
-                            new_cls_outputs = self.model.bias_forward(clust_i, outputs[:, prev:])  # clust_i and prev should point to the last subtask
-                            pred_all_classes = torch.cat([old_cls_outputs, new_cls_outputs], dim=1)
-                            predicted = torch.argmax(pred_all_classes, 1)
-                            # predicted = torch.argmax(outputs, 1)
+                            if cur_task > 0:
+                                for clust_i in range(cur_task):
+                                    num_class = len(self.cluster2finecls[clust_i])
+                                    outs = outputs[:, prev:(prev+num_class)]
+                                    bias_outputs.append(self.model.bias_forward(clust_i, outs))
+                                    prev += num_class
+                                old_cls_outputs = torch.cat(bias_outputs, dim=1)
+                                new_cls_outputs = self.model.bias_forward(clust_i, outputs[:, prev:])  # clust_i and prev should point to the last subtask
+                                pred_all_classes = torch.cat([old_cls_outputs, new_cls_outputs], dim=1)
+                                predicted = torch.argmax(pred_all_classes, 1)
+                            else:
+                                outputs = outputs.view(-1, 1)
+                                predicted = torch.argmax(outputs, 1)
                             pred_correct += predicted.eq(labels).cpu().sum().float()
                             dataset_len += images.size(0)
 
@@ -661,6 +667,8 @@ class Trainer:
                     
                         if self.metric:
                             self.metric.add_accuracy(subtask, task_accuracy.item())
+
+                cur_task += 1
 
         # if check_gate_train:
         #     self.check_gate(train_loaders, f"01_gate_projection_train_{self.mem_size}", f"gate_projection_train_{self.mem_size}")

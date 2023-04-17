@@ -52,13 +52,16 @@ class DynamicExpert(nn.Module):
         self.expert_classes = []
         self.cossim = {}
         self.old_weight = {} # for weight distance calculation
+        self.old_gate = None
+        self.T = 2
 
     def expand_gmm(self, this_task_classes):
         if not self.experts:
-            gate = nn.Linear(in_features=self.input_size, out_features=1)
-            # gate = nn.Sequential(nn.Linear(in_features=self.input_size, out_features=self.input_size//2),
-            #                     nn.ReLU(),
-            #                     nn.Linear(in_features=self.input_size//2, out_features=1))
+            # gate = nn.Linear(in_features=self.input_size, out_features=1)
+            gate = nn.Sequential(nn.Linear(in_features=self.input_size, out_features=self.input_size//2),
+                                nn.BatchNorm1d(num_features=self.input_size//2, affine=True),
+                                nn.ReLU(),
+                                nn.Linear(in_features=self.input_size//2, out_features=1))
             hidden_size = int((self.hidden_size / self.class_per_task) * len(this_task_classes))
             experts = nn.ModuleList([Expert(input_size=self.input_size, hidden_size=hidden_size, output_size=len(this_task_classes), projected_output_size=len(this_task_classes))])
             self.bias_layers = nn.ModuleList([BiasLayer()])
@@ -66,10 +69,14 @@ class DynamicExpert(nn.Module):
             self.all_classes.extend(sorted(this_task_classes))
             self.expert_classes.append(sorted(this_task_classes))
         else:
-            gate = nn.Linear(in_features=self.input_size, out_features=self.num_experts+1)
-            # gate = nn.Sequential(nn.Linear(in_features=self.input_size, out_features=self.input_size//2),
-            #                     nn.ReLU(),
-            #                     nn.Linear(in_features=self.input_size//2, out_features=self.num_experts+1))
+            self.old_gate = copy.deepcopy(self.gate)
+            self.old_gate.eval()
+
+            # gate = nn.Linear(in_features=self.input_size, out_features=self.num_experts+1)
+            gate = nn.Sequential(nn.Linear(in_features=self.input_size, out_features=self.input_size//2),
+                                nn.BatchNorm1d(num_features=self.input_size//2, affine=True),
+                                nn.ReLU(),
+                                nn.Linear(in_features=self.input_size//2, out_features=self.num_experts+1))
             hidden_size = int((self.hidden_size / self.class_per_task) * len(this_task_classes))
             experts = copy.deepcopy(self.experts)
             experts.append(Expert(input_size=self.input_size, hidden_size=hidden_size, output_size=len(this_task_classes), projected_output_size=len(this_task_classes)))
@@ -108,6 +115,34 @@ class DynamicExpert(nn.Module):
         # print(f"task-{self.num_experts-1} EXPERT_TOTAL_PARAMS: {expert_total_params}")
         bias_total_params = sum(p.numel() for p in self.bias_layers.parameters())
         # print(f"task-{self.num_experts-1} bias_TOTAL_PARAMS: {bias_total_params}")
+
+    def kd_loss(self, x, current_output):
+        """Calculate knowledge distillation loss on gate"""
+        old_output = self.old_gate(x)   # old_output is one unit behind current output
+        t = old_output.size(1)
+        # print(f"CURRENT_OUTPUT[:t].size(): {current_output[:t].size()}")
+        # print(f"OLD_OUTPUT[:t].size(): {old_output[:t].size()}")
+        loss = self.cross_entropy(current_output[:, :t], old_output[:, :t], exp=1.0 / self.T)        
+        return loss
+
+    def cross_entropy(self, outputs, targets, exp=1.0, size_average=True, eps=1e-5):
+        """Calculate cross entropy with temperature scaling"""
+        # print(f"outputs.size(): {outputs.size()}")
+        # print(f"targets.size(): {targets.size()}")
+        out = torch.nn.functional.softmax(outputs, dim=1)
+        tar = torch.nn.functional.softmax(targets, dim=1)
+        if exp != 1:
+            out = out.pow(exp)
+            out = out / out.sum(1).view(-1, 1).expand_as(out)
+            tar = tar.pow(exp)
+            tar = tar / tar.sum(1).view(-1, 1).expand_as(tar)
+        out = out + eps / out.size(1)
+        out = out / out.sum(1).view(-1, 1).expand_as(out)
+        ce = -(tar * out.log()).sum(1)
+        if size_average:
+            ce = ce.mean()
+        return ce
+
 
     def calculate_expert_weight_distance(self):
         # call after subtask
