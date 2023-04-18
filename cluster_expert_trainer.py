@@ -861,7 +861,8 @@ if __name__ == "__main__":
             validation=0.2,
             num_tasks=n_experts,
             expert=True,
-            seed=42)
+            # seed=42)
+            )
     else:
         test_embedding_path = test_path[d]
         # data, task_cla, class_order = get_cifar100_coarse(train_embedding_path, test_embedding_path, None, validation=0.2)
