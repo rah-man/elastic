@@ -657,7 +657,8 @@ class Trainer:
                                 pred_all_classes = torch.cat([old_cls_outputs, new_cls_outputs], dim=1)
                                 predicted = torch.argmax(pred_all_classes, 1)
                             else:
-                                outputs = outputs.view(-1, 1)
+                                if len(outputs.size()) == 1:
+                                    outputs = outputs.view(-1, 1)
                                 predicted = torch.argmax(outputs, 1)
                             pred_correct += predicted.eq(labels).cpu().sum().float()
                             dataset_len += images.size(0)
