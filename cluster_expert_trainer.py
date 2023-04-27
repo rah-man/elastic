@@ -4,6 +4,7 @@ import copy
 import itertools
 import numpy as np
 import pickle
+import random
 import statistics
 import time
 import torch
@@ -45,7 +46,8 @@ class Trainer:
         replay=None,
         metric=None,
         n_task=5,
-        use_bias=True):
+        use_bias=True,
+        predict_type='logits'):
     
         self.criterion = criterion
         self.dataset = dataset
@@ -61,6 +63,7 @@ class Trainer:
         self.metric = metric
         self.n_task = n_task
         self.use_bias = use_bias
+        self.predict_type = predict_type
     
         self.seen_cls = 0
         self.previous_model = None
@@ -609,8 +612,8 @@ class Trainer:
                             # print("outputs.size():", outputs.size())
                             # print("labels.size():", labels.size())
 
-                            # if cur_task > 0 and self.use_bias and len(outputs.size()) != 1:
-                            if cur_task > 0 and len(outputs.size()) != 1:
+                            if cur_task > 0 and self.use_bias and len(outputs.size()) != 1:
+                            # if cur_task > 0 and len(outputs.size()) != 1:
                             # RUN BIAS CORRECTION FOR ALL EXPERTS
                                 bias_outputs = []
                                 prev = 0
@@ -625,10 +628,12 @@ class Trainer:
                                 pred_all_classes = torch.cat([old_cls_outputs, new_cls_outputs], dim=1)
                                 loss = self.criterion(pred_all_classes, labels)
                                 loss += 0.1 * ((self.model.bias_layers[clust_i].beta[0] ** 2) / 2)
+                                predicted = torch.argmax(pred_all_classes, 1)
                             else:
                                 if len(outputs.size()) == 1:
                                     outputs = outputs.view(-1, 1)
                                 loss = self.criterion(outputs, labels)
+                                predicted = torch.argmax(outputs.data, 1)
 
                             # if cur_task > 0:
                             #     loss += self.model.kd_loss(images, gate_outputs)
@@ -647,13 +652,10 @@ class Trainer:
                             loss.backward()
                             gate_optimiser.step()
                             gate_optimiser.zero_grad()
-                            predicted = torch.argmax(pred_all_classes, 1) if cur_task > 0 else torch.argmax(outputs.data, 1)
-                            
+                                                            
                             pred_correct += predicted.eq(labels).cpu().sum().float()
-
                             ypreds.extend(predicted.detach().cpu().tolist())
-                            ytrue.extend(labels.detach().cpu().tolist())
-                            
+                            ytrue.extend(labels.detach().cpu().tolist())                            
                             dataset_len += images.size(0)
 
                         early_stop(loss, self.model)
@@ -685,12 +687,12 @@ class Trainer:
                             labels = labels.to(self.device)
 
                             with torch.no_grad():
-                                outputs, gate_outputs, original_expert_outputs, original_gate_outputs = self.model.predict(images, type="logits")
+                                outputs, gate_outputs, original_expert_outputs, original_gate_outputs = self.model.predict(images, type=self.predict_type)
 
                             bias_outputs = []
                             prev = 0
-                            # if cur_task > 0 and self.use_bias and len(outputs.size()) != 1:
-                            if cur_task > 0 and len(outputs.size()) != 1:
+                            if cur_task > 0 and self.use_bias and len(outputs.size()) != 1:
+                            # if cur_task > 0 and len(outputs.size()) != 1:
                                 for clust_i in range(cur_task):
                                     num_class = len(self.cluster2finecls[clust_i])
                                     outs = outputs[:, prev:(prev+num_class)]
@@ -882,6 +884,7 @@ if __name__ == "__main__":
     parser.add_argument("--wandb_project")
     # parser.add_argument("-se")
     parser.add_argument("-ub", type=str2bool, nargs='?', const=True, default=True)
+    parser.add_argument("-pt", type=str, nargs='?', const='logits', default='logits')
 
     args = parser.parse_args()
 
@@ -898,6 +901,7 @@ if __name__ == "__main__":
     wandb_project = args.wandb_project
     # seed = int(args.se)
     use_bias = args.ub
+    predict_type = args.pt
 
     train_path = ["cifar100_train_embedding.pt", "imagenet1000_train_embedding.pt", "cifar100_coarse_train_embedding_nn.pt"]
     test_path = ["cifar100_test_embedding.pt", "imagenet1000_val_embedding.pt", "cifar100_coarse_test_embedding_nn.pt"]
@@ -910,6 +914,9 @@ if __name__ == "__main__":
     random_replay = RandomReplay(mem_size=mem_size)
     criterion = nn.CrossEntropyLoss()
     device = "cuda" if torch.cuda.is_available() else "cpu"
+
+    # random_seed = int(random.random() * 100)
+
     if d != 2:
         data, task_cla, class_order = get_data(
             train_embedding_path, 
@@ -917,7 +924,7 @@ if __name__ == "__main__":
             validation=0.2,
             num_tasks=n_experts,
             expert=True,
-            # seed=42,
+            # seed=random_seed,
             )
     else:
         test_embedding_path = test_path[d]
@@ -934,7 +941,9 @@ if __name__ == "__main__":
         replay=random_replay, 
         metric=met,
         n_task=n_experts,
-        use_bias=use_bias)
+        use_bias=use_bias,
+        predict_type=predict_type,
+        )
 
     # for wandb
     config = {
@@ -968,7 +977,7 @@ if __name__ == "__main__":
         - train loss?
     """
     ##############################################
-
+    # print("Random seed:", random_seed)
     walltime_start, processtime_start = time.time(), time.process_time()
     # train_loss1, train_loss2, val_loss, model = trainer.train_loop(steps=steps)
     _, _ = trainer.train_loop(steps=steps)

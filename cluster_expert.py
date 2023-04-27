@@ -101,13 +101,13 @@ class DynamicExpert(nn.Module):
 
     def expand_gmm(self, this_task_classes):
         if not self.experts:
-            # gate = nn.Linear(in_features=self.input_size, out_features=1)
-            gate = nn.Sequential(nn.Linear(in_features=self.input_size, out_features=self.input_size//2),
-                                # nn.BatchNorm1d(num_features=self.input_size//2, affine=True),
-                                nn.InstanceNorm1d(num_features=self.input_size//2),
-                                nn.ReLU(),
-                                # SelfAttention(dim=self.input_size//2),
-                                nn.Linear(in_features=self.input_size//2, out_features=1))
+            gate = nn.Linear(in_features=self.input_size, out_features=1)
+            # gate = nn.Sequential(nn.Linear(in_features=self.input_size, out_features=self.input_size//2),
+            #                     # nn.BatchNorm1d(num_features=self.input_size//2, affine=True),
+            #                     nn.InstanceNorm1d(num_features=self.input_size//2),
+            #                     nn.ReLU(),
+            #                     # SelfAttention(dim=self.input_size//2),
+            #                     nn.Linear(in_features=self.input_size//2, out_features=1))
             # gate = GateA(input_size=self.input_size, output_size=1)
             # gate = GateB(input_size=self.input_size, output_size=1)
             hidden_size = int((self.hidden_size / self.class_per_task) * len(this_task_classes))
@@ -120,16 +120,16 @@ class DynamicExpert(nn.Module):
             self.all_classes.extend(sorted(this_task_classes))
             self.expert_classes.append(sorted(this_task_classes))
         else:
-            self.old_gate = copy.deepcopy(self.gate)
-            self.old_gate.eval()
+            # self.old_gate = copy.deepcopy(self.gate)
+            # self.old_gate.eval()
 
-            # gate = nn.Linear(in_features=self.input_size, out_features=self.num_experts+1)
-            gate = nn.Sequential(nn.Linear(in_features=self.input_size, out_features=self.input_size//2),
-                                # nn.BatchNorm1d(num_features=self.input_size//2, affine=True),
-                                nn.InstanceNorm1d(num_features=self.input_size//2),
-                                nn.ReLU(),
-                                # SelfAttention(dim=self.input_size//2),
-                                nn.Linear(in_features=self.input_size//2, out_features=self.num_experts+1))
+            gate = nn.Linear(in_features=self.input_size, out_features=self.num_experts+1)
+            # gate = nn.Sequential(nn.Linear(in_features=self.input_size, out_features=self.input_size//2),
+            #                     # nn.BatchNorm1d(num_features=self.input_size//2, affine=True),
+            #                     nn.InstanceNorm1d(num_features=self.input_size//2),
+            #                     nn.ReLU(),
+            #                     # SelfAttention(dim=self.input_size//2),
+            #                     nn.Linear(in_features=self.input_size//2, out_features=self.num_experts+1))
             # gate = GateA(input_size=self.input_size, output_size=self.num_experts+1)
             # gate = GateB(input_size=self.input_size, output_size=self.num_experts+1)
             
