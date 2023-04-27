@@ -5,6 +5,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from kneebow.rotor import Rotor
+from self_attention_cv import MultiHeadSelfAttention, SelfAttention
 from torch.distributions.normal import Normal
 
 class Expert(nn.Module):
@@ -39,8 +40,48 @@ class BiasLayer(torch.nn.Module):
     def forward(self, x):
         return self.alpha * x + self.beta        
 
+class GateA(nn.Module):
+    def __init__(self, input_size=768, output_size=1):
+        super().__init__()
+        self.fc1 = nn.Linear(in_features=input_size, out_features=input_size//2)
+        # self.norm = nn.InstanceNorm1d(num_features=input_size//2)
+        # self.relu = nn.ReLU()
+        self.attention = SelfAttention(dim=input_size//2)
+        # self.attention = MultiHeadSelfAttention(dim=input_size//2)
+        self.fc2 = nn.Linear(in_features=input_size//2, out_features=output_size)
+
+    def forward(self, x):
+        out = self.fc1(x)
+        # out = self.norm(out)
+        # out = self.relu(out)
+        out = torch.unsqueeze(out, 1)
+        out = self.attention(out)
+        out = torch.squeeze(out)
+        out = self.fc2(out)        
+        return out
+
+class GateB(nn.Module):
+    def __init__(self, input_size=768, output_size=1):
+        super().__init__()
+        # self.attention = SelfAttention(dim=input_size)
+        self.att1 = SelfAttention(dim=input_size)
+        self.fc1 = nn.Linear(in_features=input_size, out_features=input_size//2)
+        self.att2 = SelfAttention(dim=input_size//2)
+        self.fc2 = nn.Linear(in_features=input_size//2, out_features=output_size)
+
+    def forward(self, x):
+        out = torch.unsqueeze(x, 1)
+        out = self.att1(out)
+        out = torch.squeeze(out)
+        out = self.fc1(out)
+        out = torch.unsqueeze(out, 1)
+        out = self.att2(out)
+        out = torch.squeeze(out)
+        out = self.fc2(out)        
+        return out
+
 class DynamicExpert(nn.Module):
-    def __init__(self, input_size=768, hidden_size=20, total_cls=100, class_per_task=20, device="cpu"):
+    def __init__(self, input_size=768, hidden_size=20, total_cls=100, class_per_task=20, device="cpu", use_bias=True):
         super().__init__()
         self.input_size = input_size
         self.hidden_size = hidden_size
@@ -56,33 +97,62 @@ class DynamicExpert(nn.Module):
         self.old_weight = {} # for weight distance calculation
         self.old_gate = None
         self.T = 2
+        self.use_bias = use_bias
 
     def expand_gmm(self, this_task_classes):
         if not self.experts:
-            gate = nn.Linear(in_features=self.input_size, out_features=1)
-            # gate = nn.Sequential(nn.Linear(in_features=self.input_size, out_features=self.input_size//2),
-            #                     nn.BatchNorm1d(num_features=self.input_size//2, affine=True),
-            #                     nn.ReLU(),
-            #                     nn.Linear(in_features=self.input_size//2, out_features=1))
+            # gate = nn.Linear(in_features=self.input_size, out_features=1)
+            gate = nn.Sequential(nn.Linear(in_features=self.input_size, out_features=self.input_size//2),
+                                # nn.BatchNorm1d(num_features=self.input_size//2, affine=True),
+                                nn.InstanceNorm1d(num_features=self.input_size//2),
+                                nn.ReLU(),
+                                # SelfAttention(dim=self.input_size//2),
+                                nn.Linear(in_features=self.input_size//2, out_features=1))
+            # gate = GateA(input_size=self.input_size, output_size=1)
+            # gate = GateB(input_size=self.input_size, output_size=1)
             hidden_size = int((self.hidden_size / self.class_per_task) * len(this_task_classes))
             experts = nn.ModuleList([Expert(input_size=self.input_size, hidden_size=hidden_size, output_size=len(this_task_classes), projected_output_size=len(this_task_classes))])
-            self.bias_layers = nn.ModuleList([BiasLayer()])
+
+            if self.use_bias:
+                self.bias_layers = nn.ModuleList([BiasLayer()])
+
             self.num_experts = len(experts)
             self.all_classes.extend(sorted(this_task_classes))
             self.expert_classes.append(sorted(this_task_classes))
         else:
-            # self.old_gate = copy.deepcopy(self.gate)
-            # self.old_gate.eval()
+            self.old_gate = copy.deepcopy(self.gate)
+            self.old_gate.eval()
 
-            gate = nn.Linear(in_features=self.input_size, out_features=self.num_experts+1)
-            # gate = nn.Sequential(nn.Linear(in_features=self.input_size, out_features=self.input_size//2),
-            #                     nn.BatchNorm1d(num_features=self.input_size//2, affine=True),
-            #                     nn.ReLU(),
-            #                     nn.Linear(in_features=self.input_size//2, out_features=self.num_experts+1))
+            # gate = nn.Linear(in_features=self.input_size, out_features=self.num_experts+1)
+            gate = nn.Sequential(nn.Linear(in_features=self.input_size, out_features=self.input_size//2),
+                                # nn.BatchNorm1d(num_features=self.input_size//2, affine=True),
+                                nn.InstanceNorm1d(num_features=self.input_size//2),
+                                nn.ReLU(),
+                                # SelfAttention(dim=self.input_size//2),
+                                nn.Linear(in_features=self.input_size//2, out_features=self.num_experts+1))
+            # gate = GateA(input_size=self.input_size, output_size=self.num_experts+1)
+            # gate = GateB(input_size=self.input_size, output_size=self.num_experts+1)
+            
+            # copy fc1, attention, and fc2 from old gate
+            # with torch.no_grad():
+            #     gate.fc1.weight.data = self.old_gate.fc1.weight
+            #     gate.attention.to_qvk.data = self.old_gate.attention.to_qvk.weight
+            #     # gate.attention.W_0.data = self.old_gate.attention.W_0.weight
+            #     # gate.att1.to_qvk.data = self.old_gate.att1.to_qvk.weight
+            #     # gate.att1.W_0.data = self.old_gate.att1.W_0.weight
+            #     # gate.fc1.weight.data = self.old_gate.fc1.weight
+            #     # gate.att2.to_qvk.data = self.old_gate.att2.to_qvk.weight
+            #     # gate.att2.W_0.data = self.old_gate.att2.W_0.weight                
+            #     old_fc2_size = self.old_gate.fc2.weight.size(0)
+            #     gate.fc2.weight.data[:old_fc2_size, :] = self.old_gate.fc2.weight
+
             hidden_size = int((self.hidden_size / self.class_per_task) * len(this_task_classes))
             experts = copy.deepcopy(self.experts)
             experts.append(Expert(input_size=self.input_size, hidden_size=hidden_size, output_size=len(this_task_classes), projected_output_size=len(this_task_classes)))
-            self.bias_layers.append(BiasLayer())
+
+            if self.use_bias:
+                self.bias_layers.append(BiasLayer())
+
             self.num_experts = len(experts)
             self.all_classes.extend(sorted(this_task_classes))
             self.expert_classes.append(sorted(this_task_classes))
@@ -115,7 +185,8 @@ class DynamicExpert(nn.Module):
         # print(f"task-{self.num_experts-1} GATE_TOTAL_PARAMS: {gate_total_params}")
         expert_total_params = sum(p.numel() for p in experts.parameters())
         # print(f"task-{self.num_experts-1} EXPERT_TOTAL_PARAMS: {expert_total_params}")
-        bias_total_params = sum(p.numel() for p in self.bias_layers.parameters())
+        if self.use_bias:
+            bias_total_params = sum(p.numel() for p in self.bias_layers.parameters())
         # print(f"task-{self.num_experts-1} bias_TOTAL_PARAMS: {bias_total_params}")
 
     def kd_loss(self, x, current_output):

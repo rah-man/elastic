@@ -15,6 +15,8 @@ import wandb
 
 from collections import Counter
 from matplotlib import pyplot as plt
+from pydpp.dpp import DPP
+from sklearn.metrics import accuracy_score, silhouette_score, calinski_harabasz_score, davies_bouldin_score, ConfusionMatrixDisplay, confusion_matrix, classification_report
 from torch.utils.data import DataLoader
 from torchvision.models.feature_extraction import create_feature_extractor
 
@@ -23,7 +25,6 @@ from earlystopping import EarlyStopping
 from cluster_expert import DynamicExpert
 from mets import Metrics2
 from replay import RandomReplay
-from sklearn.metrics import accuracy_score, silhouette_score, calinski_harabasz_score, davies_bouldin_score, ConfusionMatrixDisplay, confusion_matrix, classification_report
 
 WEIGHT_DECAY = 5e-4
 
@@ -43,7 +44,8 @@ class Trainer:
         device="cpu",        
         replay=None,
         metric=None,
-        n_task=5):
+        n_task=5,
+        use_bias=True):
     
         self.criterion = criterion
         self.dataset = dataset
@@ -58,6 +60,7 @@ class Trainer:
         self.transform = None
         self.metric = metric
         self.n_task = n_task
+        self.use_bias = use_bias
     
         self.seen_cls = 0
         self.previous_model = None
@@ -82,20 +85,21 @@ class Trainer:
         self.cluster2rawcls = {}
         self.finecls2cluster = {}
         self.cluster2finecls = {}
-        self.clsgmm = {}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
+        self.clsgmm = {}    # dictionary containing the class gmm
         self.buffer_x = {}  # {0: [], 1: []}
         self.buffer_y = {}  # {0: [0, 0, 0, 0, 0], 1: [1, 1, 1, 1, 1]}
         self.buffer = {}    # {"x": [], "y": []}
         self.fisher = {}    # {n: p} for n is the number of trainable named_parameters() of the gate and p is the torch.zeros
         self.alpha = 0.5    # hardcode for fisher
         self.ewc_lamb = 5000
+        self.clsdata = {}  # dictionary contianing raw/feature for each class; for debugging against self.clsgmm only
 
         # if "ordered" in self.dataset:
         #     self.subclass_mapper = self.dataset["ordered"]
 
         hidden_size = int(1000 / self.n_task)
         class_per_task = int(self.total_cls / self.n_task)
-        self.model = DynamicExpert(hidden_size=hidden_size, class_per_task=class_per_task, device=self.device)
+        self.model = DynamicExpert(hidden_size=hidden_size, class_per_task=class_per_task, device=self.device, use_bias=self.use_bias)
     
     def split2subtask(self, x, y, cls2cluster_):
         # split original dataset into sub-tasks dataset
@@ -108,8 +112,20 @@ class Trainer:
             subtask[clust] = {"x": x_, "y": y_}
         return subtask
 
+    def get_clsdata(self, x, y, cls2cluster_):
+        # gmm dictionary uses raw class, i.e. cls_ not mapped class, i.e. self.cls2idx[cls_]
+        clsdata = {}
+        for clust in sorted(set(cls2cluster_.values())):            
+            for cls_ in self.cluster2rawcls[clust]:
+                x_ = [x[y == self.cls2idx[cls_]]]
+                clsdata[cls_] = x_
+        return clsdata
+
     def update_clsgmm(self, clsgmm_):
         self.clsgmm = {**self.clsgmm, **clsgmm_}
+
+    def update_clsdata(self, clsdata_):        
+        self.clsdata = {**self.clsdata, **clsdata_}
 
     def update_cls2cluster(self, cls2cluster_):
         self.rawcls2cluster = {**self.rawcls2cluster, **cls2cluster_}
@@ -162,20 +178,23 @@ class Trainer:
             x_t = np.array(x)
             y_t = np.array(y)
 
-
+        buffer_empty = True
         # if buffer not empty, reduce buffer to current size
         if self.buffer_x:
+            buffer_empty = False
             # for existing buffer
             for y_, members in self.buffer_x.items():
                 self.buffer_x[y_] = self.populate_buffer(members, sample_per_class)
             for y_, members in self.buffer_y.items():
-                self.buffer_y[y_] = self.populate_buffer(members, sample_per_class)
+                # self.buffer_y[y_] = self.populate_buffer(members, sample_per_class)   # me being stupid to pick randomly class labels WTH
+                self.buffer_y[y_] = np.array([y_ for _ in range(sample_per_class)])
 
             # for new buffer
             class_data = self.dataset_by_class(x, y) if all else self.dataset_by_class(x_t, y_t)
             for label, dataset in class_data.items():
                 self.buffer_x[label] = self.populate_buffer(dataset["x"], sample_per_class)
-                self.buffer_y[label] = self.populate_buffer(dataset["y"], sample_per_class)
+                # self.buffer_y[label] = self.populate_buffer(dataset["y"], sample_per_class)   # me being stupid to pick randomly class labels WTH
+                self.buffer_y[label] = np.array([label for _ in range(sample_per_class)])
         else:
             class_data = self.dataset_by_class(x, y) if all else self.dataset_by_class(x_t, y_t)
             for label, dataset in class_data.items():
@@ -188,6 +207,16 @@ class Trainer:
 
         x_ = [item for sublist in x_ for item in sublist]
         y_ = [item for sublist in y_ for item in sublist]
+
+        if not buffer_empty:
+            ##loop for every class, map to raw class, generate 100 of them each using GMM
+            for cls_ in np.unique(y_):
+                raw_cls = self.idx2cls[cls_]
+                gen_x = self.clsgmm[raw_cls].sample(100)    # hard code
+                gen_y = [cls_ for _ in range(100)]
+                x_.extend(np.float32(gen_x[0]))
+                y_.extend(gen_y)
+            pass
         
         print(f"\tGENERATING UNIFORM LOADER FOR STEP 2")
         print(f"\tBUFFER_CLASS: {Counter(y_)}")
@@ -199,8 +228,15 @@ class Trainer:
         return dataloader
 
     def populate_buffer(self, members, sample_per_class):
+        # standard random buffer
         members = np.random.permutation(members)
         members = members[:sample_per_class]
+
+        # use DPP 'rbf' for random buffer
+        # dpp = DPP(members)
+        # dpp.compute_kernel()
+        # samples = dpp.sample_k(sample_per_class)
+        # members = members[samples]
         return members
 
     def dataset_by_class(self, x, y):
@@ -443,6 +479,9 @@ class Trainer:
             subtask_train = self.split2subtask(x, y, cls2cluster_)
             subtask_val = self.split2subtask(xval, yval, cls2cluster_)
 
+            clsdata_ = self.get_clsdata(x, y, cls2cluster_)
+            self.update_clsdata(clsdata_)
+
             # create loader for Step 2
             # only when Step 2 is done after all sub-tasks haves been trained
             # otherwise go to TRAIN_STEP_2_PER_SUBTASK block
@@ -566,8 +605,12 @@ class Trainer:
                             labels = labels.to(self.device)
                             
                             outputs, gate_outputs, original_expert_outputs = self.model(images, train_step=2)
+                            # print("gate_outputs.size():", gate_outputs.size())
+                            # print("outputs.size():", outputs.size())
+                            # print("labels.size():", labels.size())
 
-                            if cur_task > 0:
+                            # if cur_task > 0 and self.use_bias and len(outputs.size()) != 1:
+                            if cur_task > 0 and len(outputs.size()) != 1:
                             # RUN BIAS CORRECTION FOR ALL EXPERTS
                                 bias_outputs = []
                                 prev = 0
@@ -646,7 +689,8 @@ class Trainer:
 
                             bias_outputs = []
                             prev = 0
-                            if cur_task > 0:
+                            # if cur_task > 0 and self.use_bias and len(outputs.size()) != 1:
+                            if cur_task > 0 and len(outputs.size()) != 1:
                                 for clust_i in range(cur_task):
                                     num_class = len(self.cluster2finecls[clust_i])
                                     outs = outputs[:, prev:(prev+num_class)]
@@ -717,6 +761,7 @@ class Trainer:
         # print("done saving train_loaders to 'train_loaders_25000.pt'")        
         # exit()
         # return self.train_loss1, self.train_loss2, self.val_loss, self.model
+        return self.clsgmm, self.clsdata
 
     def test_loop(self):
         self.model.to(self.device)
@@ -816,32 +861,43 @@ class Trainer:
         for name, param in self.model.named_parameters():
             print(name, param.requires_grad)
     
+def str2bool(s):
+    if isinstance(s, bool):
+        return s
+    if s.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif s.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
 
 if __name__ == "__main__":        
     parser = argparse.ArgumentParser()
-    parser.add_argument("-d")
-    parser.add_argument("-b", "--batch")
-    parser.add_argument("-s", "--steps")
-    parser.add_argument("-m", "--memory")
-    parser.add_argument("-e", "--epochs")
-    parser.add_argument("-n", "--n_experts")
+    parser.add_argument("-d", type=int)
+    parser.add_argument("-b", "--batch", type=int)
+    parser.add_argument("-s", "--steps", type=int)
+    parser.add_argument("-m", "--memory", type=int)
+    parser.add_argument("-e", "--epochs", type=int)
+    parser.add_argument("-n", "--n_experts", type=int)
     # parser.add_argument("-k")
     parser.add_argument("-p", "--pickle")
     parser.add_argument("--wandb_project")
+    # parser.add_argument("-se")
+    parser.add_argument("-ub", type=str2bool, nargs='?', const=True, default=True)
 
     args = parser.parse_args()
 
     # d = 0/cifar-100 & 1/imagenet-1000 & 2/cifar100-coarse
-    d = int(args.d)
-    batch = int(args.batch)
+    d = args.d
+    batch = args.batch
     # n_class = int(args.n_class)
-    steps = int(args.steps)
-    mem_size = int(args.memory)
-    epochs = int(args.epochs)
-    n_experts = int(args.n_experts)
+    steps = args.steps
+    mem_size = args.memory
+    epochs = args.epochs
+    n_experts = args.n_experts
     # k = int(args.k)
     # pickle_file = args.pickle 
     wandb_project = args.wandb_project
+    # seed = int(args.se)
+    use_bias = args.ub
 
     train_path = ["cifar100_train_embedding.pt", "imagenet1000_train_embedding.pt", "cifar100_coarse_train_embedding_nn.pt"]
     test_path = ["cifar100_test_embedding.pt", "imagenet1000_val_embedding.pt", "cifar100_coarse_test_embedding_nn.pt"]
@@ -861,7 +917,7 @@ if __name__ == "__main__":
             validation=0.2,
             num_tasks=n_experts,
             expert=True,
-            # seed=42)
+            # seed=42,
             )
     else:
         test_embedding_path = test_path[d]
@@ -877,7 +933,8 @@ if __name__ == "__main__":
         device=device, 
         replay=random_replay, 
         metric=met,
-        n_task=n_experts)
+        n_task=n_experts,
+        use_bias=use_bias)
 
     # for wandb
     config = {
@@ -914,7 +971,7 @@ if __name__ == "__main__":
 
     walltime_start, processtime_start = time.time(), time.process_time()
     # train_loss1, train_loss2, val_loss, model = trainer.train_loop(steps=steps)
-    trainer.train_loop(steps=steps)
+    _, _ = trainer.train_loop(steps=steps)
     walltime_end, processtime_end = time.time(), time.process_time()
     elapsed_walltime = walltime_end - walltime_start
     elapsed_processtime = processtime_end - processtime_start
@@ -949,6 +1006,8 @@ if __name__ == "__main__":
     # to_save = {"data": data, "task_cla": task_cla, "class_order": class_order}
     # pickle.dump(to_save, open(f"{model_path}.dat", "wb"))
 
+    # torch.save(clsgmm, "clsgmm.pkl")
+    # torch.save(clsdata, "clsdata.pkl")
 
 # l = nn.Linear(2, 4)
 # w1 = weight_norm(l, name="weight")
