@@ -7,4 +7,3 @@ F_MNIST_data/
 __pycache__/
 .DS_Store
 CIFAR_data/
-mammoth/
