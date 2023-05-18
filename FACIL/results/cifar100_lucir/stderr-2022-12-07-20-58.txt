@@ -1,0 +1,2 @@
+/home/fr27/Documents/pyscript/FACIL/src/approach/lucir.py:47: UserWarning: Warning: LUCIR is expected to use exemplars. Check documentation.
+  warnings.warn("Warning: LUCIR is expected to use exemplars. Check documentation.")

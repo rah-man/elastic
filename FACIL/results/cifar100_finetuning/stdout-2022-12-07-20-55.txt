@@ -1,0 +1,20 @@
+	dataset_config: {'path': '../data/cifar100', 'resize': None, 'pad': 4, 'crop': 32, 'flip': True, 'normalize': ((0.5071, 0.4866, 0.4409), (0.2009, 0.1984, 0.2023)), 'class_order': None, 'extend_channel': None}
+Downloading https://www.cs.toronto.edu/~kriz/cifar-100-python.tar.gz to ../data/cifar100/cifar-100-python.tar.gz
+Extracting ../data/cifar100/cifar-100-python.tar.gz to ../data/cifar100
+Files already downloaded and verified
+CLASS_ORDER:  [73, 97, 69, 6, 95, 78, 88, 52, 26, 98, 9, 45, 66, 31, 67, 74, 55, 64, 14, 65, 15, 13, 22, 24, 41, 16, 50, 91, 57, 33, 36, 56, 3, 84, 17, 44, 61, 4, 47, 49, 30, 21, 5, 63, 1, 23, 83, 53, 94, 54, 34, 81, 28, 79, 90, 87, 2, 92, 32, 86, 46, 10, 12, 89, 11, 20, 19, 68, 43, 7, 60, 77, 42, 75, 0, 62, 76, 37, 39, 70, 71, 58, 93, 29, 96, 80, 27, 99, 51, 38, 18, 72, 25, 35, 40, 48, 82, 85, 59, 8]
+************************************************************************************************************
+Task  0
+************************************************************************************************************
+| Epoch   1, time=  6.3s | Train: skip eval | Valid: time=  0.6s loss=2.657, TAw acc= 19.1% | *
+| Epoch   2, time=  4.5s | Train: skip eval | Valid: time=  0.6s loss=2.922, TAw acc= 18.8% |
+| Epoch   3, time=  4.5s | Train: skip eval | Valid: time=  0.5s loss=2.487, TAw acc= 26.7% | *
+| Epoch   4, time=  4.4s | Train: skip eval | Valid: time=  0.5s loss=2.792, TAw acc= 25.8% |
+| Epoch   5, time=  4.5s | Train: skip eval | Valid: time=  0.6s loss=2.312, TAw acc= 31.4% | *
+| Epoch   6, time=  4.5s | Train: skip eval | Valid: time=  0.6s loss=2.342, TAw acc= 31.8% |
+| Epoch   7, time=  4.5s | Train: skip eval | Valid: time=  0.5s loss=2.229, TAw acc= 34.9% | *
+| Epoch   8, time=  4.5s | Train: skip eval | Valid: time=  0.5s loss=2.590, TAw acc= 29.5% |
+| Epoch   9, time=  4.5s | Train: skip eval | Valid: time=  0.5s loss=2.149, TAw acc= 38.6% | *
+| Epoch  10, time=  4.4s | Train: skip eval | Valid: time=  0.5s loss=2.156, TAw acc= 37.7% |
+| Epoch  11, time=  4.4s | Train: skip eval | Valid: time=  0.6s loss=1.942, TAw acc= 41.4% | *
+| Epoch  12, time=  4.5s | Train: skip eval | Valid: time=  0.6s loss=1.971, TAw acc= 41.6% |

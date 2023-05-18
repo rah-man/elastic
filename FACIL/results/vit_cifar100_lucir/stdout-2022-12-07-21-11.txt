@@ -1,0 +1,1 @@
+	dataset_config: {'path': 'cifar100_train_embedding.pt', 'path_test': 'cifar100_test_embedding.pt', 'resize': None, 'pad': None, 'crop': None, 'normalize': None, 'class_order': None, 'extend_channel': None, 'flip': False}

@@ -1,0 +1,18 @@
+Traceback (most recent call last):
+  File "main_incremental.py", line 300, in <module>
+    main()
+  File "main_incremental.py", line 195, in main
+    trn_loader, val_loader, tst_loader, taskcla = get_loaders(args.datasets, args.num_tasks, args.nc_first_task,
+  File "/home/fr27/Documents/pyscript/FACIL/src/datasets/data_loader.py", line 42, in get_loaders
+    trn_dset, val_dset, tst_dset, curtaskcla = get_datasets(cur_dataset, dc['path'], num_tasks, nc_first_task,
+  File "/home/fr27/Documents/pyscript/FACIL/src/datasets/data_loader.py", line 89, in get_datasets
+    all_data, taskcla, class_indices = base.get_data(
+  File "/home/fr27/Documents/pyscript/FACIL/src/datasets/base.py", line 110, in get_data
+    trainset = torch.load(train_embedding_path)
+  File "/home/fr27/pytorch/lib/python3.8/site-packages/torch/serialization.py", line 699, in load
+    with _open_file_like(f, 'rb') as opened_file:
+  File "/home/fr27/pytorch/lib/python3.8/site-packages/torch/serialization.py", line 230, in _open_file_like
+    return _open_file(name_or_buffer, mode)
+  File "/home/fr27/pytorch/lib/python3.8/site-packages/torch/serialization.py", line 211, in __init__
+    super(_open_file, self).__init__(open(name, mode))
+FileNotFoundError: [Errno 2] No such file or directory: 'cifar100_train_embedding.pt'
