@@ -1,8 +1,8 @@
 *.pt
 *.pth
 *.pkl
-.zip
-.mat
+*.zip
+*.mat
 F_MNIST_data/
 __pycache__/
 .DS_Store
