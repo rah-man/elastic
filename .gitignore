@@ -1,6 +1,10 @@
+*.pt
+*.pth
+*.pkl
+.zip
+.mat
 F_MNIST_data/
 __pycache__/
 .DS_Store
 CIFAR_data/
-FACIL/
 mammoth/
